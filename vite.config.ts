@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 
 import { renderTimeline, getRenderProgress } from './render-service.js';
 import os from 'os';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -44,9 +45,12 @@ export default defineConfig(({ mode }) => {
                   if (!body) throw new Error('Empty request body');
 
                   const data = JSON.parse(body);
-                  const downloadsDir = path.join(os.homedir(), 'Downloads');
+                  const rendersDir = path.join(__dirname, 'public', 'renders');
+                  if (!fs.existsSync(rendersDir)) fs.mkdirSync(rendersDir, { recursive: true });
+
                   const timestamp = Date.now();
-                  const finalPath = path.join(downloadsDir, `render_${timestamp}.mp4`);
+                  const fileName = `render_${timestamp}.mp4`;
+                  const finalPath = path.join(rendersDir, fileName);
 
                   console.log(`[API] Starting automated render to: ${finalPath}`);
 
@@ -55,7 +59,7 @@ export default defineConfig(({ mode }) => {
                   });
 
                   res.writeHead(200, { 'Content-Type': 'application/json' });
-                  res.end(JSON.stringify({ success: true, path: finalPath }));
+                  res.end(JSON.stringify({ success: true, path: `/renders/${fileName}` }));
                 } catch (err) {
                   console.error('[API] Render Error (JSON/FS):', err);
                   res.writeHead(500, { 'Content-Type': 'application/json' });

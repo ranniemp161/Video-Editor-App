@@ -48,9 +48,16 @@ export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, rend
           <MenuIcon className="w-5 h-5" />
         </button>
         <div className="h-4 w-[1px] bg-[#333]"></div>
-        <span className="text-xs text-gray-500 font-medium tracking-wide">
+        <span className="text-xs text-gray-500 font-medium tracking-wide flex items-center gap-2">
           {renderStatus === 'success' && lastRenderPath ? (
-            <span className="text-green-500 animate-pulse">Saved to: {lastRenderPath.split('\\').pop()}</span>
+            <a
+              href={lastRenderPath}
+              download
+              className="text-green-400 hover:text-green-300 transition-colors flex items-center gap-1.5 animate-bounce-short"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>
+              DOWNLOAD FINAL MP4
+            </a>
           ) : 'Menu'}
         </span>
       </div>
