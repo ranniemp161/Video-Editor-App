@@ -1,0 +1,144 @@
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 222.125
+outpoint 224.54166666666666
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 246.08333333333334
+outpoint 250.79166666666669
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1102.5833333333333
+outpoint 1107.5
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1107.5
+outpoint 1114.8333333333335
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1114.8333333333333
+outpoint 1123.2916666666665
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1123.2916666666667
+outpoint 1129.0833333333335
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1129.0833333333333
+outpoint 1136.1666666666665
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1136.1666666666667
+outpoint 1148.7916666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1148.7916666666667
+outpoint 1159.3750000000002
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1159.375
+outpoint 1165.875
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1165.875
+outpoint 1178.5416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1178.5416666666667
+outpoint 1186.4166666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1186.4166666666667
+outpoint 1201.0000000000002
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1201
+outpoint 1205.9583333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1205.9583333333333
+outpoint 1212.0416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1212.0416666666667
+outpoint 1227.5416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1227.5416666666667
+outpoint 1246.125
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1246.125
+outpoint 1255.5
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1255.5
+outpoint 1260.5000000000002
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1260.5
+outpoint 1265.7916666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1265.7916666666667
+outpoint 1284.4583333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1284.4583333333333
+outpoint 1295.5
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1295.5
+outpoint 1319.9583333333335
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1319.9583333333333
+outpoint 1328.4166666666665
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1328.4166666666667
+outpoint 1337.7916666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1337.7916666666667
+outpoint 1350.875
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1350.875
+outpoint 1365.3333333333335
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1365.3333333333333
+outpoint 1374.791666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1374.7916666666667
+outpoint 1381.3333333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1381.3333333333333
+outpoint 1401.833333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1401.8333333333333
+outpoint 1411.8333333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1411.8333333333333
+outpoint 1422.875
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1422.875
+outpoint 1431.75
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1431.75
+outpoint 1442.5416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1442.5416666666667
+outpoint 1451.5416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1451.5416666666667
+outpoint 1461.041666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1461.0416666666667
+outpoint 1470
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1470
+outpoint 1479.5416666666665
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1479.5416666666667
+outpoint 1486.875
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1486.875
+outpoint 1493.625
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1493.625
+outpoint 1499.5416666666667
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1499.5416666666667
+outpoint 1506
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1506
+outpoint 1514.4583333333335
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1514.4583333333333
+outpoint 1520.5
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1520.5
+outpoint 1527.0833333333333
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1527.0833333333333
+outpoint 1533.6666666666665
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1533.6666666666667
+outpoint 1542.625
+file 'C:\Users\USER\OneDrive\Desktop\Antigravity project\claude project rannie\my-video\public\main-video.mp4'
+inpoint 1542.625
+outpoint 1546.613991

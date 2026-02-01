@@ -32,7 +32,10 @@ const App: React.FC = () => {
     selectedClipIds,
     onSelectClip,
     selectAllClips,
-    exportTimeline,
+    renderToMP4,
+    renderStatus,
+    renderProgress,
+    lastRenderPath,
     isMagnetic,
     setIsMagnetic,
     toggleTrackMute,
@@ -168,7 +171,13 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen bg-[#0f0f0f] flex flex-col font-sans text-gray-200 overflow-hidden">
-      <Header onImportClick={handleFileChange} onExport={exportTimeline} />
+      <Header
+        onImportClick={handleFileChange}
+        renderToMP4={renderToMP4}
+        renderStatus={renderStatus}
+        renderProgress={renderProgress}
+        lastRenderPath={lastRenderPath}
+      />
 
       <div className="flex-grow flex overflow-hidden">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />

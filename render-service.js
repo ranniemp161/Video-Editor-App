@@ -1,12 +1,15 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
 /**
  * render-service.js
  * 
- * Logic to render a timeline JSON to MP4.
+ * Logic to render a timeline JSON to MP4 with progress tracking.
  */
+
+let currentProgress = 0;
+let isRendering = false;
 
 const searchDirs = [
     '.',
@@ -26,6 +29,10 @@ function findFile(filename) {
     return filename;
 }
 
+export function getRenderProgress() {
+    return { progress: currentProgress, isRendering };
+}
+
 export function renderTimeline(timelineData, outputFile) {
     return new Promise((resolve, reject) => {
         const { tracks } = timelineData.timeline;
@@ -37,6 +44,9 @@ export function renderTimeline(timelineData, outputFile) {
         if (videoClips.length === 0) {
             return reject(new Error('No video clips found to render.'));
         }
+
+        // Calculate total duration for progress parsing
+        const totalTimelineDuration = videoClips.length > 0 ? videoClips[videoClips.length - 1].end : 0;
 
         let concatScript = '';
         videoClips.forEach(clip => {
@@ -62,17 +72,53 @@ export function renderTimeline(timelineData, outputFile) {
         const scriptFile = 'concat_list_auto.txt';
         fs.writeFileSync(scriptFile, concatScript);
 
-        const command = `ffmpeg -y -f concat -safe 0 -i ${scriptFile} -c:v libx264 -pix_fmt yuv420p -c:a aac "${outputFile}"`;
+        const args = [
+            '-y',
+            '-f', 'concat',
+            '-safe', '0',
+            '-i', scriptFile,
+            '-c:v', 'libx264',
+            '-pix_fmt', 'yuv420p',
+            '-c:a', 'aac',
+            outputFile
+        ];
 
-        console.log('[Render Service] Executing FFmpeg...');
+        console.log('[Render Service] Spawning FFmpeg pool...');
+        const ffmpeg = spawn('ffmpeg', args);
 
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`[Render Service] Error: ${error.message}`);
-                return reject(error);
+        currentProgress = 0;
+        isRendering = true;
+
+        ffmpeg.stderr.on('data', (data) => {
+            const line = data.toString();
+            // Parse progress from FFmpeg output: time=00:00:05.12
+            const timeMatch = line.match(/time=(\d+):(\d+):(\d+\.\d+)/);
+            if (timeMatch && totalTimelineDuration > 0) {
+                const hours = parseInt(timeMatch[1]);
+                const minutes = parseInt(timeMatch[2]);
+                const seconds = parseFloat(timeMatch[3]);
+                const currentTime = hours * 3600 + minutes * 60 + seconds;
+                currentProgress = Math.min(Math.round((currentTime / totalTimelineDuration) * 100), 99);
+                console.log(`[Render Service] Progress: ${currentProgress}%`);
             }
-            console.log(`[Render Service] Render complete: ${outputFile}`);
-            resolve(outputFile);
+        });
+
+        ffmpeg.on('close', (code) => {
+            isRendering = false;
+            if (code === 0) {
+                currentProgress = 100;
+                console.log(`[Render Service] Render complete: ${outputFile}`);
+                resolve(outputFile);
+            } else {
+                console.error(`[Render Service] FFmpeg exited with code ${code}`);
+                reject(new Error(`FFmpeg exited with code ${code}`));
+            }
+        });
+
+        ffmpeg.on('error', (err) => {
+            isRendering = false;
+            console.error(`[Render Service] Failed to start FFmpeg: ${err.message}`);
+            reject(err);
         });
     });
 }

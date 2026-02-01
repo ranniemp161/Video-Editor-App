@@ -46,6 +46,7 @@ export const useTimeline = () => {
   const [selectedClipIds, setSelectedClipIds] = useState<string[]>([]);
   const [isMagnetic, setIsMagnetic] = useState(true);
   const [renderStatus, setRenderStatus] = useState<'idle' | 'rendering' | 'success' | 'error'>('idle');
+  const [renderProgress, setRenderProgress] = useState(0);
   const [lastRenderPath, setLastRenderPath] = useState<string | null>(null);
 
   const animationFrameRef = useRef<number | null>(null);
@@ -213,10 +214,26 @@ export const useTimeline = () => {
       });
       const result = await response.json();
       if (result.success) {
-        setRenderStatus('success');
-        setLastRenderPath(result.path);
-        // Reset after 5s
-        setTimeout(() => setRenderStatus('idle'), 5000);
+        // Start polling progress
+        const pollInterval = setInterval(async () => {
+          try {
+            const progressRes = await fetch('/api/render-progress');
+            const progressData = await progressRes.json();
+            setRenderProgress(progressData.progress);
+
+            if (!progressData.isRendering && progressData.progress === 100) {
+              clearInterval(pollInterval);
+              setRenderStatus('success');
+              setLastRenderPath(result.path);
+              setTimeout(() => {
+                setRenderStatus('idle');
+                setRenderProgress(0);
+              }, 5000);
+            }
+          } catch (e) {
+            console.error('Progress poll failed:', e);
+          }
+        }, 1000);
       } else {
         setRenderStatus('error');
       }
@@ -432,6 +449,7 @@ export const useTimeline = () => {
     selectAllClips,
     renderToMP4,
     renderStatus,
+    renderProgress,
     lastRenderPath,
     isMagnetic,
     setIsMagnetic,
