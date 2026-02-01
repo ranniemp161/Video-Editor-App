@@ -25,6 +25,8 @@ export interface TimelineTrack {
   id: string;
   type?: 'video' | 'audio'; // Added for convenience
   clips: TimelineClip[];
+  muted?: boolean;
+  locked?: boolean;
 }
 
 export interface TimelineState {

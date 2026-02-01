@@ -5,17 +5,48 @@ import { TimelineState, Asset, TimelineClip } from '../types';
 export const useTimeline = () => {
   const [timeline, setTimeline] = useState<TimelineState>({
     tracks: [
-      { id: 'v1', type: 'video', clips: [] },
-      { id: 'v2', type: 'video', clips: [] },
-      { id: 'a1', type: 'audio', clips: [] },
+      { id: 'v1', type: 'video', clips: [], muted: false, locked: false },
+      { id: 'v2', type: 'video', clips: [], muted: false, locked: false },
+      { id: 'a1', type: 'audio', clips: [], muted: false, locked: false },
     ]
   });
+
+  const [past, setPast] = useState<TimelineState[]>([]);
+  const [future, setFuture] = useState<TimelineState[]>([]);
+
+  const pushToHistory = useCallback((newState: TimelineState) => {
+    setPast(prev => [...prev, timeline].slice(-50)); // Keep last 50
+    setFuture([]);
+    setTimeline(newState);
+  }, [timeline]);
+
+  const undo = useCallback(() => {
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    const newPast = past.slice(0, past.length - 1);
+
+    setFuture(prev => [timeline, ...prev]);
+    setPast(newPast);
+    setTimeline(previous);
+  }, [past, timeline]);
+
+  const redo = useCallback(() => {
+    if (future.length === 0) return;
+    const next = future[0];
+    const newFuture = future.slice(1);
+
+    setPast(prev => [...prev, timeline]);
+    setFuture(newFuture);
+    setTimeline(next);
+  }, [future, timeline]);
 
   const [assets, setAssets] = useState<Asset[]>([]);
   const [playheadPosition, setPlayheadPosition] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedClipId, setSelectedClipId] = useState<string | null>(null);
+  const [selectedClipIds, setSelectedClipIds] = useState<string[]>([]);
   const [isMagnetic, setIsMagnetic] = useState(true);
+  const [renderStatus, setRenderStatus] = useState<'idle' | 'rendering' | 'success' | 'error'>('idle');
+  const [lastRenderPath, setLastRenderPath] = useState<string | null>(null);
 
   const animationFrameRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number | null>(null);
@@ -94,7 +125,10 @@ export const useTimeline = () => {
         idx === trackIdx ? { ...t, clips: [...t.clips, newClip] } : t
       );
 
-      return { ...prev, tracks: newTracks };
+      const next = { ...prev, tracks: newTracks };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
     });
   }, []);
 
@@ -153,16 +187,53 @@ export const useTimeline = () => {
       });
     });
 
-    setTimeline(prev => ({
-      ...prev,
-      tracks: prev.tracks.map((t, i) => i === 0 ? { ...t, clips: newClips } : t)
-    }));
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map((t, i) => i === 0 ? { ...t, clips: newClips } : t)
+      };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
   }, []);
+
+  const renderToMP4 = useCallback(async () => {
+    setRenderStatus('rendering');
+    const data = {
+      timeline,
+      assets: assets.map(a => ({ id: a.id, name: a.name, duration: a.duration }))
+    };
+
+    try {
+      const response = await fetch('/api/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (result.success) {
+        setRenderStatus('success');
+        setLastRenderPath(result.path);
+        // Reset after 5s
+        setTimeout(() => setRenderStatus('idle'), 5000);
+      } else {
+        setRenderStatus('error');
+      }
+    } catch (err) {
+      console.error('Render trigger failed:', err);
+      setRenderStatus('error');
+    }
+  }, [timeline, assets]);
 
   const moveClip = useCallback((clipId: string, trackId: string, newStart: number) => {
     setTimeline(prev => {
-      const clip = prev.tracks.flatMap(t => t.clips).find(c => c.id === clipId);
-      if (!clip) return prev;
+      const sourceTrack = prev.tracks.find(t => t.clips.some(c => c.id === clipId));
+      const targetTrack = prev.tracks.find(t => t.id === trackId);
+
+      if (!sourceTrack || !targetTrack || sourceTrack.locked || targetTrack.locked) return prev;
+
+      const clip = sourceTrack.clips.find(c => c.id === clipId);
 
       const duration = clip.end - clip.start;
       const updatedTargetClip: TimelineClip = { ...clip, start: newStart, end: newStart + duration, trackId };
@@ -184,64 +255,95 @@ export const useTimeline = () => {
         return { ...track, clips };
       });
 
-      return { ...prev, tracks: finalTracks };
+      const next = { ...prev, tracks: finalTracks };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
     });
   }, [isMagnetic]);
 
   const splitClip = useCallback((clipId: string, position: number) => {
-    setTimeline(prev => ({
-      ...prev,
-      tracks: prev.tracks.map(track => {
-        const clip = track.clips.find(c => c.id === clipId);
-        if (clip && position > clip.start && position < clip.end) {
-          const firstHalf = { ...clip, id: `${clip.id}-1`, end: position, trimEnd: clip.trimStart + (position - clip.start) };
-          const secondHalf = { ...clip, id: `${clip.id}-2`, start: position, trimStart: clip.trimStart + (position - clip.start) };
-          return { ...track, clips: [...track.clips.filter(c => c.id !== clipId), firstHalf, secondHalf] };
-        }
-        return track;
-      })
-    }));
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(track => {
+          if (track.locked) return track;
+          const clip = track.clips.find(c => c.id === clipId);
+          if (clip && position > clip.start && position < clip.end) {
+            const firstHalf = { ...clip, id: `${clip.id}-1`, end: position, trimEnd: clip.trimStart + (position - clip.start) };
+            const secondHalf = { ...clip, id: `${clip.id}-2`, start: position, trimStart: clip.trimStart + (position - clip.start) };
+            return { ...track, clips: [...track.clips.filter(c => c.id !== clipId), firstHalf, secondHalf] };
+          }
+          return track;
+        })
+      };
+      if (next !== prev) {
+        setPast(p => [...p, prev].slice(-50));
+        setFuture([]);
+      }
+      return next;
+    });
   }, []);
 
-  const deleteClip = useCallback((clipId: string) => {
-    setTimeline(prev => ({
-      ...prev,
-      tracks: prev.tracks.map(track => {
-        let clips = track.clips.filter(c => c.id !== clipId);
-        if (isMagnetic) {
-          clips.sort((a, b) => a.start - b.start);
-          let currentPos = 0;
-          clips = clips.map(c => {
-            const d = c.end - c.start;
-            const updated = { ...c, start: currentPos, end: currentPos + d };
-            currentPos += d;
-            return updated;
-          });
-        }
-        return { ...track, clips };
-      })
-    }));
-    if (selectedClipId === clipId) setSelectedClipId(null);
-  }, [selectedClipId, isMagnetic]);
+  const selectAllClips = useCallback(() => {
+    const allIds = timeline.tracks.flatMap(track => track.clips.map(clip => clip.id));
+    setSelectedClipIds(allIds);
+  }, [timeline]);
+
+  const deleteClip = useCallback((clipId?: string) => {
+    const idsToDelete = clipId ? [clipId] : selectedClipIds;
+    if (idsToDelete.length === 0) return;
+
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(track => {
+          if (track.locked) return track;
+          let clips = track.clips.filter(c => !idsToDelete.includes(c.id));
+          if (isMagnetic) {
+            clips.sort((a, b) => a.start - b.start);
+            let currentPos = 0;
+            clips = clips.map(c => {
+              const d = c.end - c.start;
+              const updated = { ...c, start: currentPos, end: currentPos + d };
+              currentPos += d;
+              return updated;
+            });
+          }
+          return { ...track, clips };
+        })
+      };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+    setSelectedClipIds([]);
+  }, [selectedClipIds, isMagnetic]);
 
   const updateClip = useCallback((clipId: string, updates: Partial<TimelineClip>) => {
-    setTimeline(prev => ({
-      ...prev,
-      tracks: prev.tracks.map(track => {
-        let clips = track.clips.map(clip => clip.id === clipId ? { ...clip, ...updates } : clip);
-        if (isMagnetic) {
-          clips.sort((a, b) => a.start - b.start);
-          let currentPos = 0;
-          clips = clips.map(c => {
-            const d = c.end - c.start;
-            const updated = { ...c, start: currentPos, end: currentPos + d };
-            currentPos += d;
-            return updated;
-          });
-        }
-        return { ...track, clips };
-      })
-    }));
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(track => {
+          if (track.locked) return track;
+          let clips = track.clips.map(clip => clip.id === clipId ? { ...clip, ...updates } : clip);
+          if (isMagnetic) {
+            clips.sort((a, b) => a.start - b.start);
+            let currentPos = 0;
+            clips = clips.map(c => {
+              const d = c.end - c.start;
+              const updated = { ...c, start: currentPos, end: currentPos + d };
+              currentPos += d;
+              return updated;
+            });
+          }
+          return { ...track, clips };
+        })
+      };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
   }, [isMagnetic]);
 
   const animatePlayback = useCallback(() => {
@@ -258,6 +360,30 @@ export const useTimeline = () => {
     animationFrameRef.current = requestAnimationFrame(animatePlayback);
   }, [totalDuration]);
 
+  const toggleTrackMute = useCallback((trackId: string) => {
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(t => t.id === trackId ? { ...t, muted: !t.muted } : t)
+      };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+  }, []);
+
+  const toggleTrackLock = useCallback((trackId: string) => {
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(t => t.id === trackId ? { ...t, locked: !t.locked } : t)
+      };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+  }, []);
+
   useEffect(() => {
     if (isPlaying) {
       lastUpdateTimeRef.current = performance.now();
@@ -267,6 +393,23 @@ export const useTimeline = () => {
     }
     return () => { if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current); };
   }, [isPlaying, animatePlayback]);
+
+  const onSelectClip = useCallback((clipId: string | null, append = false) => {
+    if (clipId === null) {
+      setSelectedClipIds([]);
+      return;
+    }
+
+    setSelectedClipIds(prev => {
+      if (append) {
+        if (prev.includes(clipId)) {
+          return prev.filter(id => id !== clipId);
+        }
+        return [...prev, clipId];
+      }
+      return [clipId];
+    });
+  }, []);
 
   return {
     timeline,
@@ -284,10 +427,20 @@ export const useTimeline = () => {
     splitClip,
     deleteClip,
     updateClip,
-    selectedClipId,
-    setSelectedClipId,
+    selectedClipIds,
+    onSelectClip,
+    selectAllClips,
+    renderToMP4,
+    renderStatus,
+    lastRenderPath,
     isMagnetic,
     setIsMagnetic,
-    findMatchingAsset
+    findMatchingAsset,
+    toggleTrackMute,
+    toggleTrackLock,
+    undo,
+    redo,
+    canUndo: past.length > 0,
+    canRedo: future.length > 0
   };
 };

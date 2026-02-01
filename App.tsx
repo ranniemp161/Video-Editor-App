@@ -29,14 +29,112 @@ const App: React.FC = () => {
     splitClip,
     deleteClip,
     updateClip,
-    selectedClipId,
-    setSelectedClipId,
+    selectedClipIds,
+    onSelectClip,
+    selectAllClips,
+    exportTimeline,
     isMagnetic,
     setIsMagnetic,
+    toggleTrackMute,
+    toggleTrackLock,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useTimeline();
 
   const [activeTab, setActiveTab] = useState('media');
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+
+  // --- Keyboard Shortcuts ---
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
+
+      switch (e.key.toLowerCase()) {
+        case ' ': // Space: Play/Pause
+          e.preventDefault();
+          togglePlayback();
+          break;
+        case 's': // S: Split
+          const targetClipS = timeline.tracks.flatMap(t => t.clips).find(c => playheadPosition >= c.start && playheadPosition < c.end);
+          if (targetClipS) splitClip(targetClipS.id, playheadPosition);
+          break;
+        case 'q': // Q: Ripple Trim Start to Playhead (Standard Mapping)
+          {
+            const allClips = timeline.tracks.flatMap(t => t.clips);
+            let target = selectedClipIds.length > 0 ? allClips.find(c => c.id === selectedClipIds[0]) : null;
+            if (!target || !(playheadPosition > target.start && playheadPosition < target.end)) {
+              target = allClips.find(c => playheadPosition > c.start && playheadPosition < c.end);
+            }
+
+            if (target) {
+              const delta = playheadPosition - target.start;
+              updateClip(target.id, {
+                start: playheadPosition,
+                trimStart: target.trimStart + delta
+              });
+            }
+          }
+          break;
+        case 'w': // W: Ripple Trim End to Playhead (Standard Mapping)
+          {
+            const allClips = timeline.tracks.flatMap(t => t.clips);
+            let target = selectedClipIds.length > 0 ? allClips.find(c => c.id === selectedClipIds[0]) : null;
+            if (!target || !(playheadPosition > target.start && playheadPosition < target.end)) {
+              target = allClips.find(c => playheadPosition > c.start && playheadPosition < c.end);
+            }
+
+            if (target) {
+              const delta = target.end - playheadPosition;
+              updateClip(target.id, {
+                end: playheadPosition,
+                trimEnd: target.trimEnd - delta
+              });
+            }
+          }
+          break;
+        case 'y': // Ctrl + Y: Redo
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            redo();
+          }
+          break;
+        case 'z': // Ctrl + Z (Undo) or Ctrl + Shift + Z (Redo)
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            if (e.shiftKey) {
+              redo();
+            } else {
+              undo();
+            }
+          }
+          break;
+        case 'a': // Ctrl + A: Select All
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            selectAllClips();
+          }
+          break;
+        case 'delete':
+        case 'backspace': // Del/Backspace: Delete
+          deleteClip();
+          break;
+        case 'arrowleft': // Left: step back 1 frame
+          e.preventDefault();
+          setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
+          break;
+        case 'arrowright': // Right: step forward 1 frame
+          e.preventDefault();
+          setPlayheadPosition(Math.min(totalDuration, playheadPosition + 0.1));
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [togglePlayback, timeline, playheadPosition, splitClip, selectedClipIds, deleteClip, selectAllClips, totalDuration, setPlayheadPosition, undo, redo]);
 
   const handleAssetSelect = (asset: Asset) => {
     setSelectedAsset(asset);
@@ -70,7 +168,7 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen bg-[#0f0f0f] flex flex-col font-sans text-gray-200 overflow-hidden">
-      <Header onImportClick={handleFileChange} />
+      <Header onImportClick={handleFileChange} onExport={exportTimeline} />
 
       <div className="flex-grow flex overflow-hidden">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -113,7 +211,7 @@ const App: React.FC = () => {
             <div className="w-[300px] border-l border-[#2d2d2d]">
               <Inspector
                 selectedAsset={selectedAsset || (currentClip?.asset ?? null)}
-                selectedClip={timeline.tracks.flatMap(t => t.clips).find(c => c.id === selectedClipId) || null}
+                selectedClip={timeline.tracks.flatMap(t => t.clips).find(c => selectedClipIds.includes(c.id)) || null}
                 onUpdateClip={updateClip}
               />
             </div>
@@ -130,8 +228,8 @@ const App: React.FC = () => {
                   <button
                     onClick={() => setIsMagnetic(!isMagnetic)}
                     className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${isMagnetic
-                        ? 'bg-[#26c6da1a] text-[#26c6da] border-[#26c6da44] hover:bg-[#26c6da2a]'
-                        : 'bg-[#2d2d2d] text-gray-500 border-[#444] hover:bg-[#3d3d3d]'
+                      ? 'bg-[#26c6da1a] text-[#26c6da] border-[#26c6da44] hover:bg-[#26c6da2a]'
+                      : 'bg-[#2d2d2d] text-gray-500 border-[#444] hover:bg-[#3d3d3d]'
                       }`}
                     title="Toggle Magnetic Timeline (Ripple Editing)"
                   >
@@ -153,10 +251,10 @@ const App: React.FC = () => {
                   </button>
                   <button
                     onClick={() => {
-                      if (selectedClipId) deleteClip(selectedClipId);
+                      deleteClip();
                     }}
-                    disabled={!selectedClipId}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold transition-colors border ${selectedClipId
+                    disabled={selectedClipIds.length === 0}
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold transition-colors border ${selectedClipIds.length > 0
                       ? 'bg-[#2d2d2d] hover:bg-red-900/40 text-red-500 border-red-900/50 hover:border-red-500/50'
                       : 'bg-[#1a1a1a] text-gray-700 border-[#2d2d2d] cursor-not-allowed'
                       }`}
@@ -184,9 +282,11 @@ const App: React.FC = () => {
                 onClipSplit={splitClip}
                 onClipDelete={deleteClip}
                 onClipUpdate={updateClip}
-                selectedClipId={selectedClipId}
-                onSelectClip={setSelectedClipId}
+                selectedClipIds={selectedClipIds}
+                onSelectClip={onSelectClip}
                 totalDuration={totalDuration}
+                onToggleMute={toggleTrackMute}
+                onToggleLock={toggleTrackLock}
               />
             </div>
           </div>
