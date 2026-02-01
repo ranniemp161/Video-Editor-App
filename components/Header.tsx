@@ -1,38 +1,36 @@
-
-import React, { useRef } from 'react';
-import { FilmIcon } from './icons';
+import React from 'react';
+import { MenuIcon } from './icons';
 
 interface HeaderProps {
   onImportClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onImportClick }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
   return (
-    <header className="flex-shrink-0 bg-[#2D2D2D] p-2 flex items-center justify-between border-b border-gray-700">
-      <div className="flex items-center space-x-2">
-        <FilmIcon className="w-6 h-6 text-blue-400" />
-        <h1 className="text-lg font-semibold text-gray-200">Web Video Editor</h1>
-      </div>
-      <div>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={onImportClick}
-          className="hidden"
-          accept=".xml"
-        />
-        <button 
-          onClick={handleButtonClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-1 px-3 rounded-md transition-colors"
-        >
-          Import FCP7 XML
+    <header className="h-10 bg-[#0f0f0f] border-b border-[#2d2d2d] flex items-center justify-between px-4 z-50">
+      <div className="flex items-center gap-4">
+        <button className="text-gray-400 hover:text-white transition-colors">
+          <MenuIcon className="w-5 h-5" />
         </button>
+        <div className="h-4 w-[1px] bg-[#333]"></div>
+        <span className="text-xs text-gray-500 font-medium tracking-wide">Menu</span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] font-semibold text-white uppercase tracking-wider">0130</span>
+        <div className="bg-[#2d2d2d] px-1 text-[8px] text-gray-500 rounded">0130</div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <button className="text-gray-400 hover:text-white px-2 py-1 text-[11px] font-medium transition-colors border border-[#333] rounded">
+            Pro
+          </button>
+          <label className="cursor-pointer bg-[#26c6da] hover:bg-[#4dd0e1] text-[#0f0f0f] px-4 py-1.5 rounded text-[11px] font-bold transition-transform active:scale-95 flex items-center gap-1">
+            Import XML
+            <input type="file" className="hidden" accept=".xml" onChange={onImportClick} />
+          </label>
+        </div>
       </div>
     </header>
   );

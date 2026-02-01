@@ -11,16 +11,16 @@ interface PlaybackControlsProps {
 }
 
 const formatTime = (seconds: number) => {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
 
 export const PlaybackControls: React.FC<PlaybackControlsProps> = ({ isPlaying, togglePlayback, playheadPosition, totalDuration, onSeek }) => {
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSeek(parseFloat(e.target.value));
   };
-    
+
   return (
     <div className="flex-shrink-0 bg-gray-800 p-2 flex items-center space-x-4">
       <button onClick={togglePlayback} className="text-white hover:text-blue-400">
