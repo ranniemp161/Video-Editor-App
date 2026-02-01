@@ -1,0 +1,27 @@
+
+export interface Asset {
+  id: string;
+  type: 'video' | 'audio' | 'image';
+  name: string;
+  src: string | null; // Can be null for offline media
+  duration: number; // in seconds
+}
+
+export interface TimelineClip {
+  id: string; // Unique instance ID
+  assetId: string;
+  trackId: string;
+  start: number; // Start position on the timeline in seconds
+  end: number; // End position on the timeline in seconds
+  trimStart: number; // Start trim within the original asset in seconds
+  trimEnd: number; // End trim within the original asset in seconds
+}
+
+export interface TimelineTrack {
+  id:string;
+  clips: TimelineClip[];
+}
+
+export interface TimelineState {
+  tracks: TimelineTrack[];
+}
