@@ -1,5 +1,0 @@
-{
-  "name": "Web-Based Video Editor",
-  "description": "An interactive, client-side video editor with a media pool, preview window, and a drag-and-drop timeline for sequencing and trimming clips. Inspired by professional NLE software.",
-  "requestFramePermissions": []
-}

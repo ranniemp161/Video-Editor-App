@@ -1,0 +1,20 @@
+[2026-02-02T06:56:35.920Z] Transcribe hit: /api/transcribe
+[2026-02-02T06:56:35.923Z] Body: {"videoPath":"/RoughCutComposition (1).mp4"}
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\RoughCutComposition (1).mp4
+[2026-02-02T06:59:42.606Z] SUCCESS for /RoughCutComposition (1).mp4
+[2026-02-02T07:11:56.324Z] Transcribe hit: /api/transcribe
+[2026-02-02T07:11:56.333Z] Body: {"videoPath":"/RoughCutComposition (1).mp4"}
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\RoughCutComposition (1).mp4
+[2026-02-02T07:14:47.686Z] SUCCESS for /RoughCutComposition (1).mp4
+[2026-02-02T07:34:49.647Z] Transcribe hit: /api/transcribe
+[2026-02-02T07:34:49.649Z] Body: {"videoPath":"/main-video.mp4"}
+[2026-02-02T07:34:53.486Z] ERROR: Whisper executable not found at C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\claude project rannie\my-video\whisper.cpp\main.exe
+[2026-02-02T07:34:57.979Z] Transcribe hit: /api/transcribe
+[2026-02-02T07:34:57.981Z] Body: {"videoPath":"/main-video.mp4"}
+[2026-02-02T07:35:03.783Z] ERROR: Whisper executable not found at C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\claude project rannie\my-video\whisper.cpp\main.exe
+[2026-02-02T07:35:13.430Z] Transcribe hit: /api/transcribe
+[2026-02-02T07:35:13.432Z] Body: {"videoPath":"/main-video.mp4"}
+[2026-02-02T07:35:17.712Z] ERROR: Whisper executable not found at C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\claude project rannie\my-video\whisper.cpp\main.exe
+[2026-02-02T07:39:27.438Z] Transcribe hit: /api/transcribe
+[2026-02-02T07:39:27.440Z] Body: {"videoPath":"/main-video.mp4"}
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
