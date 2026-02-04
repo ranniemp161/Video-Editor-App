@@ -83,13 +83,23 @@ export function renderTimeline(timelineData, outputFile) {
             '-filter_complex', filterComplex,
             '-map', '[outv]',
             '-map', '[outa]',
+            // YouTube-optimized 1080p scaling (maintains aspect ratio)
+            '-vf', 'scale=-2:1080',
+            // Video encoding - YouTube-optimized settings
             '-c:v', 'libx264',
-            '-preset', 'medium',
-            '-crf', '20',
+            '-preset', 'slow',           // Better compression (worth the extra time)
+            '-crf', '18',                // High quality (18 = near-lossless)
+            '-b:v', '12M',               // 12 Mbps target bitrate
+            '-maxrate', '15M',           // Peak bitrate cap
+            '-bufsize', '24M',           // Buffer size (2x maxrate)
+            // Audio encoding - High quality
             '-c:a', 'aac',
             '-b:a', '192k',
+            // YouTube compatibility
             '-pix_fmt', 'yuv420p',
-            '-movflags', '+faststart',
+            '-profile:v', 'high',        // H.264 High profile
+            '-level', '4.2',             // H.264 level 4.2 (supports 1080p@60fps)
+            '-movflags', '+faststart',   // Web streaming optimization
             outputFile
         ];
 
