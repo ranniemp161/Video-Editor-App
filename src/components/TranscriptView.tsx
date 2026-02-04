@@ -36,11 +36,35 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     const [isDeleteMode, setIsDeleteMode] = React.useState(false);
     const [showThoughts, setShowThoughts] = React.useState(false); // New: thought view toggle
 
+    // OPTIMIZATION: Calculate originalTime ONCE per render
+    const originalVideoTime = React.useMemo(() => {
+        const allClips = timeline.tracks.flatMap(t => t.clips);
+        if (allClips.length === 0) return playheadPosition;
+
+        for (const track of timeline.tracks) {
+            for (const clip of track.clips) {
+                if (playheadPosition >= clip.start && playheadPosition <= clip.end) {
+                    const offsetInClip = playheadPosition - clip.start;
+                    return clip.trimStart + offsetInClip;
+                }
+            }
+        }
+        return -1;
+    }, [playheadPosition, timeline.tracks]);
+
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && asset) {
             onUploadTranscript(asset.id, e.target.files[0]);
         }
     };
+
+    const words = React.useMemo(() => asset?.transcription?.words || [], [asset]);
+
+    // Find current word for auto-scroll dependency
+    const currentWord = React.useMemo(() => {
+        const EPSILON = 0.05;
+        return words.find(w => originalVideoTime >= (w.start / 1000 - EPSILON) && originalVideoTime < (w.end / 1000 + EPSILON));
+    }, [words, originalVideoTime]);
 
     // Auto-scroll to current word
     useEffect(() => {
@@ -50,7 +74,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                 block: 'center',
             });
         }
-    }, [playheadPosition]);
+    }, [currentWord]); // Only trigger when the current word object changes!
 
     if (!asset) {
         return (
@@ -107,7 +131,6 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
         );
     }
 
-    const words = asset.transcription.words || [];
 
     return (
         <div className="flex-grow flex flex-col overflow-hidden bg-[#1a1a1a]">
@@ -177,30 +200,8 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     // Word View (Default)
                     <div className="flex flex-wrap gap-x-1.5 gap-y-2 leading-relaxed">
                         {words.map((word, i) => {
-                            // Map timeline position to original video time
-                            const allClips = timeline.tracks.flatMap(t => t.clips);
-                            let originalTime = allClips.length > 0 ? -1 : playheadPosition;
-
-                            // Find which clip contains the playhead (only if timeline exists)
-                            if (allClips.length > 0) {
-                                let found = false;
-                                for (const track of timeline.tracks) {
-                                    for (const clip of track.clips) {
-                                        if (playheadPosition >= clip.start && playheadPosition <= clip.end) {
-                                            // Calculate offset within clip
-                                            const offsetInClip = playheadPosition - clip.start;
-                                            // Map to original video time
-                                            originalTime = clip.trimStart + offsetInClip;
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-                                    if (found) break;
-                                }
-                            }
-
                             const EPSILON = 0.05; // 50ms tolerance
-                            const isCurrent = originalTime >= (word.start / 1000 - EPSILON) && originalTime < (word.end / 1000 + EPSILON);
+                            const isCurrent = originalVideoTime >= (word.start / 1000 - EPSILON) && originalVideoTime < (word.end / 1000 + EPSILON);
                             const isDeleted = (word as any).isDeleted || false;
 
                             return (
@@ -217,9 +218,9 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                                         }
                                     }}
                                     className={`cursor-pointer px-1.5 py-1 rounded transition-all text-sm
-                  ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-lg z-10' : ''}
-                  ${isDeleted ? 'line-through text-red-500 opacity-50 bg-red-900/20' : 'text-gray-300 hover:bg-[#333] hover:text-white'}
-                `}
+                                          ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-lg z-10' : ''}
+                                          ${isDeleted ? 'line-through text-red-500 opacity-50 bg-red-900/20' : 'text-gray-300 hover:bg-[#333] hover:text-white'}
+                                        `}
                                     title={`${formatTime(word.start / 1000)} ${isDeleteMode ? '(Click to Delete)' : '(Click to Seek)'}`}
                                 >
                                     {word.word}

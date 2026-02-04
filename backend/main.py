@@ -15,6 +15,15 @@ from rough_cut import generate_rough_cut
 from expert_editor import analyze_transcript
 from word_timing import distribute_word_timestamps
 from professional_rough_cut_v2 import ProfessionalRoughCutV2
+from thought_grouper import ThoughtGrouper
+
+from database import SessionLocal, engine, Base, get_db
+import models
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
+# Create tables
+Base.metadata.create_all(bind=engine)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -66,12 +75,15 @@ async def transcribe_generic(request: TranscribeRequest):
     if os.path.exists(direct_path):
         target_path = direct_path
     else:
-        # 2. Search projects for matching original filename
-        for pid, p in projects.items():
-            if p.originalFileName == filename:
-                target_path = p.mediaPath
-                target_project_id = pid
-                break
+        # 2. Search DB for matching original filename
+        db = SessionLocal()
+        try:
+            db_project = db.query(models.Project).filter(models.Project.originalFileName == filename).first()
+            if db_project:
+                target_path = db_project.mediaPath
+                target_project_id = db_project.id
+        finally:
+            db.close()
     
     if not target_path or not os.path.exists(target_path):
         # Fallback: check if videoPath is relative to root?
@@ -180,10 +192,49 @@ async def get_transcription_progress(videoPath: str):
 
 
 
-# In-memory storage (Replace with DB/File persistence in production)
-projects = {}
+# In-memory storage (Remove in favor of DB)
+# projects = {}
 UPLOAD_DIR = "public/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# --- Helpers ---
+
+def cleanup_orphaned_files(db: Session):
+    """Delete files in UPLOAD_DIR that are not referenced in the database."""
+    try:
+        db_files = {os.path.basename(p.mediaPath) for p in db.query(models.Project).all()}
+        # Also include active rendering/temp files if naming convention allows
+        # For now, just protect files created in the last 10 minutes to avoid deleting active uploads
+        import time
+        now = time.time()
+        
+        for filename in os.listdir(UPLOAD_DIR):
+            file_path = os.path.join(UPLOAD_DIR, filename)
+            # Skip directories
+            if os.path.isdir(file_path): continue
+            
+            # If not in DB and older than 10 mins, delete
+            if filename not in db_files and (now - os.path.getmtime(file_path)) > 600:
+                logger.info(f"Cleaning up orphaned file: {filename}")
+                try:
+                    os.remove(file_path)
+                    # Also try to remove matching .wav, .json etc
+                    base = os.path.splitext(file_path)[0]
+                    for ext in ['.wav', '.json', '.txt']:
+                        if os.path.exists(base + ext):
+                            os.remove(base + ext)
+                except Exception as e:
+                    logger.error(f"Failed to delete {filename}: {e}")
+    except Exception as e:
+        logger.error(f"Orphan cleanup failed: {e}")
+
+@app.on_event("startup")
+def startup_event():
+    db = SessionLocal()
+    try:
+        cleanup_orphaned_files(db)
+    finally:
+        db.close()
 
 # --- Endpoints ---
 
@@ -192,7 +243,7 @@ def read_root():
     return {"message": "Gling-like Video Editor Backend API"}
 
 @app.post("/upload")
-async def upload_video(file: UploadFile = File(...)):
+async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
         file_id = str(uuid.uuid4())
         extension = os.path.splitext(file.filename)[1]
@@ -201,39 +252,72 @@ async def upload_video(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
-        # Initialize Project State
-        project = ProjectState(
-            projectId=file_id,
+        # Initialize Database Entry
+        import time
+        db_project = models.Project(
+            id=file_id,
             mediaPath=file_path,
-            segments=[],
             duration=0.0,
-            originalFileName=file.filename
+            originalFileName=file.filename,
+            createdAt=time.time()
         )
-        
-        # Sidecar Check
-        # Check if a .json or .txt with the same name exists in uploads
-        base_name = os.path.splitext(file_path)[0]
-        for ext in ['.json', '.txt', '.srt', '.vtt']:
-            sidecar_path = base_name + ext
-            if os.path.exists(sidecar_path):
-                logger.info(f"Sidecar transcript found: {sidecar_path}")
-                # We could parse it here, but maybe better to do it on demand 
-                # or let the frontend poll?
-                # For now let's just note it or parse if simple.
-                break
-
-        projects[file_id] = project
+        db.add(db_project)
+        db.commit()
         
         return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}{extension}"}
     except Exception as e:
         logger.error(f"Upload failed: {e}")
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/project/{project_id}")
-def get_project(project_id: str):
-    if project_id not in projects:
+def get_project(project_id: str, db: Session = Depends(get_db)):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
-    return projects[project_id]
+    
+    # Map to ProjectState model
+    return {
+        "projectId": db_project.id,
+        "mediaPath": db_project.mediaPath,
+        "duration": db_project.duration,
+        "originalFileName": db_project.originalFileName,
+        "segments": [
+            {
+                "start": s.start,
+                "end": s.end,
+                "text": s.text,
+                "type": s.type,
+                "isDeleted": s.isDeleted
+            } for s in db_project.segments
+        ]
+    }
+
+@app.delete("/project/{project_id}")
+def delete_project(project_id: str, db: Session = Depends(get_db)):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not db_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    # 1. Delete associated files
+    media_path = db_project.mediaPath
+    try:
+        if os.path.exists(media_path):
+            os.remove(media_path)
+            # Try to remove sidecars/temps
+            base = os.path.splitext(media_path)[0]
+            for ext in ['.wav', '.json', '.txt', '.srt', '.vtt']:
+                sidecar = base + ext
+                if os.path.exists(sidecar):
+                    os.remove(sidecar)
+    except Exception as e:
+        logger.error(f"Error deleting files for project {project_id}: {e}")
+
+    # 2. Delete from DB
+    db.delete(db_project)
+    db.commit()
+    
+    return {"success": True}
 
 import subprocess
 
@@ -244,21 +328,20 @@ WHISPER_MODEL = "tiny.en"
 WHISPER_MODEL_PATH = os.path.join(WHISPER_ROOT, "models", f"ggml-{WHISPER_MODEL}.bin")
 
 @app.post("/project/{project_id}/transcribe")
-async def transcribe_project(project_id: str):
-    if project_id not in projects:
+async def transcribe_project(project_id: str, db: Session = Depends(get_db)):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    project = projects[project_id]
-    media_path = project.mediaPath
+    media_path = db_project.mediaPath
     
     # 1. Extract Audio to WAV (16kHz, Mono, PCM)
     wav_path = media_path + ".wav"
-    abs_wav_path = os.path.abspath(wav_path) # Absolute path for Whisper
+    abs_wav_path = os.path.abspath(wav_path)
     
     try:
         if not os.path.exists(wav_path):
             logger.info(f"Extracting audio to {wav_path}...")
-            # Use ffmpeg. Assume it's in PATH
             cmd = [
                 "ffmpeg", "-y", "-i", media_path, 
                 "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", 
@@ -274,43 +357,41 @@ async def transcribe_project(project_id: str):
         logger.error(f"Whisper executable not found at {WHISPER_EXE}")
         # Fallback to mock
         mock_segments = [
-            Segment(start=0.0, end=2.0, text="Whisper binary not found.", type="speech"),
-            Segment(start=2.0, end=5.0, text="Please check config.", type="speech")
+            models.Segment(projectId=project_id, start=0.0, end=2.0, text="Whisper binary not found.", type="speech"),
+            models.Segment(projectId=project_id, start=2.0, end=5.0, text="Please check config.", type="speech")
         ]
-        project.segments = mock_segments
+        # Clear existing and add mock
+        db.query(models.Segment).filter(models.Segment.projectId == project_id).delete()
+        for s in mock_segments: db.add(s)
+        db.commit()
         return {"success": True, "segments": mock_segments}
         
     try:
         logger.info(f"Running Whisper on {abs_wav_path}...")
-        # Args: -m model -f file -oj (output json)
         cmd = [
             WHISPER_EXE, 
             "-m", WHISPER_MODEL_PATH,
             "-f", abs_wav_path,
-            "-ml", "1", # max line length? Or other params from JS? JS had '-ml', '1'.
-            "-oj" # Output JSON
+            "-ml", "1",
+            "-oj"
         ]
         
-        # Capture output for debugging
         process = subprocess.run(cmd, cwd=WHISPER_ROOT, check=False, capture_output=True)
         
         if process.returncode != 0:
             logger.error(f"Whisper failed with code {process.returncode}")
-            logger.error(f"Stderr: {process.stderr.decode('utf-8', errors='ignore')}")
-            raise Exception(f"Whisper failed: {process.stderr.decode('utf-8', errors='ignore')}")
+            raise Exception("Whisper failed")
         
         # 3. Parse JSON Output
         json_path = abs_wav_path + ".json"
+        BLACKLIST = {'BL', 'ANK', 'AUD', 'IO', '_', '[', ']', 'BLANK_AUDIO', '[BLANK_AUDIO]', 'SILENCE', '[SILENCE]', 'MUSIC', '[MUSIC]', 'APPLAUSE', '[APPLAUSE]'}
+        
         if os.path.exists(json_path):
             with open(json_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             
             transcription = data.get("transcription", [])
             all_words = []
-            
-            # Whisper.cpp JSON structure: transcription: [ { text: "...", offsets: { from: ms, to: ms } } ]
-            # Note: offsets are in MILLISECONDS? JS said: "s.offsets.from, // Whisper.cpp offsets are in ms"
-            # But python Segment expects SECONDS.
             
             for item in transcription:
                 text = item.get("text", "").strip()
@@ -319,11 +400,9 @@ async def transcribe_project(project_id: str):
                 
                 if not text or text in BLACKLIST: continue
                 
-                # Split phrases into words
                 sub_words = text.split()
                 if not sub_words: continue
                 
-                # Use smart syllable-based distribution for better precision
                 smart_words = distribute_word_timestamps(
                     sentence_start=start_ms / 1000.0,
                     sentence_end=end_ms / 1000.0,
@@ -332,66 +411,73 @@ async def transcribe_project(project_id: str):
                 
                 for sw in smart_words:
                     all_words.append({
-                        "text": sw['word'], # Use 'text' key for Segment compatibility
-                        "start": sw['start'] / 1000.0, # Convert to seconds
+                        "text": sw['word'],
+                        "start": sw['start'] / 1000.0,
                         "end": sw['end'] / 1000.0,
                         "type": "speech"
                     })
             
             # Apply Expert Analysis
-            # all_words uses seconds here, let's convert to ms for analyzer if needed 
-            # or update analyzer to be unit agnostic.
-            # For now, analyze_transcript handles them as numbers.
-            # But wait, filler words and repetitions work regardless of units.
-            # Silence detection (gap > 1000) will fail if in seconds.
-            
-            # Convert to ms for analyzer
-            ms_for_analysis = []
-            for w in all_words:
-                ms_for_analysis.append({
-                    "word": w["text"],
-                    "start": w["start"] * 1000,
-                    "end": w["end"] * 1000
-                })
-            
+            ms_for_analysis = [{"word": w["text"], "start": w["start"] * 1000, "end": w["end"] * 1000} for w in all_words]
             analyzed_ms = analyze_transcript(ms_for_analysis)
             
-            # Map back to all_words
-            for i in range(len(all_words)):
-                all_words[i]['isDeleted'] = analyzed_ms[i].get('isDeleted', False)
-
+            # 4. Save to Database
+            # Clear old segments
+            db.query(models.Segment).filter(models.Segment.projectId == project_id).delete()
+            
             final_segments = []
-            for w in all_words: 
-                 final_segments.append(Segment(
+            for i, w in enumerate(all_words): 
+                 seg = models.Segment(
+                     projectId=project_id,
                      start=w['start'],
                      end=w['end'],
                      text=w['text'],
                      type=w.get('type', 'speech'),
-                     isDeleted=w.get('isDeleted', False) 
-                 ))
+                     isDeleted=analyzed_ms[i].get('isDeleted', False) 
+                 )
+                 db.add(seg)
+                 final_segments.append(seg)
             
-            project.segments = final_segments
+            db.commit()
             
-            # Cleanup
+            # --- STORAGE CLEANUP ---
+            # Delete temporary .wav and .json files after processing
             try:
-                os.remove(json_path)
-                os.remove(wav_path)
-            except: pass
+                if os.path.exists(json_path): os.remove(json_path)
+                if os.path.exists(wav_path): os.remove(wav_path)
+                logger.info(f"Cleaned up temporary transcription files for {project_id}")
+            except Exception as e:
+                logger.error(f"Temp cleanup failed: {e}")
             
             return {"success": True, "segments": final_segments}
         else:
              raise Exception("Output JSON not generated")
 
     except Exception as e:
-        logger.error(f"Transcription process failed: {e}")
+        logger.error(f"Transcription failed: {e}")
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/project/{project_id}/segments")
-async def update_segments(project_id: str, segments: List[Segment]):
-    if project_id not in projects:
+async def update_segments(project_id: str, segments: List[Segment], db: Session = Depends(get_db)):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    projects[project_id].segments = segments
+    # Replace segments
+    db.query(models.Segment).filter(models.Segment.projectId == project_id).delete()
+    for s in segments:
+        db_seg = models.Segment(
+            projectId=project_id,
+            start=s.start,
+            end=s.end,
+            text=s.text,
+            type=s.type,
+            isDeleted=s.isDeleted
+        )
+        db.add(db_seg)
+    
+    db.commit()
     return {"success": True}
 
 class UploadTranscriptRequest(BaseModel):
@@ -489,17 +575,22 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
             )
             
             # Optional: Refine with audio if projectId is known
-            if request.projectId and request.projectId in projects:
-                project = projects[request.projectId]
-                # Ensure we have audio
-                wav_path = project.mediaPath + ".wav"
-                if os.path.exists(wav_path):
-                    smart_words = refine_word_timestamps_with_audio(
-                        words=smart_words,
-                        audio_path=wav_path,
-                        start_sec=current_start,
-                        end_sec=current_end
-                    )
+            if request.projectId:
+                db = SessionLocal()
+                try:
+                    db_project = db.query(models.Project).filter(models.Project.id == request.projectId).first()
+                    if db_project:
+                        # Ensure we have audio
+                        wav_path = db_project.mediaPath + ".wav"
+                        if os.path.exists(wav_path):
+                            smart_words = refine_word_timestamps_with_audio(
+                                words=smart_words,
+                                audio_path=wav_path,
+                                start_sec=current_start,
+                                end_sec=current_end
+                            )
+                finally:
+                    db.close()
             
             words.extend(smart_words)
         

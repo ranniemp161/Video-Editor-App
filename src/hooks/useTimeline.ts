@@ -100,6 +100,14 @@ export const useTimeline = () => {
       for (const clip of track.clips) {
         if (playheadPosition >= clip.start && playheadPosition < clip.end) {
           const asset = findMatchingAsset(clip.assetId, clip.name, clip.sourceFileName);
+          console.log('[DEBUG currentClip] Found clip at playhead:', {
+            clipId: clip.id,
+            clipName: clip.name,
+            assetId: clip.assetId,
+            sourceFileName: clip.sourceFileName,
+            foundAsset: asset ? { id: asset.id, name: asset.name, hasSrc: !!asset.src } : null,
+            allAssets: assets.map(a => ({ id: a.id, name: a.name, hasSrc: !!a.src }))
+          });
           if (asset) return { clip, asset };
         }
       }
@@ -202,10 +210,11 @@ export const useTimeline = () => {
           })),
           source: 'ai' as const
         };
-        setAssets(prev => prev.map(a => a.id === pId || a.id === 'video-1' ? { ...a, transcription: transcriptionWithSource } : a));
+        const assetId = pId; // Use projectId as matching context
+        setAssets(prev => prev.map(a => (a.id === pId || a.id.startsWith('asset-')) ? { ...a, transcription: transcriptionWithSource } : a));
 
         // Auto-generate timeline from new segments
-        generateTimelineFromSegments(result.segments);
+        generateTimelineFromSegments(result.segments, assets[0]?.id || pId);
       }
     } catch (e) {
       console.error("Transcription failed", e);
@@ -214,7 +223,7 @@ export const useTimeline = () => {
     }
   }, []);
 
-  const generateTimelineFromSegments = useCallback((curSegments: any[]) => {
+  const generateTimelineFromSegments = useCallback((curSegments: any[], assetId: string = 'video-1') => {
     // Filter out deleted segments
     const activeSegments = curSegments.filter(s => !s.isDeleted);
 
@@ -227,7 +236,7 @@ export const useTimeline = () => {
 
       newClips.push({
         id: `seg-${idx}-${Date.now()}`,
-        assetId: `video-1`, // Placeholder, assuming single video track
+        assetId: assetId,
         trackId: 'v1',
         name: seg.text || 'Clip',
         sourceFileName: 'Project Video',
@@ -274,7 +283,37 @@ export const useTimeline = () => {
     } catch (e) {
       console.error("Failed to sync segments", e);
     }
-  }, [projectId, segments, generateTimelineFromSegments]);
+  }, [projectId, segments]);
+
+  const deleteProject = useCallback(async () => {
+    if (!projectId) return;
+
+    if (!confirm("Are you sure you want to delete this project and all its video files from your computer? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/project/${projectId}`, { method: 'DELETE' });
+      if (res.ok) {
+        // Reset Frontend State
+        setProjectId(null);
+        setSegments([]);
+        setAssets([]);
+        setTimeline({
+          tracks: [
+            { id: 'v1', type: 'video', clips: [], muted: false, locked: false },
+            { id: 'v2', type: 'video', clips: [], muted: false, locked: false },
+            { id: 'a1', type: 'audio', clips: [], muted: false, locked: false },
+          ]
+        });
+        setPlayheadPosition(0);
+        localStorage.removeItem('currentProjectId');
+        console.log("Project and files deleted successfully.");
+      }
+    } catch (e) {
+      console.error("Failed to delete project", e);
+    }
+  }, [projectId]);
 
   // Fetch segments on load if projectId exists
   useEffect(() => {
@@ -950,5 +989,6 @@ export const useTimeline = () => {
     selectClipsInRange,
     rippleDelete,
     setTrackHeight,
+    deleteProject,
   };
 };

@@ -40,6 +40,128 @@ const TICK_INTERVALS = [
   0.1, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 3600
 ];
 
+// --- Optimized Sub-components ---
+
+interface ClipProps {
+  clip: TimelineClip;
+  asset: Asset | null;
+  pixelsPerSecond: number;
+  isSelected: boolean;
+  isLocked: boolean;
+  onSelect: (id: string, append: boolean) => void;
+  onDragStart: (e: React.DragEvent, id: string) => void;
+  onTrimStart: (e: React.MouseEvent, clip: TimelineClip) => void;
+  onTrimEnd: (e: React.MouseEvent, clip: TimelineClip) => void;
+  onUpdate: (id: string, updates: Partial<TimelineClip>) => void;
+}
+
+const TimelineClipItem = memo(({
+  clip,
+  asset,
+  pixelsPerSecond,
+  isSelected,
+  isLocked,
+  onSelect,
+  onDragStart,
+  onTrimStart,
+  onTrimEnd,
+}: ClipProps) => {
+  const { TRACK_HEIGHT, TRACK_GAP } = TIMELINE_CONSTANTS;
+
+  const isOffline = !asset || !asset.src;
+  const isVideo = asset?.type === 'video';
+  const clipDuration = clip.end - clip.start;
+  const clipColor = isOffline ? '#3d0b0b' : (isVideo ? '#4a8faa' : '#64a064');
+  const clipWidthPx = Math.max(2, clipDuration * pixelsPerSecond);
+  const showText = clipWidthPx > 40;
+
+  return (
+    <div
+      draggable={!isLocked}
+      onDragStart={(e) => !isLocked && onDragStart(e, clip.id)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(clip.id, e.ctrlKey || e.metaKey);
+      }}
+      className={`absolute rounded-md overflow-hidden text-white text-[10px] flex flex-col transition-all select-none group ${isSelected
+        ? 'ring-2 ring-white z-20 shadow-lg'
+        : 'shadow-sm border border-black/10'
+        } ${isLocked ? 'opacity-60 grayscale-[0.5] cursor-not-allowed' : 'cursor-move active:opacity-80'}`}
+      style={{
+        left: `${clip.start * pixelsPerSecond}px`,
+        width: `${clipWidthPx}px`,
+        height: `${TRACK_HEIGHT}px`,
+        top: `${TRACK_GAP / 2}px`,
+        backgroundColor: clipColor,
+      }}
+    >
+      {asset && isVideo && clipWidthPx > 20 && (
+        <WaveformDisplay
+          asset={asset}
+          clipStart={clip.start}
+          clipEnd={clip.end}
+          trimStart={clip.trimStart}
+          trimEnd={clip.trimEnd}
+          width={clipWidthPx}
+          height={TRACK_HEIGHT}
+        />
+      )}
+
+      {!isLocked && (
+        <>
+          <div
+            onMouseDown={(e) => onTrimStart(e, clip)}
+            className={`absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-green-400/60 z-30 transition-all flex items-center justify-center ${isSelected ? 'opacity-100 bg-green-500/30' : 'opacity-0 group-hover:opacity-100'}`}
+          >
+            <div className="w-[2px] h-6 bg-green-300 rounded-full shadow-lg" />
+          </div>
+          <div
+            onMouseDown={(e) => onTrimEnd(e, clip)}
+            className={`absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-red-400/60 z-30 transition-all flex items-center justify-center ${isSelected ? 'opacity-100 bg-red-500/30' : 'opacity-0 group-hover:opacity-100'}`}
+          >
+            <div className="w-[2px] h-6 bg-red-300 rounded-full shadow-lg" />
+          </div>
+        </>
+      )}
+
+      <div className="relative w-full h-full flex items-center overflow-hidden">
+        {showText && (
+          <div className={`px-2 w-full truncate font-medium drop-shadow-md flex items-center gap-1.5 ${isLocked ? 'text-white/60' : 'text-white/95'}`}>
+            {isOffline && <span className="text-red-400 font-bold bg-black/50 px-1 rounded">!</span>}
+            <span>{clip.name || 'Unknown Clip'}</span>
+          </div>
+        )}
+      </div>
+
+      {isLocked && (
+        <div className="absolute top-1 right-1 opacity-40">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+        </div>
+      )}
+
+      {isOffline && <div className="absolute inset-0 flex items-center justify-center bg-red-900/40 text-[9px] font-bold text-red-100 uppercase tracking-wider backdrop-blur-[1px]">Media Offline</div>}
+    </div>
+  );
+});
+
+TimelineClipItem.displayName = 'TimelineClipItem';
+
+const Playhead = memo(({ position, pixelsPerSecond }: { position: number, pixelsPerSecond: number }) => {
+  return (
+    <div
+      className="absolute top-0 bottom-0 w-[1px] bg-[#00E5FF] z-40 pointer-events-none will-change-transform"
+      style={{
+        transform: `translateX(${position * pixelsPerSecond}px)`,
+        boxShadow: '0 0 4px rgba(0, 229, 255, 0.4)'
+      }}
+    >
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#00E5FF] rotate-45 transform shadow-sm rounded-sm"></div>
+    </div>
+  );
+});
+
+Playhead.displayName = 'Playhead';
+
 const TimelineComponent: React.FC<TimelineProps> = ({
   timeline,
   assets,
@@ -405,30 +527,37 @@ const TimelineComponent: React.FC<TimelineProps> = ({
     };
   }, [trimming, pixelsPerSecond]);
 
-  // Helper for asset matching
+  // Optimized asset map for O(1) lookups
+  const assetMap = useMemo(() => {
+    const map = new Map<string, Asset>();
+    const fuzzyMap = new Map<string, Asset>();
+    const clean = (s: string) => s.toLowerCase().split('.')[0].trim();
+
+    assets.forEach(a => {
+      map.set(a.id, a);
+      fuzzyMap.set(clean(a.name), a);
+    });
+    return { map, fuzzyMap, clean };
+  }, [assets]);
+
   const getAssetByClip = useCallback((clip: TimelineClip) => {
-    let asset = assets.find(a => a.id === clip.assetId);
+    let asset = assetMap.map.get(clip.assetId);
     if (asset) return asset;
 
-    // Source File Match
     if (clip.sourceFileName) {
-      const clean = (s: string) => s.toLowerCase().split('.')[0].trim();
-      asset = assets.find(a => clean(a.name) === clean(clip.sourceFileName!));
+      asset = assetMap.fuzzyMap.get(assetMap.clean(clip.sourceFileName));
       if (asset) return asset;
     }
 
-    // Fallback Name Match
     if (clip.name) {
-      const clean = (s: string) => s.toLowerCase().split('.')[0].trim();
-      asset = assets.find(a => clean(a.name) === clean(clip.name));
+      asset = assetMap.fuzzyMap.get(assetMap.clean(clip.name));
     }
-    return asset;
-  }, [assets]);
+    return asset || null;
+  }, [assetMap]);
 
-  // NEW: Keyboard shortcut handler
+  // Keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Split at playhead (S key)
       if (e.key === 's' || e.key === 'S') {
         if (!e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
@@ -440,6 +569,19 @@ const TimelineComponent: React.FC<TimelineProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onSplitAtPlayhead]);
+
+  // Memoize split-able clip to avoid per-frame deep search
+  const splitableClip = useMemo(() => {
+    if (!hoveredClip) return null;
+    for (const track of timeline.tracks) {
+      for (const clip of track.clips) {
+        if (clip.id === hoveredClip && playheadPosition > clip.start && playheadPosition < clip.end) {
+          return clip;
+        }
+      }
+    }
+    return null;
+  }, [hoveredClip, timeline.tracks, playheadPosition]);
 
   // NEW: Marquee selection handler
   useEffect(() => {
@@ -648,117 +790,34 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                 }
               }}
             >
-              <div className="relative h-full">
-                {/* Clips */}
-                {track.clips.map(clip => {
-                  // Virtualization: Check visibility
-                  const visibleStart = scrollLeft / pixelsPerSecond;
-                  const visibleEnd = (scrollLeft + containerWidth) / pixelsPerSecond;
-                  if (clip.end < visibleStart || clip.start > visibleEnd) return null;
+              {/* Clips */}
+              {track.clips.map(clip => {
+                // Virtualization: Check visibility
+                const visibleStart = scrollLeft / pixelsPerSecond;
+                const visibleEnd = (scrollLeft + containerWidth) / pixelsPerSecond;
+                if (clip.end < visibleStart || clip.start > visibleEnd) return null;
 
-                  const asset = getAssetByClip(clip);
-                  const isOffline = !asset || !asset.src;
-                  const isVideo = asset?.type === 'video';
-                  const clipDuration = clip.end - clip.start;
-                  const clipColor = isOffline ? '#3d0b0b' : (isVideo ? '#4a8faa' : '#64a064');
-                  const clipBorder = isOffline ? '#662222' : (isVideo ? '#6bb2ce' : '#88c688');
-                  const clipWidthPx = Math.max(2, clipDuration * pixelsPerSecond);
-                  const showText = clipWidthPx > 40; // Only show text if wide enough
-
-                  return (
-                    <div
-                      key={clip.id}
-                      draggable={!track.locked}
-                      onDragStart={(e) => !track.locked && handleDragStart(e, clip.id)}
-                      onMouseEnter={() => setHoveredClip(clip.id)}
-                      onMouseLeave={() => setHoveredClip(null)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectClip(clip.id, e.ctrlKey || e.metaKey);
-                      }}
-                      className={`absolute rounded-md overflow-hidden text-white text-[10px] flex flex-col transition-all select-none group ${selectedClipIds.includes(clip.id)
-                        ? 'ring-2 ring-white z-20 shadow-lg'
-                        : 'shadow-sm border border-black/10'
-                        } ${track.locked ? 'opacity-60 grayscale-[0.5] cursor-not-allowed' : 'cursor-move active:opacity-80'}`}
-                      style={{
-                        left: `${clip.start * pixelsPerSecond}px`,
-                        width: `${clipWidthPx}px`,
-                        height: `${TRACK_HEIGHT}px`,
-                        top: `${TRACK_GAP / 2}px`,
-                        backgroundColor: clipColor,
-                      }}
-                    >
-                      {/* Real Waveform Display */}
-                      {asset && isVideo && clipWidthPx > 20 && (
-                        <WaveformDisplay
-                          asset={asset}
-                          clipStart={clip.start}
-                          clipEnd={clip.end}
-                          trimStart={clip.trimStart}
-                          trimEnd={clip.trimEnd}
-                          width={clipWidthPx}
-                          height={TRACK_HEIGHT}
-                        />
-                      )}
-
-                      {/* Enhanced Trim Handles - Larger and color-coded */}
-                      {!track.locked && (
-                        <>
-                          <div
-                            onMouseDown={(e) => handleTrimStart(e, clip)}
-                            className={`absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-green-400/60 z-30 transition-all flex items-center justify-center ${selectedClipIds.includes(clip.id) ? 'opacity-100 bg-green-500/30' : 'opacity-0 group-hover:opacity-100'
-                              }`}
-                          >
-                            <div className="w-[2px] h-6 bg-green-300 rounded-full shadow-lg" />
-                          </div>
-                          <div
-                            onMouseDown={(e) => handleTrimEnd(e, clip)}
-                            className={`absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-red-400/60 z-30 transition-all flex items-center justify-center ${selectedClipIds.includes(clip.id) ? 'opacity-100 bg-red-500/30' : 'opacity-0 group-hover:opacity-100'
-                              }`}
-                          >
-                            <div className="w-[2px] h-6 bg-red-300 rounded-full shadow-lg" />
-                          </div>
-                        </>
-                      )}
-
-                      {/* Clip Content Layer */}
-                      <div className="relative w-full h-full flex items-center overflow-hidden">
-                        {/* Clip Label */}
-                        {showText && (
-                          <div className={`px-2 w-full truncate font-medium drop-shadow-md flex items-center gap-1.5 ${track.locked ? 'text-white/60' : 'text-white/95'}`}>
-                            {isOffline && <span className="text-red-400 font-bold bg-black/50 px-1 rounded">!</span>}
-                            <span>{clip.name || 'Unknown Clip'}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Locked Overlay Icon */}
-                      {track.locked && (
-                        <div className="absolute top-1 right-1 opacity-40">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                        </div>
-                      )}
-
-                      {/* Offline Warning */}
-                      {isOffline && <div className="absolute inset-0 flex items-center justify-center bg-red-900/40 text-[9px] font-bold text-red-100 uppercase tracking-wider backdrop-blur-[1px]">Media Offline</div>}
-                    </div>
-                  );
-                })}
-              </div>
+                return (
+                  <TimelineClipItem
+                    key={clip.id}
+                    clip={clip}
+                    asset={getAssetByClip(clip)}
+                    pixelsPerSecond={pixelsPerSecond}
+                    isSelected={selectedClipIds.includes(clip.id)}
+                    isLocked={track.locked}
+                    onSelect={onSelectClip}
+                    onDragStart={handleDragStart}
+                    onTrimStart={handleTrimStart}
+                    onTrimEnd={handleTrimEnd}
+                    onUpdate={onClipUpdate}
+                  />
+                );
+              })}
             </div>
           ))}
 
           {/* Playhead */}
-          <div
-            className="absolute top-0 bottom-0 w-[1px] bg-[#00E5FF] z-40 pointer-events-none will-change-transform"
-            style={{
-              transform: `translateX(${playheadPosition * pixelsPerSecond}px)`,
-              boxShadow: '0 0 4px rgba(0, 229, 255, 0.4)'
-            }}
-          >
-            {/* Playhead Cap */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#00E5FF] rotate-45 transform shadow-sm rounded-sm"></div>
-          </div>
+          <Playhead position={playheadPosition} pixelsPerSecond={pixelsPerSecond} />
 
           {/* Snap Guide Line */}
           {snapGuideTime !== null && (
@@ -785,21 +844,19 @@ const TimelineComponent: React.FC<TimelineProps> = ({
           ))}
 
           {/* Split Preview Line - Shows where split will occur */}
-          {hoveredClip && timeline.tracks.some(t =>
-            t.clips.some(c => c.id === hoveredClip && playheadPosition > c.start && playheadPosition < c.end)
-          ) && (
-              <div
-                className="absolute top-0 bottom-0 w-[2px] bg-orange-400 z-35 pointer-events-none opacity-60"
-                style={{
-                  left: `${playheadPosition * pixelsPerSecond}px`,
-                  boxShadow: '0 0 8px rgba(251, 146, 60, 0.6)'
-                }}
-              >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[9px] bg-orange-500 text-white px-1 rounded whitespace-nowrap">
-                  Press S to Split
-                </div>
+          {splitableClip && (
+            <div
+              className="absolute top-0 bottom-0 w-[2px] bg-orange-400 z-35 pointer-events-none opacity-60"
+              style={{
+                left: `${playheadPosition * pixelsPerSecond}px`,
+                boxShadow: '0 0 8px rgba(251, 146, 60, 0.6)'
+              }}
+            >
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[9px] bg-orange-500 text-white px-1 rounded whitespace-nowrap">
+                Press S to Split
               </div>
-            )}
+            </div>
+          )}
 
           {/* Marquee Selection Box */}
           {selectionBox && (
@@ -834,7 +891,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
           setScrollLeft(newScrollLeft);
         }}
       />
-    </div>
+    </div >
   );
 };
 

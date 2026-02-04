@@ -62,8 +62,8 @@ export function renderTimeline(timelineData, outputFile) {
             const trimStart = clip.trimStart || 0;
             const trimEnd = clip.trimEnd || (clip.end - clip.start + trimStart);
 
-            // Video trim filter
-            filterComplex += `[0:v]trim=start=${trimStart}:end=${trimEnd},setpts=PTS-STARTPTS[v${idx}];`;
+            // Video trim and scale filter (scale to 1080p maintaining aspect ratio)
+            filterComplex += `[0:v]trim=start=${trimStart}:end=${trimEnd},setpts=PTS-STARTPTS,scale=-2:1080[v${idx}];`;
             // Audio trim filter
             filterComplex += `[0:a]atrim=start=${trimStart}:end=${trimEnd},asetpts=PTS-STARTPTS[a${idx}];`;
 
@@ -83,8 +83,6 @@ export function renderTimeline(timelineData, outputFile) {
             '-filter_complex', filterComplex,
             '-map', '[outv]',
             '-map', '[outa]',
-            // YouTube-optimized 1080p scaling (maintains aspect ratio)
-            '-vf', 'scale=-2:1080',
             // Video encoding - YouTube-optimized settings
             '-c:v', 'libx264',
             '-preset', 'slow',           // Better compression (worth the extra time)

@@ -61,6 +61,7 @@ const App: React.FC = () => {
     splitClipAtPlayhead,
     selectClipsInRange,
     setTrackHeight,
+    deleteProject,
   } = useTimeline();
 
   const [activeTab, setActiveTab] = useState('media');
@@ -76,6 +77,16 @@ const App: React.FC = () => {
     getPreviousMarker,
   } = useMarkers();
 
+  // Pre-calculate mapped words to avoid doing it per-frame
+  const transcriptWords = React.useMemo(() => {
+    return segments.map((s: any) => ({
+      word: s.text,
+      start: s.start * 1000,
+      end: s.end * 1000,
+      isDeleted: s.isDeleted
+    }));
+  }, [segments]);
+
   // Helper to construct a viewable asset for the transcript view based on backend segments
   const activeTranscriptAsset = React.useMemo(() => {
     // If we have backend segments, use them to overlay onto the current clip's asset or create a dummy one
@@ -89,17 +100,13 @@ const App: React.FC = () => {
         ...baseAsset,
         transcription: {
           transcription: segments.map((s: any) => s.text).join(' '),
-          words: segments.map((s: any) => ({
-            word: s.text,
-            start: s.start * 1000,
-            end: s.end * 1000,
-            isDeleted: s.isDeleted // Pass this through!
-          }))
+          words: transcriptWords
         }
       } as Asset;
     }
-    return currentClip?.asset ?? null;
-  }, [segments, assets, currentClip]);
+    return currentClip?.asset ?? assets[0] ?? null;
+  }, [segments, assets, transcriptWords, currentClip?.asset.id]); // Optimization: depend on ID, not object
+
 
   // --- Keyboard Shortcuts ---
   React.useEffect(() => {
@@ -248,6 +255,7 @@ const App: React.FC = () => {
         renderProgress={renderProgress}
         lastRenderPath={lastRenderPath}
         exportToXML={exportToXML}
+        deleteProject={deleteProject}
       />
 
       <div className="flex-grow flex overflow-hidden">

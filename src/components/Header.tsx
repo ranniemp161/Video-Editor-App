@@ -8,9 +8,10 @@ interface HeaderProps {
   renderProgress: number;
   lastRenderPath: string | null;
   exportToXML: () => void;
+  deleteProject: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML }) => {
+export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML, deleteProject }) => {
   const getButtonContent = () => {
     switch (renderStatus) {
       case 'rendering':
@@ -93,6 +94,14 @@ export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, rend
             Import XML
             <input type="file" className="hidden" accept=".xml" onChange={onImportClick} />
           </label>
+          <div className="h-4 w-[1px] bg-[#333] mx-1"></div>
+          <button
+            onClick={deleteProject}
+            className="px-3 py-1.5 text-[10px] font-bold bg-[#1a1a1a] hover:bg-red-900/40 text-red-500 border border-red-900/50 hover:border-red-500/50 transition-all rounded"
+            title="Delete current project and all its media files"
+          >
+            RESET PROJECT
+          </button>
         </div>
       </div>
     </header>
