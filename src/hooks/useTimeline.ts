@@ -52,6 +52,10 @@ export const useTimeline = () => {
   const [lastRenderPath, setLastRenderPath] = useState<string | null>(null);
   const [isTranscribing, setIsTranscribing] = useState<string | null>(null); // Asset ID being transcribed
 
+  // New Backend Integration State
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [segments, setSegments] = useState<any[]>([]); // Source of Truth from backend
+
   const animationFrameRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number | null>(null);
 
@@ -136,47 +140,223 @@ export const useTimeline = () => {
     });
   }, []);
 
-  const addMediaFiles = useCallback((files: FileList) => {
-    Array.from(files).forEach(file => {
-      const asset: Asset = {
-        id: `asset-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: file.name,
-        type: file.type.startsWith('video') ? 'video' : 'audio',
-        src: URL.createObjectURL(file),
-        duration: 0,
-      };
+  const addMediaFiles = useCallback(async (files: FileList) => {
+    // We only support single file upload for the main project for now in this new flow
+    const file = files[0];
+    if (!file) return;
 
-      const dummyVideo = document.createElement('video');
-      dummyVideo.src = asset.src;
-      dummyVideo.onloadedmetadata = () => {
-        asset.duration = dummyVideo.duration;
-        setAssets(prev => [...prev, asset]);
-        // Automatically trigger transcription for new video files
-        if (asset.type === 'video') {
-          transcribeAsset(asset.id, file.name);
+    // 1. Local Asset Creation (Optimistic UI)
+    const asset: Asset = {
+      id: `asset-${Date.now()}`,
+      name: file.name,
+      type: file.type.startsWith('video') ? 'video' : 'audio',
+      src: URL.createObjectURL(file), // Local preview
+      duration: 0,
+    };
+
+    // Get Duration
+    const dummyVideo = document.createElement('video');
+    dummyVideo.src = asset.src;
+    dummyVideo.onloadedmetadata = async () => {
+      asset.duration = dummyVideo.duration;
+      setAssets([asset]); // Replace assets for single-project flow
+
+      // 2. Upload to Backend
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        console.log("Uploading to backend...");
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success) {
+          console.log("Upload success, Project ID:", data.projectId);
+          setProjectId(data.projectId);
+
+          // DO NOT Trigger Transcription automatically
+          // transcribeProject(data.projectId);
         }
-      };
-    });
+      } catch (e) {
+        console.error("Upload failed", e);
+      }
+    };
   }, []);
 
-  const transcribeAsset = useCallback(async (assetId: string, fileName: string) => {
-    setIsTranscribing(assetId);
+  const transcribeProject = useCallback(async (pId: string) => {
+    setIsTranscribing(pId);
     try {
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoPath: `/${fileName}` }) // Assuming it's in public for now, or we need to handle blobs
-      });
-      const result = await response.json();
+      const res = await fetch(`/api/project/${pId}/transcribe`, { method: 'POST' });
+      const result = await res.json();
       if (result.success) {
-        setAssets(prev => prev.map(a => a.id === assetId ? { ...a, transcription: result.transcription } : a));
+        setSegments(result.segments);
+        // Add source metadata
+        const transcriptionWithSource = {
+          transcription: result.segments.map((s: any) => s.text).join(' '),
+          words: result.segments.map((s: any) => ({
+            word: s.text,
+            start: s.start * 1000,
+            end: s.end * 1000
+          })),
+          source: 'ai' as const
+        };
+        setAssets(prev => prev.map(a => a.id === pId || a.id === 'video-1' ? { ...a, transcription: transcriptionWithSource } : a));
+
+        // Auto-generate timeline from new segments
+        generateTimelineFromSegments(result.segments);
       }
-    } catch (err) {
-      console.error('Transcription failed:', err);
+    } catch (e) {
+      console.error("Transcription failed", e);
     } finally {
       setIsTranscribing(null);
     }
   }, []);
+
+  const generateTimelineFromSegments = useCallback((curSegments: any[]) => {
+    // Filter out deleted segments
+    const activeSegments = curSegments.filter(s => !s.isDeleted);
+
+    const newClips: TimelineClip[] = [];
+    let currentTimelinePos = 0;
+
+    activeSegments.forEach((seg, idx) => {
+      const duration = seg.end - seg.start;
+      // Apply minimal padding? (Logic can go here later)
+
+      newClips.push({
+        id: `seg-${idx}-${Date.now()}`,
+        assetId: `video-1`, // Placeholder, assuming single video track
+        trackId: 'v1',
+        name: seg.text || 'Clip',
+        sourceFileName: 'Project Video',
+        start: currentTimelinePos,
+        end: currentTimelinePos + duration,
+        trimStart: seg.start,
+        trimEnd: seg.end,
+        opacity: 100,
+        volume: 100
+      });
+      currentTimelinePos += duration;
+    });
+
+    setTimeline(prev => ({
+      ...prev,
+      tracks: prev.tracks.map(t => t.id === 'v1' ? { ...t, clips: newClips } : t)
+    }));
+  }, []);
+
+  // Update Segments (e.g. toggle delete)
+  const toggleSegmentDelete = useCallback(async (start: number) => {
+    if (!projectId) return;
+
+    // Optimistic Update
+    const newSegments = segments.map(s => {
+      if (Math.abs(s.start - start) < 0.01) { // Tiny epsilon match
+        return { ...s, isDeleted: !s.isDeleted };
+      }
+      return s;
+    });
+
+    setSegments(newSegments);
+    // REMOVED: Auto-regenerate timeline - preserves user's manual timeline edits
+    // Users should click "Auto-Cut" if they want to regenerate from segments
+    // generateTimelineFromSegments(newSegments);
+
+    // Sync to Backend
+    try {
+      await fetch(`/api/project/${projectId}/segments`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSegments)
+      });
+    } catch (e) {
+      console.error("Failed to sync segments", e);
+    }
+  }, [projectId, segments, generateTimelineFromSegments]);
+
+  // Fetch segments on load if projectId exists
+  useEffect(() => {
+    // Try to restore from local storage if not in state
+    if (!projectId) {
+      const stored = localStorage.getItem('currentProjectId');
+      if (stored) setProjectId(stored);
+      return;
+    }
+
+    // Save to local storage
+    localStorage.setItem('currentProjectId', projectId);
+
+    const fetchSegments = async () => {
+      try {
+        const res = await fetch(`/api/project/${projectId}`);
+        if (!res.ok) {
+          // If 404, maybe backend restarted? Clear storage
+          if (res.status === 404) {
+            console.warn("Project not found on backend (maybe restarted). Clearing session.");
+            localStorage.removeItem('currentProjectId');
+            setProjectId(null);
+          }
+          return;
+        }
+        const data = await res.json();
+        if (data.segments) {
+          setSegments(data.segments);
+          // REMOVED: Auto-timeline generation - user clicks "Auto-Cut" button instead
+          // generateTimelineFromSegments(data.segments);
+        }
+      } catch (e) {
+        console.error("Failed to fetch project state", e);
+      }
+    };
+    fetchSegments();
+  }, [projectId, generateTimelineFromSegments]);
+
+  const [transcriptionProgress, setTranscriptionProgress] = useState(0);
+
+  const transcribeAsset = useCallback(async (assetId: string, fileName: string) => {
+    setIsTranscribing(assetId);
+    setTranscriptionProgress(0);
+
+    // Find asset to get duration
+    const asset = assets.find(a => a.id === assetId);
+    if (!asset) {
+      console.error("Asset not found for transcription");
+      setIsTranscribing(null);
+      return;
+    }
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/transcription-progress?videoPath=/${fileName}`);
+        const data = await res.json();
+        setTranscriptionProgress(data.progress || 0);
+      } catch (e) { console.error(e); }
+    }, 1000);
+
+    try {
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoPath: `/${fileName}`, duration: asset.duration })
+      });
+      const result = await response.json();
+      if (result.success) {
+        const transcriptionWithSource = {
+          ...result.transcription,
+          source: 'ai' as const
+        };
+        setAssets(prev => prev.map(a => a.id === assetId ? { ...a, transcription: transcriptionWithSource } : a));
+      }
+    } catch (err) {
+      console.error('Transcription failed:', err);
+    } finally {
+      clearInterval(pollInterval);
+      setTranscriptionProgress(0);
+      setIsTranscribing(null);
+    }
+  }, [assets]);
 
   const autoCutAsset = useCallback(async (assetId: string) => {
     const asset = assets.find(a => a.id === assetId);
@@ -198,16 +378,32 @@ export const useTimeline = () => {
       });
 
       const data = await response.json();
-      if (data.success && data.clips) {
+
+      // Log statistics from professional rough cut
+      if (data.statistics) {
+        console.log('📊 Professional Rough Cut Statistics:');
+        console.log(`  • Segments: ${data.statistics.segment_count}`);
+        console.log(`  • Reduction: ${data.statistics.reduction_percentage}%`);
+        console.log(`  • Time saved: ${data.statistics.time_saved}s`);
+        console.log(`  • Silences removed: ${data.statistics.silences_removed}`);
+        console.log(`  • Repetitions removed: ${data.statistics.repetitions_removed}`);
+        console.log(`  • "Cut that" signals: ${data.statistics.cut_that_signals}`);
+        console.log(`  • Incomplete sentences: ${data.statistics.incomplete_sentences}`);
+      }
+
+      if (data.clips && data.clips.length > 0) {
         setTimeline(prev => {
           const newTracks = prev.tracks.map(track => {
-            if (track.type === 'video') {
+            if (track.id === 'v1') { // Target V1 only
               return { ...track, clips: data.clips };
             }
             return track;
           });
           return { ...prev, tracks: newTracks };
         });
+        console.log(`✅ Added ${data.clips.length} clips to timeline`);
+      } else {
+        console.warn('⚠️ No clips returned from auto-cut');
       }
     } catch (err) {
       console.error('Auto-cut failed:', err);
@@ -500,6 +696,34 @@ export const useTimeline = () => {
     return () => { if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current); };
   }, [isPlaying, animatePlayback]);
 
+  const exportTranscript = useCallback(async (transcription: any) => {
+    try {
+      const response = await fetch('/api/export-transcript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcription, format: 'txt' }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transcript_${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      } else {
+        console.error('Failed to export transcript');
+      }
+    } catch (error) {
+      console.error('Error exporting transcript:', error);
+    }
+  }, []);
+
   const onSelectClip = useCallback((clipId: string | null, append = false) => {
     if (clipId === null) {
       setSelectedClipIds([]);
@@ -515,6 +739,50 @@ export const useTimeline = () => {
       }
       return [clipId];
     });
+  }, []);
+
+  const uploadTranscript = useCallback(async (assetId: string, file: File) => {
+    try {
+      const content = await file.text();
+      const response = await fetch('/api/upload-transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, fileName: file.name })
+      });
+      const result = await response.json();
+      if (result.success) {
+        const transcriptionWithSource = {
+          ...result.transcription,
+          source: 'upload' as const
+        };
+        setAssets(prev => prev.map(a => a.id === assetId ? { ...a, transcription: transcriptionWithSource } : a));
+
+        // Update segments for transcript display, but DON'T regenerate timeline
+        // The existing timeline clips should remain untouched
+        if (projectId) {
+          // Convert word ms to seconds for segments (for transcript sidebar display)
+          const newSegments = result.transcription.words.map((w: any) => ({
+            start: w.start / 1000,
+            end: w.end / 1000,
+            text: w.word,
+            type: w.type || 'speech',
+            isDeleted: w.isDeleted || false
+          }));
+          setSegments(newSegments);
+          // REMOVED: generateTimelineFromSegments(newSegments); 
+          // Don't regenerate timeline - user's existing cuts should be preserved!
+
+          // Sync segments to backend (for transcript data only)
+          fetch(`/api/project/${projectId}/segments`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSegments)
+          }).catch(e => console.error("Sync failed", e));
+        }
+      }
+    } catch (err) {
+      console.error('Transcript upload failed:', err);
+    }
   }, []);
 
   return {
@@ -552,6 +820,13 @@ export const useTimeline = () => {
     isTranscribing,
     transcribeAsset,
     autoCutAsset,
-    exportToXML
+    exportToXML,
+    exportTranscript,
+    uploadTranscript,
+    transcriptionProgress,
+    // New exports
+    toggleSegmentDelete,
+    projectId,
+    segments
   };
 };

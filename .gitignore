@@ -22,3 +22,27 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Media files
+*.mp4
+*.mp3
+*.wav
+*.aac
+*.m4a
+*.webm
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs and outputs
+*.log
+test_output.txt
+results.txt
+
+# Temp files
+temp/
+tmp/
+.temp/
+.tmp/

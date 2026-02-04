@@ -48,11 +48,43 @@ const App: React.FC = () => {
     isTranscribing,
     transcribeAsset,
     autoCutAsset,
-    exportToXML
+    exportToXML,
+    exportTranscript,
+    uploadTranscript,
+    transcriptionProgress,
+    // New imports from hook
+    toggleSegmentDelete,
+    projectId,
+    segments
   } = useTimeline();
 
   const [activeTab, setActiveTab] = useState('media');
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+
+  // Helper to construct a viewable asset for the transcript view based on backend segments
+  const activeTranscriptAsset = React.useMemo(() => {
+    // If we have backend segments, use them to overlay onto the current clip's asset or create a dummy one
+    if (segments && segments.length > 0) {
+      // Find the asset that corresponds to the project media
+      // (For now assuming single asset project flow)
+      const baseAsset = assets[0] || currentClip?.asset;
+      if (!baseAsset) return null;
+
+      return {
+        ...baseAsset,
+        transcription: {
+          transcription: segments.map((s: any) => s.text).join(' '),
+          words: segments.map((s: any) => ({
+            word: s.text,
+            start: s.start * 1000,
+            end: s.end * 1000,
+            isDeleted: s.isDeleted // Pass this through!
+          }))
+        }
+      } as Asset;
+    }
+    return currentClip?.asset ?? null;
+  }, [segments, assets, currentClip]);
 
   // --- Keyboard Shortcuts ---
   React.useEffect(() => {
@@ -190,7 +222,7 @@ const App: React.FC = () => {
 
         <div className="flex-grow flex flex-col overflow-hidden">
           <div className="flex-[3] flex overflow-hidden border-b border-[#2d2d2d]">
-            <div className="w-[320px] bg-[#1a1a1a] border-r border-[#2d2d2d] flex flex-col">
+            <div className={`${activeTab === 'transcript' ? 'w-[500px]' : 'w-[320px]'} bg-[#1a1a1a] border-r border-[#2d2d2d] flex flex-col transition-all duration-200`}>
               {activeTab === 'media' && (
                 <MediaPool
                   assets={assets}
@@ -200,12 +232,38 @@ const App: React.FC = () => {
               )}
               {activeTab === 'transcript' && (
                 <TranscriptView
-                  asset={currentClip?.asset ?? null}
+                  asset={activeTranscriptAsset}
                   playheadPosition={playheadPosition}
-                  onSeek={setPlayheadPosition}
+                  timeline={timeline}
+                  onSeek={(originalTime) => {
+                    // Map original video timestamp to current timeline position
+                    // After auto-cut, clips are rearranged, so we need to find which clip
+                    // contains this original timestamp
+
+                    let targetPosition = originalTime; // fallback to original time
+
+                    for (const track of timeline.tracks) {
+                      for (const clip of track.clips) {
+                        // Check if original time falls within this clip's source range
+                        if (originalTime >= clip.trimStart && originalTime <= clip.trimEnd) {
+                          // Calculate offset within the clip
+                          const offsetInClip = originalTime - clip.trimStart;
+                          // Map to timeline position
+                          targetPosition = clip.start + offsetInClip;
+                          break;
+                        }
+                      }
+                    }
+
+                    setPlayheadPosition(targetPosition);
+                  }}
                   onTranscribe={transcribeAsset}
                   onAutoCut={autoCutAsset}
-                  isTranscribing={isTranscribing === currentClip?.asset?.id}
+                  onExport={exportTranscript}
+                  onUploadTranscript={uploadTranscript}
+                  isTranscribing={!!isTranscribing}
+                  progress={transcriptionProgress}
+                  onToggleWord={(start) => toggleSegmentDelete(start)}
                 />
               )}
               {activeTab !== 'media' && activeTab !== 'transcript' && (
@@ -233,13 +291,16 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-[300px] border-l border-[#2d2d2d]">
-              <Inspector
-                selectedAsset={selectedAsset || (currentClip?.asset ?? null)}
-                selectedClip={timeline.tracks.flatMap((t: any) => t.clips).find((c: any) => selectedClipIds.includes(c.id)) || null}
-                onUpdateClip={updateClip}
-              />
-            </div>
+            {/* Inspector Panel - Hidden in Transcript tab, visible in Media tab */}
+            {activeTab !== 'transcript' && (
+              <div className="w-[300px] border-l border-[#2d2d2d]">
+                <Inspector
+                  selectedAsset={selectedAsset || (currentClip?.asset ?? null)}
+                  selectedClip={timeline.tracks.flatMap((t: any) => t.clips).find((c: any) => selectedClipIds.includes(c.id)) || null}
+                  onUpdateClip={updateClip}
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex-[2] flex flex-col bg-[#0f0f0f] overflow-hidden">

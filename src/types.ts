@@ -7,23 +7,39 @@ export interface Word {
 }
 
 export interface Transcription {
-  transcription: {
-    offsets: {
-      from: number;
-      to: number;
-    };
-    text: string;
-    tokens: any[];
-    timestamps: {
-      from: string;
-      to: string;
-    }
-  };
+  source?: 'ai' | 'upload';
+  transcription: any;
   words: {
     word: string;
     start: number;
     end: number;
+    isDeleted?: boolean;
   }[];
+  thoughts?: ThoughtMetadata; // New: thought grouping metadata
+}
+
+export interface Thought {
+  id: number;
+  start_time: number;
+  end_time: number;
+  text: string;
+  word_indices: number[];
+  word_count: number;
+  coherence_score: number;
+  type: 'main_point' | 'tangent' | 'filler' | 'repetition';
+  is_kept?: boolean;
+}
+
+export interface ThoughtMetadata {
+  thoughts: Thought[];
+  summary?: {
+    total_thoughts: number;
+    total_words: number;
+    avg_words_per_thought: number;
+    avg_coherence: number;
+    type_distribution: Record<string, number>;
+    total_duration: number;
+  };
 }
 
 export interface Asset {

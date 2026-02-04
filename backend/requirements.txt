@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+librosa
+moviepy
+numpy
+scipy
+fuzzywuzzy
+python-levenshtein

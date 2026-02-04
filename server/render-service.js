@@ -32,45 +32,80 @@ export function renderTimeline(timelineData, outputFile) {
         // Calculate total duration for progress parsing
         const totalTimelineDuration = videoClips.length > 0 ? videoClips[videoClips.length - 1].end : 0;
 
-        let concatScript = '';
+        // Group clips by source file for optimization
+        const clipsBySource = new Map();
         videoClips.forEach(clip => {
             const asset = assets.find(a => a.id === clip.assetId);
-            const fileName = asset?.name || 'unknown';
-            const absolutePath = asset ? findFile(asset.src ? asset.src : fileName) : '';
+            const fileName = asset?.name || clip.sourceFileName || clip.name;
+            const filePath = path.resolve(findFile(fileName));
 
-            const filePath = path.resolve(findFile(clip.sourceFileName || clip.name));
-            const escapedPath = filePath.replace(/'/g, "'\\''");
-
-            const trimStart = clip.trimStart || 0;
-            const clipDuration = clip.end - clip.start;
-
-            concatScript += `file '${escapedPath}'\n`;
-            concatScript += `inpoint ${trimStart}\n`;
-            concatScript += `outpoint ${trimStart + clipDuration}\n`;
+            if (!clipsBySource.has(filePath)) {
+                clipsBySource.set(filePath, []);
+            }
+            clipsBySource.get(filePath).push(clip);
         });
 
-        const scriptFile = path.join('data', 'concat_list_auto.txt');
-        fs.writeFileSync(scriptFile, concatScript);
+        // For now, we'll use the simpler approach: single source file
+        // If multiple source files, we'd need a more complex filter_complex
+        const sourceFiles = Array.from(clipsBySource.keys());
+
+        if (sourceFiles.length === 0) {
+            return reject(new Error('No source files found for clips.'));
+        }
+
+        // Build filter_complex for single source (most common case)
+        const sourceFile = sourceFiles[0];
+        let filterComplex = '';
+        let concatInputs = '';
+
+        videoClips.forEach((clip, idx) => {
+            const trimStart = clip.trimStart || 0;
+            const trimEnd = clip.trimEnd || (clip.end - clip.start + trimStart);
+
+            // Video trim filter
+            filterComplex += `[0:v]trim=start=${trimStart}:end=${trimEnd},setpts=PTS-STARTPTS[v${idx}];`;
+            // Audio trim filter
+            filterComplex += `[0:a]atrim=start=${trimStart}:end=${trimEnd},asetpts=PTS-STARTPTS[a${idx}];`;
+
+            // Collect labels for concat
+            concatInputs += `[v${idx}][a${idx}]`;
+        });
+
+        // Add concat filter
+        const numClips = videoClips.length;
+        filterComplex += `${concatInputs}concat=n=${numClips}:v=1:a=1[outv][outa]`;
+
+        console.log('[Render Service] Filter Complex:', filterComplex);
 
         const args = [
             '-y',
-            '-f', 'concat',
-            '-safe', '0',
-            '-i', scriptFile,
+            '-i', sourceFile,
+            '-filter_complex', filterComplex,
+            '-map', '[outv]',
+            '-map', '[outa]',
             '-c:v', 'libx264',
-            '-pix_fmt', 'yuv420p',
+            '-preset', 'medium',
+            '-crf', '20',
             '-c:a', 'aac',
+            '-b:a', '192k',
+            '-pix_fmt', 'yuv420p',
+            '-movflags', '+faststart',
             outputFile
         ];
 
-        console.log('[Render Service] Spawning FFmpeg pool...');
+        console.log('[Render Service] Spawning FFmpeg with filter_complex...');
+        console.log('[Render Service] Command:', 'ffmpeg', args.join(' '));
+
         const ffmpeg = spawn('ffmpeg', args);
 
         currentProgress = 0;
         isRendering = true;
 
+        let stderrBuffer = '';
         ffmpeg.stderr.on('data', (data) => {
             const line = data.toString();
+            stderrBuffer += line;
+
             // Parse progress from FFmpeg output: time=00:00:05.12
             const timeMatch = line.match(/time=(\d+):(\d+):(\d+\.\d+)/);
             if (timeMatch && totalTimelineDuration > 0) {
@@ -91,6 +126,7 @@ export function renderTimeline(timelineData, outputFile) {
                 resolve(outputFile);
             } else {
                 console.error(`[Render Service] FFmpeg exited with code ${code}`);
+                console.error(`[Render Service] FFmpeg stderr:`, stderrBuffer);
                 reject(new Error(`FFmpeg exited with code ${code}`));
             }
         });
