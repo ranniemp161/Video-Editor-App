@@ -50,6 +50,7 @@ interface ClipProps {
   isLocked: boolean;
   onSelect: (id: string, append: boolean) => void;
   onDragStart: (e: React.DragEvent, id: string) => void;
+  onDragEnd: () => void;
   onTrimStart: (e: React.MouseEvent, clip: TimelineClip) => void;
   onTrimEnd: (e: React.MouseEvent, clip: TimelineClip) => void;
   onUpdate: (id: string, updates: Partial<TimelineClip>) => void;
@@ -63,6 +64,7 @@ const TimelineClipItem = memo(({
   isLocked,
   onSelect,
   onDragStart,
+  onDragEnd,
   onTrimStart,
   onTrimEnd,
 }: ClipProps) => {
@@ -79,6 +81,7 @@ const TimelineClipItem = memo(({
     <div
       draggable={!isLocked}
       onDragStart={(e) => !isLocked && onDragStart(e, clip.id)}
+      onDragEnd={onDragEnd}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(clip.id, e.ctrlKey || e.metaKey);
@@ -205,6 +208,14 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   const [selectionBox, setSelectionBox] = useState<{ startX: number; startY: number; endX: number; endY: number } | null>(null);
   const [hoveredClip, setHoveredClip] = useState<string | null>(null);
   const [trimTooltip, setTrimTooltip] = useState<{ clipId: string; side: 'start' | 'end'; value: string } | null>(null);
+
+  const lastScrubTimeRef = useRef<number | null>(null);
+  const scrollLeftRef = useRef(scrollLeft);
+
+  // Keep ref in sync for event handlers
+  useEffect(() => {
+    scrollLeftRef.current = scrollLeft;
+  }, [scrollLeft]);
 
   // Sync scroll between Ruler and Tracks
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -442,7 +453,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
       if (isScrubbing && rulerRef.current) {
         const rect = rulerRef.current.getBoundingClientRect();
-        const x = Math.max(0, e.clientX - rect.left + scrollLeft);
+        const x = Math.max(0, e.clientX - rect.left + scrollLeftRef.current);
 
         // Edge Auto-scroll logic (only for scrubbing)
         const edgeThreshold = 60;
@@ -468,11 +479,17 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    // Safety net for when focus is lost or mouse leaves window
+    window.addEventListener('mouseleave', handleMouseUp);
+    window.addEventListener('blur', handleMouseUp);
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseUp);
+      window.removeEventListener('blur', handleMouseUp);
     };
-  }, [isScrubbing, isPanning, scrollLeft, pixelsPerSecond, onPlayheadUpdate, isSnappingEnabled, timeline]);
+  }, [isScrubbing, isPanning, pixelsPerSecond, onPlayheadUpdate, isSnappingEnabled, timeline]);
 
   const handleGlobalMouseDown = (e: React.MouseEvent) => {
     // Middle Mouse Button (button 1)
@@ -517,13 +534,18 @@ const TimelineComponent: React.FC<TimelineProps> = ({
       }
     };
     const handleMouseUp = () => setTrimming(null);
+
     if (trimming) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseleave', handleMouseUp);
+      window.addEventListener('blur', handleMouseUp);
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseUp);
+      window.removeEventListener('blur', handleMouseUp);
     };
   }, [trimming, pixelsPerSecond]);
 
@@ -595,7 +617,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         if (!prev) return null;
         return {
           ...prev,
-          endX: e.clientX - rect.left + scrollLeft,
+          endX: e.clientX - rect.left + scrollLeftRef.current,
           endY: e.clientY - rect.top
         };
       });
@@ -613,11 +635,16 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseleave', handleMouseUp);
+    window.addEventListener('blur', handleMouseUp);
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseUp);
+      window.removeEventListener('blur', handleMouseUp);
     };
-  }, [isSelectingBox, selectionBox, onSelectClipsInRange, pixelsPerSecond, scrollLeft]);
+  }, [isSelectingBox, selectionBox, onSelectClipsInRange, pixelsPerSecond]);
 
   return (
     <div
@@ -807,6 +834,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                     isLocked={track.locked}
                     onSelect={onSelectClip}
                     onDragStart={handleDragStart}
+                    onDragEnd={() => setDraggingClip(null)}
                     onTrimStart={handleTrimStart}
                     onTrimEnd={handleTrimEnd}
                     onUpdate={onClipUpdate}
