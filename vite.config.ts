@@ -70,6 +70,33 @@ export default defineConfig(({ mode }) => {
               return;
             }
 
+            if (url.startsWith('/api/export-xml') && req.method === 'POST') {
+              let body = '';
+              req.on('data', chunk => { body += chunk; });
+              req.on('end', async () => {
+                try {
+                  if (!body) throw new Error('Empty request body');
+                  const data = JSON.parse(body);
+                  const exportsDir = path.join(__dirname, 'public', 'exports');
+                  if (!fs.existsSync(exportsDir)) fs.mkdirSync(exportsDir, { recursive: true });
+
+                  const fileName = `rough_cut_${Date.now()}.xml`;
+                  const finalPath = path.join(exportsDir, fileName);
+
+                  console.log(`[API] Generating XML: ${finalPath}`);
+                  generateXML(data, finalPath);
+
+                  res.writeHead(200, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ success: true, path: `/exports/${fileName}` }));
+                } catch (err) {
+                  console.error('[API] XML Export Error:', err);
+                  res.writeHead(500, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ success: false, error: err.message }));
+                }
+              });
+              return;
+            }
+
             // Fallthrough to proxy for /api/upload, /api/transcribe, etc.
             next();
           });

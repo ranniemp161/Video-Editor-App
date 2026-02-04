@@ -3,7 +3,7 @@ import path from 'path';
 import { findFile } from './path-utils.js';
 
 export function generateXML(timelineData, outputFile) {
-  const FPS = 30; // Default to 30, could be dynamic
+  const FPS = 30; // Default to 30
   const { tracks } = timelineData.timeline;
   const assets = timelineData.assets || [];
 
@@ -14,16 +14,17 @@ export function generateXML(timelineData, outputFile) {
     throw new Error('No video clips to export.');
   }
 
-  const toFrames = (seconds) => Math.floor(seconds * FPS);
+  const toFrames = (seconds) => Math.round(seconds * FPS);
 
-  const totalDuration = videoClips.reduce((acc, c) => acc + (c.end - c.start), 0);
+  // Calculate total duration using frame-accurate math
+  const totalFrames = videoClips.reduce((acc, c) => acc + toFrames(c.end - c.start), 0);
 
   const header = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xmeml>
 <xmeml version="4">
   <sequence id="RoughCut">
     <name>Rough Cut Sequence</name>
-    <duration>${toFrames(totalDuration)}</duration>
+    <duration>${totalFrames}</duration>
     <rate>
       <timebase>${FPS}</timebase>
       <ntsc>FALSE</ntsc>
@@ -47,22 +48,25 @@ export function generateXML(timelineData, outputFile) {
   </sequence>
 </xmeml>`;
 
-  let sequenceTime = 0;
+  let currentTimelineFrame = 0;
   const clipsXML = videoClips.map((clip, index) => {
     const asset = assets.find(a => a.id === clip.assetId);
     const fileName = asset?.name || 'unknown';
     const absolutePath = asset ? findFile(asset.src ? asset.src : fileName) : '';
-    const pathUrl = `file://localhost/${absolutePath.replace(/\\/g, '/')}`;
+    const pathUrl = absolutePath ? `file://localhost/${absolutePath.replace(/\\/g, '/')}` : '';
 
-    const trimStart = clip.trimStart || 0;
-    const duration = clip.end - clip.start;
-    const inFrame = toFrames(trimStart);
-    const outFrame = toFrames(trimStart + duration);
+    const durationSeconds = clip.end - clip.start;
+    const durationFrames = toFrames(durationSeconds);
 
-    const startFrameSeq = toFrames(sequenceTime);
-    const endFrameSeq = toFrames(sequenceTime + duration);
+    // In/Out frames on the source asset
+    const inFrame = toFrames(clip.trimStart || 0);
+    const outFrame = inFrame + durationFrames;
 
-    sequenceTime += duration;
+    // Start/End frames on the timeline
+    const startFrameSeq = currentTimelineFrame;
+    const endFrameSeq = currentTimelineFrame + durationFrames;
+
+    currentTimelineFrame += durationFrames;
 
     return `
           <clipitem id="clipitem-${index}">

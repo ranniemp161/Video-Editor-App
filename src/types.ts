@@ -73,6 +73,15 @@ export interface TimelineTrack {
   locked?: boolean;
 }
 
+export interface TimelineMarker {
+  id: string;              // Unique marker ID
+  time: number;            // Position on timeline in seconds
+  label?: string;          // Optional user label
+  color: 'blue' | 'red' | 'green' | 'yellow';  // Marker color
+  createdAt: number;       // Timestamp for sorting
+}
+
 export interface TimelineState {
   tracks: TimelineTrack[];
+  markers?: TimelineMarker[];  // Add markers to timeline state
 }

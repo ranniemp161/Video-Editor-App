@@ -10,6 +10,7 @@ import { Inspector } from '@/components/Inspector';
 import { TranscriptView } from '@/components/TranscriptView';
 import { AddIcon } from '@/components/icons';
 import { useTimeline } from '@/hooks/useTimeline';
+import { useMarkers } from '@/hooks/useMarkers';
 import { Asset } from '@/types';
 import { formatTime } from '@/utils/time';
 
@@ -60,6 +61,16 @@ const App: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('media');
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+
+  // Marker management
+  const {
+    markers,
+    addMarker,
+    removeMarker,
+    updateMarker,
+    getNextMarker,
+    getPreviousMarker,
+  } = useMarkers();
 
   // Helper to construct a viewable asset for the transcript view based on backend segments
   const activeTranscriptAsset = React.useMemo(() => {
@@ -162,19 +173,37 @@ const App: React.FC = () => {
           deleteClip();
           break;
         case 'arrowleft': // Left: step back 1 frame
-          e.preventDefault();
-          setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
+          if (e.shiftKey) {
+            // Shift + Left: Jump to previous marker
+            e.preventDefault();
+            const prevMarker = getPreviousMarker(playheadPosition);
+            if (prevMarker) setPlayheadPosition(prevMarker.time);
+          } else {
+            e.preventDefault();
+            setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
+          }
           break;
         case 'arrowright': // Right: step forward 1 frame
+          if (e.shiftKey) {
+            // Shift + Right: Jump to next marker
+            e.preventDefault();
+            const nextMarker = getNextMarker(playheadPosition);
+            if (nextMarker) setPlayheadPosition(nextMarker.time);
+          } else {
+            e.preventDefault();
+            setPlayheadPosition(Math.min(totalDuration, playheadPosition + 0.1));
+          }
+          break;
+        case 'm': // M: Add marker at playhead
           e.preventDefault();
-          setPlayheadPosition(Math.min(totalDuration, playheadPosition + 0.1));
+          addMarker(playheadPosition);
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePlayback, timeline, playheadPosition, splitClip, selectedClipIds, deleteClip, selectAllClips, totalDuration, setPlayheadPosition, undo, redo]);
+  }, [togglePlayback, timeline, playheadPosition, splitClip, selectedClipIds, deleteClip, selectAllClips, totalDuration, setPlayheadPosition, undo, redo, addMarker, getNextMarker, getPreviousMarker]);
 
   const handleAssetSelect = (asset: Asset) => {
     setSelectedAsset(asset);
@@ -377,6 +406,10 @@ const App: React.FC = () => {
                 totalDuration={totalDuration}
                 onToggleMute={toggleTrackMute}
                 onToggleLock={toggleTrackLock}
+                markers={markers}
+                onAddMarker={addMarker}
+                onRemoveMarker={removeMarker}
+                onUpdateMarker={updateMarker}
               />
             </div>
           </div>

@@ -1,8 +1,9 @@
 
 import React, { useRef, memo, useState, useMemo, useEffect, useCallback } from 'react';
-import { TimelineState, Asset, TimelineClip } from '../types';
+import { TimelineState, Asset, TimelineClip, TimelineMarker } from '../types';
 import { TIMELINE_CONSTANTS } from '../constants';
 import { formatTime } from '../utils/time';
+import { MarkerFlag } from './MarkerFlag';
 
 interface TimelineProps {
   timeline: TimelineState;
@@ -18,6 +19,10 @@ interface TimelineProps {
   totalDuration: number;
   onToggleMute: (trackId: string) => void;
   onToggleLock: (trackId: string) => void;
+  markers?: TimelineMarker[];
+  onAddMarker?: (time: number) => void;
+  onRemoveMarker?: (id: string) => void;
+  onUpdateMarker?: (id: string, updates: Partial<TimelineMarker>) => void;
 }
 
 const HEADER_WIDTH = 120; // Increased to fit controls
@@ -42,7 +47,11 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   onSelectClip,
   totalDuration,
   onToggleMute,
-  onToggleLock
+  onToggleLock,
+  markers = [],
+  onAddMarker,
+  onRemoveMarker,
+  onUpdateMarker,
 }) => {
   const rulerRef = useRef<HTMLDivElement>(null);
   const tracksScrollRef = useRef<HTMLDivElement>(null);
@@ -643,6 +652,18 @@ const TimelineComponent: React.FC<TimelineProps> = ({
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-400 blur-[2px]"></div>
             </div>
           )}
+
+          {/* Markers */}
+          {markers.map(marker => (
+            <MarkerFlag
+              key={marker.id}
+              marker={marker}
+              pixelsPerSecond={pixelsPerSecond}
+              onClick={onPlayheadUpdate}
+              onRemove={onRemoveMarker || (() => { })}
+              onUpdate={onUpdateMarker || (() => { })}
+            />
+          ))}
 
         </div>
       </div>
