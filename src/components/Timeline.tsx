@@ -4,6 +4,8 @@ import { TimelineState, Asset, TimelineClip, TimelineMarker } from '../types';
 import { TIMELINE_CONSTANTS } from '../constants';
 import { formatTime } from '../utils/time';
 import { MarkerFlag } from './MarkerFlag';
+import { WaveformDisplay } from './WaveformDisplay';
+import { TimelineMinimap } from './TimelineMinimap';
 
 interface TimelineProps {
   timeline: TimelineState;
@@ -23,6 +25,10 @@ interface TimelineProps {
   onAddMarker?: (time: number) => void;
   onRemoveMarker?: (id: string) => void;
   onUpdateMarker?: (id: string, updates: Partial<TimelineMarker>) => void;
+  // NEW UX Props
+  onSplitAtPlayhead?: () => void;
+  onSelectClipsInRange?: (startTime: number, endTime: number) => void;
+  onSetTrackHeight?: (trackId: string, height: number) => void;
 }
 
 const HEADER_WIDTH = 120; // Increased to fit controls
@@ -52,6 +58,10 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   onAddMarker,
   onRemoveMarker,
   onUpdateMarker,
+  // NEW UX Props
+  onSplitAtPlayhead,
+  onSelectClipsInRange,
+  onSetTrackHeight,
 }) => {
   const rulerRef = useRef<HTMLDivElement>(null);
   const tracksScrollRef = useRef<HTMLDivElement>(null);
@@ -66,6 +76,13 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   const [isPanning, setIsPanning] = useState(false);
   const [snapGuideTime, setSnapGuideTime] = useState<number | null>(null);
   const lastMouseXRef = useRef<number>(0);
+
+  // NEW: Additional state for UX enhancements
+  const [isRippleMode, setIsRippleMode] = useState(false);
+  const [isSelectingBox, setIsSelectingBox] = useState(false);
+  const [selectionBox, setSelectionBox] = useState<{ startX: number; startY: number; endX: number; endY: number } | null>(null);
+  const [hoveredClip, setHoveredClip] = useState<string | null>(null);
+  const [trimTooltip, setTrimTooltip] = useState<{ clipId: string; side: 'start' | 'end'; value: string } | null>(null);
 
   // Sync scroll between Ruler and Tracks
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -95,10 +112,11 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   const timelineWidth = Math.max(totalDuration * pixelsPerSecond, containerWidth);
 
   // --- Zoom Logic ---
-  // --- Zoom Logic ---
-  const handleWheel = (e: React.WheelEvent) => {
+  const handleWheel = useCallback((e: WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
+      e.stopPropagation();
+
       // Use shorter delta for smoother feel
       const zoomFactor = e.deltaY < 0 ? 1.05 : 0.95;
       const newPPS = Math.min(Math.max(pixelsPerSecond * zoomFactor, MIN_PPS), MAX_PPS);
@@ -126,7 +144,20 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         setPixelsPerSecond(newPPS);
       }
     }
-  };
+  }, [pixelsPerSecond, scrollLeft]);
+
+  // Add native wheel event listener to prevent browser zoom
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Use native event listener with passive: false to prevent default
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [handleWheel]);
 
   const setZoom = (val: number) => {
     setPixelsPerSecond(Math.min(Math.max(val, MIN_PPS), MAX_PPS));
@@ -394,6 +425,58 @@ const TimelineComponent: React.FC<TimelineProps> = ({
     return asset;
   }, [assets]);
 
+  // NEW: Keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Split at playhead (S key)
+      if (e.key === 's' || e.key === 'S') {
+        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          onSplitAtPlayhead?.();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onSplitAtPlayhead]);
+
+  // NEW: Marquee selection handler
+  useEffect(() => {
+    if (!isSelectingBox) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!tracksScrollRef.current || !selectionBox) return;
+
+      const rect = tracksScrollRef.current.getBoundingClientRect();
+      setSelectionBox(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          endX: e.clientX - rect.left + scrollLeft,
+          endY: e.clientY - rect.top
+        };
+      });
+    };
+
+    const handleMouseUp = () => {
+      if (selectionBox && onSelectClipsInRange) {
+        const startTime = Math.min(selectionBox.startX, selectionBox.endX) / pixelsPerSecond;
+        const endTime = Math.max(selectionBox.startX, selectionBox.endX) / pixelsPerSecond;
+        onSelectClipsInRange(startTime, endTime);
+      }
+      setIsSelectingBox(false);
+      setSelectionBox(null);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isSelectingBox, selectionBox, onSelectClipsInRange, pixelsPerSecond, scrollLeft]);
+
   return (
     <div
       ref={containerRef}
@@ -401,7 +484,20 @@ const TimelineComponent: React.FC<TimelineProps> = ({
       onMouseDown={handleGlobalMouseDown}
     >
       {/* Zoom / Controls Bar */}
-      <div className="flex items-center justify-end px-4 h-9 bg-[#1a1a1a] border-b border-[#333] gap-4">
+      <div className="flex items-center justify-between px-4 h-9 bg-[#1a1a1a] border-b border-[#333] gap-4">
+        <div className="flex items-center gap-2">
+          {/* Ripple Edit Mode Toggle */}
+          <button
+            onClick={() => setIsRippleMode(!isRippleMode)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${isRippleMode
+              ? 'bg-cyan-500 text-white'
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            title="Ripple Edit Mode - Moving/deleting clips shifts subsequent clips"
+          >
+            {isRippleMode ? '⚡ Ripple ON' : 'Ripple'}
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setZoom(pixelsPerSecond * 0.8)} className="text-gray-500 hover:text-white transition-colors text-lg font-mono">-</button>
           <input
@@ -447,7 +543,6 @@ const TimelineComponent: React.FC<TimelineProps> = ({
           className="flex-grow overflow-hidden relative cursor-pointer select-none border-l border-[#333]"
           ref={rulerRef}
           onScroll={handleScroll}
-          onWheel={handleWheel}
           onMouseDown={(e) => {
             if (e.button === 2 || e.altKey) { // Right Click or Alt+Drag to pan
               e.preventDefault();
@@ -490,7 +585,6 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         className="flex-grow flex overflow-x-auto overflow-y-auto"
         ref={tracksScrollRef}
         onScroll={handleScroll}
-        onWheel={handleWheel}
       >
         <div className="sticky left-0 flex flex-col z-10 bg-[#121212] border-r border-[#333] shadow-2xl" style={{ width: `${HEADER_WIDTH}px` }}>
           {timeline.tracks.map((track) => (
@@ -542,6 +636,17 @@ const TimelineComponent: React.FC<TimelineProps> = ({
               }}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, track.id)}
+              onMouseDown={(e) => {
+                // Shift + Click to start marquee selection
+                if (e.shiftKey && tracksScrollRef.current) {
+                  e.preventDefault();
+                  const rect = tracksScrollRef.current.getBoundingClientRect();
+                  const startX = e.clientX - rect.left + scrollLeft;
+                  const startY = e.clientY - rect.top;
+                  setSelectionBox({ startX, startY, endX: startX, endY: startY });
+                  setIsSelectingBox(true);
+                }
+              }}
             >
               <div className="relative h-full">
                 {/* Clips */}
@@ -565,6 +670,8 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                       key={clip.id}
                       draggable={!track.locked}
                       onDragStart={(e) => !track.locked && handleDragStart(e, clip.id)}
+                      onMouseEnter={() => setHoveredClip(clip.id)}
+                      onMouseLeave={() => setHoveredClip(null)}
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectClip(clip.id, e.ctrlKey || e.metaKey);
@@ -581,23 +688,35 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                         backgroundColor: clipColor,
                       }}
                     >
-                      {/* Visual Texture (Waveform-ish / Pattern) */}
-                      <div
-                        className="absolute inset-0 opacity-[0.07] pointer-events-none"
-                        style={{
-                          backgroundImage: `linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.5) 50%)`,
-                          backgroundSize: '2px 100%'
-                        }}
-                      />
+                      {/* Real Waveform Display */}
+                      {asset && isVideo && clipWidthPx > 20 && (
+                        <WaveformDisplay
+                          asset={asset}
+                          clipStart={clip.start}
+                          clipEnd={clip.end}
+                          trimStart={clip.trimStart}
+                          trimEnd={clip.trimEnd}
+                          width={clipWidthPx}
+                          height={TRACK_HEIGHT}
+                        />
+                      )}
 
-                      {/* Trim Handles - Visible on hover/selection, disabled if locked */}
+                      {/* Enhanced Trim Handles - Larger and color-coded */}
                       {!track.locked && (
                         <>
-                          <div onMouseDown={(e) => handleTrimStart(e, clip)} className="absolute left-0 top-0 bottom-0 w-3 cursor-ww-resize hover:bg-white/40 z-30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                            <div className="w-[1px] h-4 bg-white/50 shadow-sm" />
+                          <div
+                            onMouseDown={(e) => handleTrimStart(e, clip)}
+                            className={`absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-green-400/60 z-30 transition-all flex items-center justify-center ${selectedClipIds.includes(clip.id) ? 'opacity-100 bg-green-500/30' : 'opacity-0 group-hover:opacity-100'
+                              }`}
+                          >
+                            <div className="w-[2px] h-6 bg-green-300 rounded-full shadow-lg" />
                           </div>
-                          <div onMouseDown={(e) => handleTrimEnd(e, clip)} className="absolute right-0 top-0 bottom-0 w-3 cursor-ww-resize hover:bg-white/40 z-30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                            <div className="w-[1px] h-4 bg-white/50 shadow-sm" />
+                          <div
+                            onMouseDown={(e) => handleTrimEnd(e, clip)}
+                            className={`absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-red-400/60 z-30 transition-all flex items-center justify-center ${selectedClipIds.includes(clip.id) ? 'opacity-100 bg-red-500/30' : 'opacity-0 group-hover:opacity-100'
+                              }`}
+                          >
+                            <div className="w-[2px] h-6 bg-red-300 rounded-full shadow-lg" />
                           </div>
                         </>
                       )}
@@ -665,8 +784,56 @@ const TimelineComponent: React.FC<TimelineProps> = ({
             />
           ))}
 
+          {/* Split Preview Line - Shows where split will occur */}
+          {hoveredClip && timeline.tracks.some(t =>
+            t.clips.some(c => c.id === hoveredClip && playheadPosition > c.start && playheadPosition < c.end)
+          ) && (
+              <div
+                className="absolute top-0 bottom-0 w-[2px] bg-orange-400 z-35 pointer-events-none opacity-60"
+                style={{
+                  left: `${playheadPosition * pixelsPerSecond}px`,
+                  boxShadow: '0 0 8px rgba(251, 146, 60, 0.6)'
+                }}
+              >
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[9px] bg-orange-500 text-white px-1 rounded whitespace-nowrap">
+                  Press S to Split
+                </div>
+              </div>
+            )}
+
+          {/* Marquee Selection Box */}
+          {selectionBox && (
+            <div
+              className="absolute border-2 border-cyan-400 bg-cyan-400/10 pointer-events-none z-50"
+              style={{
+                left: `${Math.min(selectionBox.startX, selectionBox.endX)}px`,
+                top: `${Math.min(selectionBox.startY, selectionBox.endY)}px`,
+                width: `${Math.abs(selectionBox.endX - selectionBox.startX)}px`,
+                height: `${Math.abs(selectionBox.endY - selectionBox.startY)}px`,
+              }}
+            />
+          )}
+
         </div>
       </div>
+
+      {/* Minimap */}
+      <TimelineMinimap
+        timeline={timeline}
+        totalDuration={totalDuration}
+        viewportStart={scrollLeft / pixelsPerSecond}
+        viewportEnd={(scrollLeft + containerWidth) / pixelsPerSecond}
+        onNavigate={(newStart) => {
+          const newScrollLeft = newStart * pixelsPerSecond;
+          if (tracksScrollRef.current) {
+            tracksScrollRef.current.scrollLeft = newScrollLeft;
+          }
+          if (rulerRef.current) {
+            rulerRef.current.scrollLeft = newScrollLeft;
+          }
+          setScrollLeft(newScrollLeft);
+        }}
+      />
     </div>
   );
 };

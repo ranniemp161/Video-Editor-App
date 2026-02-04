@@ -49,6 +49,7 @@ export interface Asset {
   src: string | null; // Can be null for offline media
   duration: number; // in seconds
   transcription?: Transcription;
+  waveformPeaks?: number[]; // Cached waveform data for performance
 }
 
 export interface TimelineClip {
@@ -71,6 +72,7 @@ export interface TimelineTrack {
   clips: TimelineClip[];
   muted?: boolean;
   locked?: boolean;
+  height?: number; // Custom track height in pixels (default uses TRACK_HEIGHT constant)
 }
 
 export interface TimelineMarker {

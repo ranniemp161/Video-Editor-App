@@ -785,6 +785,123 @@ export const useTimeline = () => {
     }
   }, []);
 
+  // NEW: Split clip at current playhead position
+  const splitClipAtPlayhead = useCallback(() => {
+    const position = playheadPosition;
+    let splitOccurred = false;
+
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(track => {
+          if (track.locked) return track;
+          const clip = track.clips.find(c => position > c.start && position < c.end);
+          if (clip) {
+            splitOccurred = true;
+            const firstHalf = { ...clip, id: `${clip.id}-1`, end: position, trimEnd: clip.trimStart + (position - clip.start) };
+            const secondHalf = { ...clip, id: `${clip.id}-2`, start: position, trimStart: clip.trimStart + (position - clip.start) };
+
+            // Auto-select the second half
+            setSelectedClipIds([secondHalf.id]);
+
+            return { ...track, clips: [...track.clips.filter(c => c.id !== clip.id), firstHalf, secondHalf] };
+          }
+          return track;
+        })
+      };
+
+      if (splitOccurred) {
+        setPast(p => [...p, prev].slice(-50));
+        setFuture([]);
+      }
+
+      return next;
+    });
+  }, [playheadPosition]);
+
+  // NEW: Select clips in a time range (for marquee selection)
+  const selectClipsInRange = useCallback((startTime: number, endTime: number, trackIds?: string[]) => {
+    const clipsInRange: string[] = [];
+
+    timeline.tracks.forEach(track => {
+      if (trackIds && !trackIds.includes(track.id)) return;
+
+      track.clips.forEach(clip => {
+        // Check if clip overlaps with selection range
+        if (clip.start < endTime && clip.end > startTime) {
+          clipsInRange.push(clip.id);
+        }
+      });
+    });
+
+    setSelectedClipIds(clipsInRange);
+  }, [timeline]);
+
+  // NEW: Ripple delete - delete clips and shift subsequent clips left
+  const rippleDelete = useCallback((clipIds?: string[]) => {
+    const idsToDelete = clipIds || selectedClipIds;
+    if (idsToDelete.length === 0) return;
+
+    setTimeline(prev => {
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map(track => {
+          if (track.locked) return track;
+
+          // Find clips to delete and their positions
+          const deletedRanges: Array<{ start: number; end: number }> = [];
+          track.clips.forEach(clip => {
+            if (idsToDelete.includes(clip.id)) {
+              deletedRanges.push({ start: clip.start, end: clip.end });
+            }
+          });
+
+          // Remove deleted clips
+          let clips = track.clips.filter(c => !idsToDelete.includes(c.id));
+
+          // Ripple: shift clips after each deletion
+          deletedRanges.sort((a, b) => a.start - b.start);
+          let cumulativeShift = 0;
+
+          deletedRanges.forEach(range => {
+            const gapDuration = range.end - range.start;
+
+            clips = clips.map(clip => {
+              if (clip.start >= range.end - cumulativeShift) {
+                return {
+                  ...clip,
+                  start: clip.start - gapDuration,
+                  end: clip.end - gapDuration
+                };
+              }
+              return clip;
+            });
+
+            cumulativeShift += gapDuration;
+          });
+
+          return { ...track, clips };
+        })
+      };
+
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+
+    setSelectedClipIds([]);
+  }, [selectedClipIds]);
+
+  // NEW: Set track height
+  const setTrackHeight = useCallback((trackId: string, height: number) => {
+    setTimeline(prev => ({
+      ...prev,
+      tracks: prev.tracks.map(t =>
+        t.id === trackId ? { ...t, height: Math.max(40, Math.min(200, height)) } : t
+      )
+    }));
+  }, []);
+
   return {
     timeline,
     assets,
@@ -827,6 +944,11 @@ export const useTimeline = () => {
     // New exports
     toggleSegmentDelete,
     projectId,
-    segments
+    segments,
+    // NEW UX enhancements
+    splitClipAtPlayhead,
+    selectClipsInRange,
+    rippleDelete,
+    setTrackHeight,
   };
 };

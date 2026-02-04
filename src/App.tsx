@@ -56,7 +56,11 @@ const App: React.FC = () => {
     // New imports from hook
     toggleSegmentDelete,
     projectId,
-    segments
+    segments,
+    // NEW UX Enhancements
+    splitClipAtPlayhead,
+    selectClipsInRange,
+    setTrackHeight,
   } = useTimeline();
 
   const [activeTab, setActiveTab] = useState('media');
@@ -410,6 +414,9 @@ const App: React.FC = () => {
                 onAddMarker={addMarker}
                 onRemoveMarker={removeMarker}
                 onUpdateMarker={updateMarker}
+                onSplitAtPlayhead={splitClipAtPlayhead}
+                onSelectClipsInRange={selectClipsInRange}
+                onSetTrackHeight={setTrackHeight}
               />
             </div>
           </div>
