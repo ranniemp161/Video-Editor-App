@@ -178,10 +178,12 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     <div className="flex flex-wrap gap-x-1.5 gap-y-2 leading-relaxed">
                         {words.map((word, i) => {
                             // Map timeline position to original video time
-                            let originalTime = playheadPosition;
+                            const allClips = timeline.tracks.flatMap(t => t.clips);
+                            let originalTime = allClips.length > 0 ? -1 : playheadPosition;
 
                             // Find which clip contains the playhead (only if timeline exists)
-                            if (timeline && timeline.tracks) {
+                            if (allClips.length > 0) {
+                                let found = false;
                                 for (const track of timeline.tracks) {
                                     for (const clip of track.clips) {
                                         if (playheadPosition >= clip.start && playheadPosition <= clip.end) {
@@ -189,13 +191,16 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                                             const offsetInClip = playheadPosition - clip.start;
                                             // Map to original video time
                                             originalTime = clip.trimStart + offsetInClip;
+                                            found = true;
                                             break;
                                         }
                                     }
+                                    if (found) break;
                                 }
                             }
 
-                            const isCurrent = originalTime >= word.start / 1000 && originalTime < word.end / 1000;
+                            const EPSILON = 0.05; // 50ms tolerance
+                            const isCurrent = originalTime >= (word.start / 1000 - EPSILON) && originalTime < (word.end / 1000 + EPSILON);
                             const isDeleted = (word as any).isDeleted || false;
 
                             return (
@@ -211,7 +216,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                                             onSeek(word.start / 1000);
                                         }
                                     }}
-                                    className={`cursor-pointer px-1 py-0.5 rounded transition-all text-sm
+                                    className={`cursor-pointer px-1.5 py-1 rounded transition-all text-sm
                   ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-lg z-10' : ''}
                   ${isDeleted ? 'line-through text-red-500 opacity-50 bg-red-900/20' : 'text-gray-300 hover:bg-[#333] hover:text-white'}
                 `}

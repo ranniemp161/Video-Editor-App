@@ -237,25 +237,29 @@ const App: React.FC = () => {
                   timeline={timeline}
                   onSeek={(originalTime) => {
                     // Map original video timestamp to current timeline position
-                    // After auto-cut, clips are rearranged, so we need to find which clip
-                    // contains this original timestamp
-
-                    let targetPosition = originalTime; // fallback to original time
+                    const EPSILON = 0.05; // 50ms tolerance for cuts
 
                     for (const track of timeline.tracks) {
                       for (const clip of track.clips) {
-                        // Check if original time falls within this clip's source range
-                        if (originalTime >= clip.trimStart && originalTime <= clip.trimEnd) {
-                          // Calculate offset within the clip
-                          const offsetInClip = originalTime - clip.trimStart;
-                          // Map to timeline position
-                          targetPosition = clip.start + offsetInClip;
-                          break;
+                        // Check if original time falls within this clip's source range (with epsilon)
+                        if (originalTime >= (clip.trimStart - EPSILON) && originalTime <= (clip.trimEnd + EPSILON)) {
+                          // Calculate offset within the clip, clamped to clip bounds
+                          // Add a tiny PREROLL (30ms) to ensure we hear the start of the word clearly
+                          const PREROLL = 0.03;
+                          const offsetInClip = Math.max(0, originalTime - clip.trimStart - PREROLL);
+                          const targetPosition = clip.start + offsetInClip;
+                          setPlayheadPosition(targetPosition);
+                          return; // Found it! Exit entirely.
                         }
                       }
                     }
 
-                    setPlayheadPosition(targetPosition);
+                    // Fallback: If not found in any clip, only seek if timeline is empty or single-clip
+                    // otherwise it's safer to stay put to avoid jumping to "nowhere"
+                    const allClips = timeline.tracks.flatMap(t => t.clips);
+                    if (allClips.length <= 1) {
+                      setPlayheadPosition(originalTime);
+                    }
                   }}
                   onTranscribe={transcribeAsset}
                   onAutoCut={autoCutAsset}

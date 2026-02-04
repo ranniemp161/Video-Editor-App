@@ -747,7 +747,7 @@ export const useTimeline = () => {
       const response = await fetch('/api/upload-transcript', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, fileName: file.name })
+        body: JSON.stringify({ content, fileName: file.name, projectId })
       });
       const result = await response.json();
       if (result.success) {

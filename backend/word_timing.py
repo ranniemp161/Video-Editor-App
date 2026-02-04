@@ -1,10 +1,11 @@
-"""
-Smart word-level timestamp estimation from sentence-level timestamps.
-Uses syllable counting and word length to estimate realistic word durations.
-"""
-
 import re
-from typing import List, Dict
+import numpy as np
+import librosa
+from typing import List, Dict, Optional
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 def count_syllables(word: str) -> int:
     """
@@ -113,3 +114,77 @@ def distribute_word_timestamps(sentence_start: float, sentence_end: float, words
         current_time = end_time
     
     return result
+
+def refine_word_timestamps_with_audio(words: List[Dict], audio_path: str, start_sec: float, end_sec: float) -> List[Dict]:
+    """
+    Refine existing word timestamps by snapping them to actual audio onsets and energy peaks.
+    This is an enhancement, it won't move words radically but will "nudge" them for precision.
+    """
+    if not words or not os.path.exists(audio_path):
+        return words
+
+    try:
+        # Load the specific audio segment
+        duration = end_sec - start_sec
+        if duration <= 0:
+             return words
+             
+        y, sr = librosa.load(audio_path, offset=start_sec, duration=duration, sr=16000)
+        
+        if len(y) == 0:
+            return words
+
+        # 1. Get Onsets (start of sounds/syllables)
+        onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+        times = librosa.times_like(onset_env, sr=sr)
+        onsets = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr, units='time')
+        
+        # 2. Get Energy (amplitude envelope)
+        rms = librosa.feature.rms(y=y)[0]
+        rms_times = librosa.times_like(rms, sr=sr)
+        
+        refined_words = []
+        
+        for word_dict in words:
+            # Word times are in MS, convert to relative seconds for audio segment
+            rel_start = (word_dict['start'] / 1000.0) - start_sec
+            rel_end = (word_dict['end'] / 1000.0) - start_sec
+            
+            # Find nearest onset within a small window (+- 150ms)
+            WINDOW = 0.15
+            snapped_start = rel_start
+            
+            # Find closest onset to rel_start
+            possible_onsets = [o for o in onsets if abs(o - rel_start) < WINDOW]
+            if possible_onsets:
+                # Pick the one with the highest onset strength nearby
+                snapped_start = min(possible_onsets, key=lambda o: abs(o - rel_start))
+            else:
+                # If no onset, maybe look for energy rising?
+                # For now, just keep original if no clear onset
+                pass
+            
+            # Ensure we don't drift too far
+            snapped_start = max(rel_start - WINDOW, min(rel_start + WINDOW, snapped_start))
+            
+            # Reconstruct word dict
+            new_word = word_dict.copy()
+            new_word['start'] = (snapped_start + start_sec) * 1000.0
+            # Note: We don't snap the 'end' as aggressively to avoid overlapping next word
+            # But we ensure it starts after Previous word end
+            refined_words.append(new_word)
+
+        # Post-process: Ensure no overlaps and maintain sequence
+        for i in range(1, len(refined_words)):
+            # If current start is before previous end, push it back or pull previous end forward
+            if refined_words[i]['start'] < refined_words[i-1]['end']:
+                # Simple fix: split the difference or just cap
+                midpoint = (refined_words[i]['start'] + refined_words[i-1]['end']) / 2
+                refined_words[i-1]['end'] = midpoint
+                refined_words[i]['start'] = midpoint
+
+        return refined_words
+
+    except Exception as e:
+        logger.error(f"Error refining timestamps: {e}")
+        return words

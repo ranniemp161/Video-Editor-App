@@ -132,17 +132,18 @@ async def transcribe_generic(request: TranscribeRequest):
                 sub_words = text.split()
                 if not sub_words: continue
                 
-                duration = end_ms - start_ms
-                word_duration = duration / len(sub_words)
+                # Use smart syllable-based distribution for better precision
+                smart_words = distribute_word_timestamps(
+                    sentence_start=start_ms / 1000.0,
+                    sentence_end=end_ms / 1000.0,
+                    words=sub_words
+                )
                 
-                for i, sw in enumerate(sub_words):
-                    w_start = start_ms + (i * word_duration)
-                    w_end = w_start + word_duration
-                    
+                for sw in smart_words:
                     words.append({
-                        "word": sw,
-                        "start": w_start, # Keep MS for frontend
-                        "end": w_end,
+                        "word": sw['word'],
+                        "start": sw['start'], # Already in ms from utility
+                        "end": sw['end'],
                         "type": "speech"
                     })
                 
@@ -322,17 +323,18 @@ async def transcribe_project(project_id: str):
                 sub_words = text.split()
                 if not sub_words: continue
                 
-                duration = end_ms - start_ms
-                word_duration = duration / len(sub_words)
+                # Use smart syllable-based distribution for better precision
+                smart_words = distribute_word_timestamps(
+                    sentence_start=start_ms / 1000.0,
+                    sentence_end=end_ms / 1000.0,
+                    words=sub_words
+                )
                 
-                for i, sw in enumerate(sub_words):
-                    w_start = start_ms + (i * word_duration)
-                    w_end = w_start + word_duration
-                    
+                for sw in smart_words:
                     all_words.append({
-                        "text": sw, # Use 'text' key for Segment compatibility
-                        "start": w_start / 1000.0, # Convert to seconds
-                        "end": w_end / 1000.0,
+                        "text": sw['word'], # Use 'text' key for Segment compatibility
+                        "start": sw['start'] / 1000.0, # Convert to seconds
+                        "end": sw['end'] / 1000.0,
                         "type": "speech"
                     })
             
@@ -395,6 +397,7 @@ async def update_segments(project_id: str, segments: List[Segment]):
 class UploadTranscriptRequest(BaseModel):
     content: str
     fileName: str
+    projectId: Optional[str] = None
 
 @app.post("/upload-transcript")
 async def upload_transcript_manual(request: UploadTranscriptRequest):
@@ -431,8 +434,8 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
                     "end": w.get("end", 0) * 1000 if w.get("end", 0) < 10000 else w.get("end", 0),
                     "type": w.get("type", "speech")
                 })
-            # DISABLED: Auto-expert analysis - let user manually trigger it
-            # words = analyze_transcript(words)
+            from expert_editor import analyze_transcript
+            words = analyze_transcript(words)
             
             return {
                 "success": True, 
@@ -485,11 +488,23 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
                 words=line_words
             )
             
+            # Optional: Refine with audio if projectId is known
+            if request.projectId and request.projectId in projects:
+                project = projects[request.projectId]
+                # Ensure we have audio
+                wav_path = project.mediaPath + ".wav"
+                if os.path.exists(wav_path):
+                    smart_words = refine_word_timestamps_with_audio(
+                        words=smart_words,
+                        audio_path=wav_path,
+                        start_sec=current_start,
+                        end_sec=current_end
+                    )
+            
             words.extend(smart_words)
         
-        # DISABLED: Auto-expert analysis on upload was too aggressive
-        # Users can manually trigger "Auto-Cut" if they want suggestions
-        # words = analyze_transcript(words)
+        from expert_editor import analyze_transcript
+        words = analyze_transcript(words)
     else:
         # Fallback to crude splitting (e.g. for plain txt)
         raw_words = text.split()
