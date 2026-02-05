@@ -352,3 +352,1015 @@
 [Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
 [Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\EP Rannie.mp4
 [Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\EP Rannie.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\cluade-rannie\Videos\main-video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/6ce49ad6-50cd-4bf0-9774-1a4095344ce7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/04da58bd-172b-45c3-913d-0ec228e472bf
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/877bb2ba-59bb-4747-a757-6215d90f3933
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/877bb2ba-59bb-4747-a757-6215d90f3933
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/877bb2ba-59bb-4747-a757-6215d90f3933
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/877bb2ba-59bb-4747-a757-6215d90f3933
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/9ad02251-8695-41f3-a304-7a89042b16a1
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of C:/Videos/test & video.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/98fe86dc-d166-4b52-97ca-f86e9c3e29b9
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/98fe86dc-d166-4b52-97ca-f86e9c3e29b9
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/00362507-a26f-4c0f-ab25-965150d42728
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of test.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of test.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of test.mp4
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/5da54fae-cd0d-487d-aef2-57d9fe96eac7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/58a653ef-526a-4b8e-81e0-bd0aa955afe7
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/805119ac-daaa-48ce-bc4b-74deae44c79c
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/858027bb-3bab-44eb-983c-1afe7c7fdbb3
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/858027bb-3bab-44eb-983c-1afe7c7fdbb3
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/858027bb-3bab-44eb-983c-1afe7c7fdbb3
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/858027bb-3bab-44eb-983c-1afe7c7fdbb3
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/4f185af8-b27f-4e18-bc70-9b2f297e1035
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/4f185af8-b27f-4e18-bc70-9b2f297e1035
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/df848da9-fc9c-45c9-9415-9b8a36317e03
+[Path Utils] SMART FALLBACK: Using deals-video.mp4 instead of blob:http://localhost:3000/df848da9-fc9c-45c9-9415-9b8a36317e03
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\4510693a-2749-427e-be0d-b62bd12583ab.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\a7e324ef-43e3-4b70-8552-5bc7bf8d75d0.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\5eb158dd-ef48-422d-b7d6-f7aff6d84f26.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\c0b529af-32ca-4df6-856b-7299d591643d\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\c0b529af-32ca-4df6-856b-7299d591643d\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\c0b529af-32ca-4df6-856b-7299d591643d\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\2a05592e-277f-4a69-b9f7-b050e3bda9f8\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\2a05592e-277f-4a69-b9f7-b050e3bda9f8\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\2a05592e-277f-4a69-b9f7-b050e3bda9f8\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\0015f114-9739-473e-ada2-49d585139c80\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\0015f114-9739-473e-ada2-49d585139c80\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\0015f114-9739-473e-ada2-49d585139c80\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\d5cdf305-d534-4398-8092-0bfec5a0b933\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\d5cdf305-d534-4398-8092-0bfec5a0b933\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\d5cdf305-d534-4398-8092-0bfec5a0b933\main-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\9512952d-0621-43a0-95ce-609d142ec5ad\deals-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\9512952d-0621-43a0-95ce-609d142ec5ad\deals-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\9512952d-0621-43a0-95ce-609d142ec5ad\deals-video.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4
+[Path Utils] Found file (exact): C:\Users\USER\OneDrive\Desktop\Antigravity project\video-editor\Video-Editor-App\public\uploads\098d5cab-75b8-4693-b298-f2c49e6fd747\render_1770045462248.mp4

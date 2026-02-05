@@ -100,14 +100,6 @@ export const useTimeline = () => {
       for (const clip of track.clips) {
         if (playheadPosition >= clip.start && playheadPosition < clip.end) {
           const asset = findMatchingAsset(clip.assetId, clip.name, clip.sourceFileName);
-          console.log('[DEBUG currentClip] Found clip at playhead:', {
-            clipId: clip.id,
-            clipName: clip.name,
-            assetId: clip.assetId,
-            sourceFileName: clip.sourceFileName,
-            foundAsset: asset ? { id: asset.id, name: asset.name, hasSrc: !!asset.src } : null,
-            allAssets: assets.map(a => ({ id: a.id, name: a.name, hasSrc: !!a.src }))
-          });
           if (asset) return { clip, asset };
         }
       }
@@ -181,11 +173,13 @@ export const useTimeline = () => {
         });
         const data = await res.json();
         if (data.success) {
-          console.log("Upload success, Project ID:", data.projectId);
+          console.log("Upload success, Project ID:", data.projectId, "Server Path:", data.filePath);
           setProjectId(data.projectId);
 
-          // DO NOT Trigger Transcription automatically
-          // transcribeProject(data.projectId);
+          // Store remote path without changing the ID (keeps timeline clips linked)
+          setAssets(prev => prev.map(a =>
+            a.name === file.name ? { ...a, remoteSrc: data.filePath } : a
+          ));
         }
       } catch (e) {
         console.error("Upload failed", e);
@@ -543,7 +537,12 @@ export const useTimeline = () => {
   const exportToXML = useCallback(async () => {
     const data = {
       timeline,
-      assets: assets.map(a => ({ id: a.id, name: a.name, duration: a.duration, src: a.src }))
+      assets: assets.map(a => ({
+        id: a.id,
+        name: a.name,
+        duration: a.duration,
+        src: a.remoteSrc || a.src
+      }))
     };
 
     try {
@@ -567,6 +566,38 @@ export const useTimeline = () => {
     }
   }, [timeline, assets]);
 
+
+  const exportToEDL = useCallback(async () => {
+    const data = {
+      timeline,
+      assets: assets.map(a => ({
+        id: a.id,
+        name: a.name,
+        duration: a.duration,
+        src: a.remoteSrc || a.src
+      }))
+    };
+
+    try {
+      const response = await fetch('/api/export-edl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (result.success) {
+        const link = document.createElement('a');
+        link.href = result.path;
+        link.download = basename(result.path);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (err) {
+      console.error('EDL Export failed:', err);
+    }
+  }, [timeline, assets]);
+
   const moveClip = useCallback((clipId: string, trackId: string, newStart: number) => {
     setTimeline(prev => {
       const sourceTrack = prev.tracks.find(t => t.clips.some(c => c.id === clipId));
@@ -575,6 +606,7 @@ export const useTimeline = () => {
       if (!sourceTrack || !targetTrack || sourceTrack.locked || targetTrack.locked) return prev;
 
       const clip = sourceTrack.clips.find(c => c.id === clipId);
+      if (!clip) return prev;
 
       const duration = clip.end - clip.start;
       const updatedTargetClip: TimelineClip = { ...clip, start: newStart, end: newStart + duration, trackId };
@@ -597,6 +629,49 @@ export const useTimeline = () => {
       });
 
       const next = { ...prev, tracks: finalTracks };
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+  }, [isMagnetic]);
+
+  const moveClips = useCallback((clipIds: string[], delta: number) => {
+    setTimeline(prev => {
+      const next = { ...prev };
+      let changed = false;
+
+      next.tracks = next.tracks.map(track => {
+        if (track.locked) return track;
+
+        const hasClipsToMove = track.clips.some(c => clipIds.includes(c.id));
+        if (!hasClipsToMove) return track;
+
+        let clips = track.clips.map(clip => {
+          if (clipIds.includes(clip.id)) {
+            changed = true;
+            const newStart = Math.max(0, clip.start + delta);
+            const duration = clip.end - clip.start;
+            return { ...clip, start: newStart, end: newStart + duration };
+          }
+          return clip;
+        });
+
+        if (isMagnetic) {
+          clips.sort((a, b) => a.start - b.start);
+          let currentPos = 0;
+          clips = clips.map(c => {
+            const d = c.end - c.start;
+            const updated = { ...c, start: currentPos, end: currentPos + d };
+            currentPos += d;
+            return updated;
+          });
+        }
+
+        return { ...track, clips };
+      });
+
+      if (!changed) return prev;
+
       setPast(p => [...p, prev].slice(-50));
       setFuture([]);
       return next;
@@ -954,6 +1029,7 @@ export const useTimeline = () => {
     importXML,
     addMediaFiles,
     moveClip,
+    moveClips,
     splitClip,
     deleteClip,
     updateClip,
@@ -977,6 +1053,7 @@ export const useTimeline = () => {
     transcribeAsset,
     autoCutAsset,
     exportToXML,
+    exportToEDL,
     exportTranscript,
     uploadTranscript,
     transcriptionProgress,

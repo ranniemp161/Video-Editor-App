@@ -1,0 +1,2672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmeml version="5">
+  <project>
+    <name>Gling Export</name>
+    <children>
+      <file id="file-asset-1770282067882">
+        <name>main-video.mp4</name>
+        <pathurl></pathurl>
+        <rate>
+          <timebase>30</timebase>
+          <ntsc>FALSE</ntsc>
+        </rate>
+        <duration>46398</duration>
+        <timecode>
+          <rate>
+            <timebase>30</timebase>
+            <ntsc>FALSE</ntsc>
+          </rate>
+          <string>00:00:00:00</string>
+          <frame>0</frame>
+          <displayformat>NDF</displayformat>
+        </timecode>
+        <media>
+          <video>
+            <samplecharacteristics>
+              <width>1920</width>
+              <height>1080</height>
+              <pixelaspectratio>square</pixelaspectratio>
+              <fielddominance>none</fielddominance>
+            </samplecharacteristics>
+          </video>
+          <audio>
+            <numChannels>2</numChannels>
+            <samplecharacteristics>
+              <depth>16</depth>
+              <samplerate>48000</samplerate>
+            </samplecharacteristics>
+          </audio>
+        </media>
+      </file>
+      <sequence id="RoughCutSequence">
+        <name>Rough Cut Sequence</name>
+        <duration>26703</duration>
+        <rate>
+          <timebase>30</timebase>
+          <ntsc>FALSE</ntsc>
+        </rate>
+        <timecode>
+          <rate>
+            <timebase>30</timebase>
+            <ntsc>FALSE</ntsc>
+          </rate>
+          <string>00:00:00:00</string>
+          <frame>0</frame>
+          <displayformat>NDF</displayformat>
+        </timecode>
+        <media>
+          <video>
+            <format>
+              <samplecharacteristics>
+                <width>1920</width>
+                <height>1080</height>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+              </samplecharacteristics>
+            </format>
+            <track>
+              <clipitem id="clipitem-v-0">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>282</duration>
+                <start>0</start>
+                <end>282</end>
+                <in>1239</in>
+                <out>1521</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-1">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>379</duration>
+                <start>282</start>
+                <end>661</end>
+                <in>1539</in>
+                <out>1918</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-2">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>208</duration>
+                <start>661</start>
+                <end>869</end>
+                <in>1987</in>
+                <out>2195</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-3">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>688</duration>
+                <start>869</start>
+                <end>1557</end>
+                <in>2758</in>
+                <out>3446</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-4">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>349</duration>
+                <start>1557</start>
+                <end>1906</end>
+                <in>3453</in>
+                <out>3802</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-5">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>456</duration>
+                <start>1906</start>
+                <end>2362</end>
+                <in>3979</in>
+                <out>4435</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-6">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>225</duration>
+                <start>2362</start>
+                <end>2587</end>
+                <in>4650</in>
+                <out>4875</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-7">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>677</duration>
+                <start>2587</start>
+                <end>3264</end>
+                <in>4944</in>
+                <out>5621</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-8">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1073</duration>
+                <start>3264</start>
+                <end>4337</end>
+                <in>5652</in>
+                <out>6725</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-9">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>431</duration>
+                <start>4337</start>
+                <end>4768</end>
+                <in>7593</in>
+                <out>8024</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-10">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>171</duration>
+                <start>4768</start>
+                <end>4939</end>
+                <in>9217</in>
+                <out>9388</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-11">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>412</duration>
+                <start>4939</start>
+                <end>5351</end>
+                <in>10181</in>
+                <out>10593</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-12">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>633</duration>
+                <start>5351</start>
+                <end>5984</end>
+                <in>11569</in>
+                <out>12202</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-13">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>359</duration>
+                <start>5984</start>
+                <end>6343</end>
+                <in>13752</in>
+                <out>14111</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-14">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>629</duration>
+                <start>6343</start>
+                <end>6972</end>
+                <in>14202</in>
+                <out>14831</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-15">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>418</duration>
+                <start>6972</start>
+                <end>7390</end>
+                <in>15352</in>
+                <out>15770</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-16">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>170</duration>
+                <start>7390</start>
+                <end>7560</end>
+                <in>16133</in>
+                <out>16303</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-17">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>149</duration>
+                <start>7560</start>
+                <end>7709</end>
+                <in>16545</in>
+                <out>16694</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-18">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>683</duration>
+                <start>7709</start>
+                <end>8392</end>
+                <in>17243</in>
+                <out>17926</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-19">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>443</duration>
+                <start>8392</start>
+                <end>8835</end>
+                <in>17986</in>
+                <out>18429</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-20">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1170</duration>
+                <start>8835</start>
+                <end>10005</end>
+                <in>18717</in>
+                <out>19887</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-21">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>171</duration>
+                <start>10005</start>
+                <end>10176</end>
+                <in>20686</in>
+                <out>20857</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-22">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>959</duration>
+                <start>10176</start>
+                <end>11135</end>
+                <in>21000</in>
+                <out>21959</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-23">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>319</duration>
+                <start>11135</start>
+                <end>11454</end>
+                <in>22002</in>
+                <out>22321</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-24">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>267</duration>
+                <start>11454</start>
+                <end>11721</end>
+                <in>22722</in>
+                <out>22989</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-25">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>433</duration>
+                <start>11721</start>
+                <end>12154</end>
+                <in>23097</in>
+                <out>23530</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-26">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>76</duration>
+                <start>12154</start>
+                <end>12230</end>
+                <in>23731</in>
+                <out>23807</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-27">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>332</duration>
+                <start>12230</start>
+                <end>12562</end>
+                <in>24612</in>
+                <out>24944</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-28">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>125</duration>
+                <start>12562</start>
+                <end>12687</end>
+                <in>24988</in>
+                <out>25113</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-29">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>410</duration>
+                <start>12687</start>
+                <end>13097</end>
+                <in>25213</in>
+                <out>25623</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-30">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>288</duration>
+                <start>13097</start>
+                <end>13385</end>
+                <in>25753</in>
+                <out>26041</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-31">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1324</duration>
+                <start>13385</start>
+                <end>14709</end>
+                <in>26149</in>
+                <out>27473</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-32">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>121</duration>
+                <start>14709</start>
+                <end>14830</end>
+                <in>27498</in>
+                <out>27619</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-33">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>430</duration>
+                <start>14830</start>
+                <end>15260</end>
+                <in>27743</in>
+                <out>28173</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-34">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>180</duration>
+                <start>15260</start>
+                <end>15440</end>
+                <in>28276</in>
+                <out>28456</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-35">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>392</duration>
+                <start>15440</start>
+                <end>15832</end>
+                <in>28815</in>
+                <out>29207</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-36">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>676</duration>
+                <start>15832</start>
+                <end>16508</end>
+                <in>29795</in>
+                <out>30471</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-37">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>135</duration>
+                <start>16508</start>
+                <end>16643</end>
+                <in>30664</in>
+                <out>30799</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-38">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>215</duration>
+                <start>16643</start>
+                <end>16858</end>
+                <in>31029</in>
+                <out>31244</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-39">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>334</duration>
+                <start>16858</start>
+                <end>17192</end>
+                <in>31678</in>
+                <out>32012</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-40">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>227</duration>
+                <start>17192</start>
+                <end>17419</end>
+                <in>32094</in>
+                <out>32321</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-41">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>81</duration>
+                <start>17419</start>
+                <end>17500</end>
+                <in>32761</in>
+                <out>32842</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-42">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>358</duration>
+                <start>17500</start>
+                <end>17858</end>
+                <in>32848</in>
+                <out>33206</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-43">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>219</duration>
+                <start>17858</start>
+                <end>18077</end>
+                <in>33450</in>
+                <out>33669</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-44">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>157</duration>
+                <start>18077</start>
+                <end>18234</end>
+                <in>34051</in>
+                <out>34208</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-45">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>170</duration>
+                <start>18234</start>
+                <end>18404</end>
+                <in>34230</in>
+                <out>34400</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-46">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>345</duration>
+                <start>18404</start>
+                <end>18749</end>
+                <in>34465</in>
+                <out>34810</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-47">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>687</duration>
+                <start>18749</start>
+                <end>19436</end>
+                <in>35074</in>
+                <out>35761</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-48">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>489</duration>
+                <start>19436</start>
+                <end>19925</end>
+                <in>35808</in>
+                <out>36297</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-49">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>662</duration>
+                <start>19925</start>
+                <end>20587</end>
+                <in>36341</in>
+                <out>37003</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-50">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>137</duration>
+                <start>20587</start>
+                <end>20724</end>
+                <in>37301</in>
+                <out>37438</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-51">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>113</duration>
+                <start>20724</start>
+                <end>20837</end>
+                <in>37719</in>
+                <out>37832</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-52">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>379</duration>
+                <start>20837</start>
+                <end>21216</end>
+                <in>37842</in>
+                <out>38221</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-53">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>399</duration>
+                <start>21216</start>
+                <end>21615</end>
+                <in>38376</in>
+                <out>38775</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-54">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>177</duration>
+                <start>21615</start>
+                <end>21792</end>
+                <in>38905</in>
+                <out>39082</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-55">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>130</duration>
+                <start>21792</start>
+                <end>21922</end>
+                <in>39391</in>
+                <out>39521</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-56">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>253</duration>
+                <start>21922</start>
+                <end>22175</end>
+                <in>39654</in>
+                <out>39907</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-57">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>238</duration>
+                <start>22175</start>
+                <end>22413</end>
+                <in>39931</in>
+                <out>40169</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-58">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>161</duration>
+                <start>22413</start>
+                <end>22574</end>
+                <in>40331</in>
+                <out>40492</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-59">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>244</duration>
+                <start>22574</start>
+                <end>22818</end>
+                <in>40667</in>
+                <out>40911</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-60">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>143</duration>
+                <start>22818</start>
+                <end>22961</end>
+                <in>40917</in>
+                <out>41060</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-61">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>514</duration>
+                <start>22961</start>
+                <end>23475</end>
+                <in>41225</in>
+                <out>41739</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-62">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>208</duration>
+                <start>23475</start>
+                <end>23683</end>
+                <in>41879</in>
+                <out>42087</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-63">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>447</duration>
+                <start>23683</start>
+                <end>24130</end>
+                <in>42112</in>
+                <out>42559</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-64">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>291</duration>
+                <start>24130</start>
+                <end>24421</end>
+                <in>42659</in>
+                <out>42950</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-65">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>414</duration>
+                <start>24421</start>
+                <end>24835</end>
+                <in>42964</in>
+                <out>43378</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-66">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>323</duration>
+                <start>24835</start>
+                <end>25158</end>
+                <in>43479</in>
+                <out>43802</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-67">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>421</duration>
+                <start>25158</start>
+                <end>25579</end>
+                <in>44065</in>
+                <out>44486</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-68">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>143</duration>
+                <start>25579</start>
+                <end>25722</end>
+                <in>44493</in>
+                <out>44636</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-69">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>714</duration>
+                <start>25722</start>
+                <end>26436</end>
+                <in>45173</in>
+                <out>45887</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-70">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>76</duration>
+                <start>26436</start>
+                <end>26512</end>
+                <in>45921</in>
+                <out>45997</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-v-71">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>191</duration>
+                <start>26512</start>
+                <end>26703</end>
+                <in>46044</in>
+                <out>46235</out>
+                <sourcetrack>
+                  <mediatype>video</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+            </track>
+          </video>
+          <audio>
+            <track>
+              <clipitem id="clipitem-a-0">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>282</duration>
+                <start>0</start>
+                <end>282</end>
+                <in>1239</in>
+                <out>1521</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-1">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>379</duration>
+                <start>282</start>
+                <end>661</end>
+                <in>1539</in>
+                <out>1918</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-2">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>208</duration>
+                <start>661</start>
+                <end>869</end>
+                <in>1987</in>
+                <out>2195</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-3">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>688</duration>
+                <start>869</start>
+                <end>1557</end>
+                <in>2758</in>
+                <out>3446</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-4">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>349</duration>
+                <start>1557</start>
+                <end>1906</end>
+                <in>3453</in>
+                <out>3802</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-5">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>456</duration>
+                <start>1906</start>
+                <end>2362</end>
+                <in>3979</in>
+                <out>4435</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-6">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>225</duration>
+                <start>2362</start>
+                <end>2587</end>
+                <in>4650</in>
+                <out>4875</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-7">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>677</duration>
+                <start>2587</start>
+                <end>3264</end>
+                <in>4944</in>
+                <out>5621</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-8">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1073</duration>
+                <start>3264</start>
+                <end>4337</end>
+                <in>5652</in>
+                <out>6725</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-9">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>431</duration>
+                <start>4337</start>
+                <end>4768</end>
+                <in>7593</in>
+                <out>8024</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-10">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>171</duration>
+                <start>4768</start>
+                <end>4939</end>
+                <in>9217</in>
+                <out>9388</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-11">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>412</duration>
+                <start>4939</start>
+                <end>5351</end>
+                <in>10181</in>
+                <out>10593</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-12">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>633</duration>
+                <start>5351</start>
+                <end>5984</end>
+                <in>11569</in>
+                <out>12202</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-13">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>359</duration>
+                <start>5984</start>
+                <end>6343</end>
+                <in>13752</in>
+                <out>14111</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-14">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>629</duration>
+                <start>6343</start>
+                <end>6972</end>
+                <in>14202</in>
+                <out>14831</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-15">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>418</duration>
+                <start>6972</start>
+                <end>7390</end>
+                <in>15352</in>
+                <out>15770</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-16">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>170</duration>
+                <start>7390</start>
+                <end>7560</end>
+                <in>16133</in>
+                <out>16303</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-17">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>149</duration>
+                <start>7560</start>
+                <end>7709</end>
+                <in>16545</in>
+                <out>16694</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-18">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>683</duration>
+                <start>7709</start>
+                <end>8392</end>
+                <in>17243</in>
+                <out>17926</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-19">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>443</duration>
+                <start>8392</start>
+                <end>8835</end>
+                <in>17986</in>
+                <out>18429</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-20">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1170</duration>
+                <start>8835</start>
+                <end>10005</end>
+                <in>18717</in>
+                <out>19887</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-21">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>171</duration>
+                <start>10005</start>
+                <end>10176</end>
+                <in>20686</in>
+                <out>20857</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-22">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>959</duration>
+                <start>10176</start>
+                <end>11135</end>
+                <in>21000</in>
+                <out>21959</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-23">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>319</duration>
+                <start>11135</start>
+                <end>11454</end>
+                <in>22002</in>
+                <out>22321</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-24">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>267</duration>
+                <start>11454</start>
+                <end>11721</end>
+                <in>22722</in>
+                <out>22989</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-25">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>433</duration>
+                <start>11721</start>
+                <end>12154</end>
+                <in>23097</in>
+                <out>23530</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-26">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>76</duration>
+                <start>12154</start>
+                <end>12230</end>
+                <in>23731</in>
+                <out>23807</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-27">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>332</duration>
+                <start>12230</start>
+                <end>12562</end>
+                <in>24612</in>
+                <out>24944</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-28">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>125</duration>
+                <start>12562</start>
+                <end>12687</end>
+                <in>24988</in>
+                <out>25113</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-29">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>410</duration>
+                <start>12687</start>
+                <end>13097</end>
+                <in>25213</in>
+                <out>25623</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-30">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>288</duration>
+                <start>13097</start>
+                <end>13385</end>
+                <in>25753</in>
+                <out>26041</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-31">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>1324</duration>
+                <start>13385</start>
+                <end>14709</end>
+                <in>26149</in>
+                <out>27473</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-32">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>121</duration>
+                <start>14709</start>
+                <end>14830</end>
+                <in>27498</in>
+                <out>27619</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-33">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>430</duration>
+                <start>14830</start>
+                <end>15260</end>
+                <in>27743</in>
+                <out>28173</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-34">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>180</duration>
+                <start>15260</start>
+                <end>15440</end>
+                <in>28276</in>
+                <out>28456</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-35">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>392</duration>
+                <start>15440</start>
+                <end>15832</end>
+                <in>28815</in>
+                <out>29207</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-36">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>676</duration>
+                <start>15832</start>
+                <end>16508</end>
+                <in>29795</in>
+                <out>30471</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-37">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>135</duration>
+                <start>16508</start>
+                <end>16643</end>
+                <in>30664</in>
+                <out>30799</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-38">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>215</duration>
+                <start>16643</start>
+                <end>16858</end>
+                <in>31029</in>
+                <out>31244</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-39">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>334</duration>
+                <start>16858</start>
+                <end>17192</end>
+                <in>31678</in>
+                <out>32012</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-40">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>227</duration>
+                <start>17192</start>
+                <end>17419</end>
+                <in>32094</in>
+                <out>32321</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-41">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>81</duration>
+                <start>17419</start>
+                <end>17500</end>
+                <in>32761</in>
+                <out>32842</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-42">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>358</duration>
+                <start>17500</start>
+                <end>17858</end>
+                <in>32848</in>
+                <out>33206</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-43">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>219</duration>
+                <start>17858</start>
+                <end>18077</end>
+                <in>33450</in>
+                <out>33669</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-44">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>157</duration>
+                <start>18077</start>
+                <end>18234</end>
+                <in>34051</in>
+                <out>34208</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-45">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>170</duration>
+                <start>18234</start>
+                <end>18404</end>
+                <in>34230</in>
+                <out>34400</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-46">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>345</duration>
+                <start>18404</start>
+                <end>18749</end>
+                <in>34465</in>
+                <out>34810</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-47">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>687</duration>
+                <start>18749</start>
+                <end>19436</end>
+                <in>35074</in>
+                <out>35761</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-48">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>489</duration>
+                <start>19436</start>
+                <end>19925</end>
+                <in>35808</in>
+                <out>36297</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-49">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>662</duration>
+                <start>19925</start>
+                <end>20587</end>
+                <in>36341</in>
+                <out>37003</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-50">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>137</duration>
+                <start>20587</start>
+                <end>20724</end>
+                <in>37301</in>
+                <out>37438</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-51">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>113</duration>
+                <start>20724</start>
+                <end>20837</end>
+                <in>37719</in>
+                <out>37832</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-52">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>379</duration>
+                <start>20837</start>
+                <end>21216</end>
+                <in>37842</in>
+                <out>38221</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-53">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>399</duration>
+                <start>21216</start>
+                <end>21615</end>
+                <in>38376</in>
+                <out>38775</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-54">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>177</duration>
+                <start>21615</start>
+                <end>21792</end>
+                <in>38905</in>
+                <out>39082</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-55">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>130</duration>
+                <start>21792</start>
+                <end>21922</end>
+                <in>39391</in>
+                <out>39521</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-56">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>253</duration>
+                <start>21922</start>
+                <end>22175</end>
+                <in>39654</in>
+                <out>39907</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-57">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>238</duration>
+                <start>22175</start>
+                <end>22413</end>
+                <in>39931</in>
+                <out>40169</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-58">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>161</duration>
+                <start>22413</start>
+                <end>22574</end>
+                <in>40331</in>
+                <out>40492</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-59">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>244</duration>
+                <start>22574</start>
+                <end>22818</end>
+                <in>40667</in>
+                <out>40911</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-60">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>143</duration>
+                <start>22818</start>
+                <end>22961</end>
+                <in>40917</in>
+                <out>41060</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-61">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>514</duration>
+                <start>22961</start>
+                <end>23475</end>
+                <in>41225</in>
+                <out>41739</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-62">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>208</duration>
+                <start>23475</start>
+                <end>23683</end>
+                <in>41879</in>
+                <out>42087</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-63">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>447</duration>
+                <start>23683</start>
+                <end>24130</end>
+                <in>42112</in>
+                <out>42559</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-64">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>291</duration>
+                <start>24130</start>
+                <end>24421</end>
+                <in>42659</in>
+                <out>42950</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-65">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>414</duration>
+                <start>24421</start>
+                <end>24835</end>
+                <in>42964</in>
+                <out>43378</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-66">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>323</duration>
+                <start>24835</start>
+                <end>25158</end>
+                <in>43479</in>
+                <out>43802</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-67">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>421</duration>
+                <start>25158</start>
+                <end>25579</end>
+                <in>44065</in>
+                <out>44486</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-68">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>143</duration>
+                <start>25579</start>
+                <end>25722</end>
+                <in>44493</in>
+                <out>44636</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-69">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>714</duration>
+                <start>25722</start>
+                <end>26436</end>
+                <in>45173</in>
+                <out>45887</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-70">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>76</duration>
+                <start>26436</start>
+                <end>26512</end>
+                <in>45921</in>
+                <out>45997</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+              <clipitem id="clipitem-a-71">
+                <masterclipid>file-asset-1770282067882</masterclipid>
+                <name>main-video.mp4</name>
+                <rate>
+                  <timebase>30</timebase>
+                  <ntsc>FALSE</ntsc>
+                </rate>
+                <duration>191</duration>
+                <start>26512</start>
+                <end>26703</end>
+                <in>46044</in>
+                <out>46235</out>
+                <sourcetrack>
+                  <mediatype>audio</mediatype>
+                  <trackindex>1</trackindex>
+                </sourcetrack>
+                <file ref="file-asset-1770282067882" />
+              </clipitem>
+            </track>
+          </audio>
+        </media>
+      </sequence>
+    </children>
+  </project>
+</xmeml>

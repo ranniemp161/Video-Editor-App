@@ -47,6 +47,7 @@ export interface Asset {
   type: 'video' | 'audio' | 'image';
   name: string;
   src: string | null; // Can be null for offline media
+  remoteSrc?: string; // Persistent server-side path
   duration: number; // in seconds
   transcription?: Transcription;
   waveformPeaks?: number[]; // Cached waveform data for performance

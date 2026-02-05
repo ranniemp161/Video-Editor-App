@@ -28,6 +28,7 @@ const App: React.FC = () => {
     importXML,
     addMediaFiles,
     moveClip,
+    moveClips,
     splitClip,
     deleteClip,
     updateClip,
@@ -50,6 +51,7 @@ const App: React.FC = () => {
     transcribeAsset,
     autoCutAsset,
     exportToXML,
+    exportToEDL,
     exportTranscript,
     uploadTranscript,
     transcriptionProgress,
@@ -184,23 +186,23 @@ const App: React.FC = () => {
           deleteClip();
           break;
         case 'arrowleft': // Left: step back 1 frame
-          if (e.shiftKey) {
-            // Shift + Left: Jump to previous marker
+          if (e.altKey) {
+            // Alt + Left: Jump to previous marker
             e.preventDefault();
             const prevMarker = getPreviousMarker(playheadPosition);
             if (prevMarker) setPlayheadPosition(prevMarker.time);
-          } else {
+          } else if (!e.shiftKey) {
             e.preventDefault();
             setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
           }
           break;
         case 'arrowright': // Right: step forward 1 frame
-          if (e.shiftKey) {
-            // Shift + Right: Jump to next marker
+          if (e.altKey) {
+            // Alt + Right: Jump to next marker
             e.preventDefault();
             const nextMarker = getNextMarker(playheadPosition);
             if (nextMarker) setPlayheadPosition(nextMarker.time);
-          } else {
+          } else if (!e.shiftKey) {
             e.preventDefault();
             setPlayheadPosition(Math.min(totalDuration, playheadPosition + 0.1));
           }
@@ -255,6 +257,7 @@ const App: React.FC = () => {
         renderProgress={renderProgress}
         lastRenderPath={lastRenderPath}
         exportToXML={exportToXML}
+        exportToEDL={exportToEDL}
         deleteProject={deleteProject}
       />
 
@@ -410,6 +413,7 @@ const App: React.FC = () => {
                 playheadPosition={playheadPosition}
                 onPlayheadUpdate={setPlayheadPosition}
                 onClipMove={moveClip}
+                onClipsMove={moveClips}
                 onClipSplit={splitClip}
                 onClipDelete={deleteClip}
                 onClipUpdate={updateClip}

@@ -8,10 +8,11 @@ interface HeaderProps {
   renderProgress: number;
   lastRenderPath: string | null;
   exportToXML: () => void;
+  exportToEDL: () => void;
   deleteProject: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML, deleteProject }) => {
+export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML, exportToEDL, deleteProject }) => {
   const getButtonContent = () => {
     switch (renderStatus) {
       case 'rendering':
@@ -87,7 +88,14 @@ export const Header: React.FC<HeaderProps> = ({ onImportClick, renderToMP4, rend
             className="px-3 py-1.5 text-[11px] font-bold bg-[#1a1a1a] hover:bg-[#2d2d2d] text-gray-300 border border-[#333] transition-all rounded shadow-lg flex items-center gap-1.5"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-            EXPORT XML (DaVinci)
+            EXPORT XML
+          </button>
+          <button
+            onClick={exportToEDL}
+            className="px-3 py-1.5 text-[11px] font-bold bg-[#1a1a1a] hover:bg-[#2d2d2d] text-gray-300 border border-[#333] transition-all rounded shadow-lg flex items-center gap-1.5"
+          >
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            EXPORT EDL
           </button>
           <div className="h-4 w-[1px] bg-[#333] mx-1"></div>
           <label className="cursor-pointer bg-[#26c6da] hover:bg-[#4dd0e1] text-[#0f0f0f] px-4 py-1.5 rounded text-[11px] font-bold transition-transform active:scale-95 flex items-center gap-1">

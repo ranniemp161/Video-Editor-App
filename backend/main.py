@@ -13,7 +13,7 @@ from pathlib import Path
 
 from rough_cut import generate_rough_cut
 from expert_editor import analyze_transcript
-from word_timing import distribute_word_timestamps
+from word_timing import distribute_word_timestamps, refine_word_timestamps_with_audio
 from professional_rough_cut_v2 import ProfessionalRoughCutV2
 from thought_grouper import ThoughtGrouper
 
@@ -208,18 +208,27 @@ def cleanup_orphaned_files(db: Session):
         import time
         now = time.time()
         
-        for filename in os.listdir(UPLOAD_DIR):
-            file_path = os.path.join(UPLOAD_DIR, filename)
-            # Skip directories
-            if os.path.isdir(file_path): continue
+        for item in os.listdir(UPLOAD_DIR):
+            item_path = os.path.join(UPLOAD_DIR, item)
             
-            # If not in DB and older than 10 mins, delete
-            if filename not in db_files and (now - os.path.getmtime(file_path)) > 600:
+            # 1. Handle project directories (the new structure)
+            if os.path.isdir(item_path):
+                if item not in db_files and (now - os.path.getmtime(item_path)) > 600:
+                    logger.info(f"Cleaning up orphaned project directory: {item}")
+                    try:
+                        shutil.rmtree(item_path)
+                    except Exception as e:
+                        logger.error(f"Failed to delete directory {item}: {e}")
+                continue
+            
+            # 2. Handle legacy flat files (cleanup old versions)
+            filename = item
+            if filename not in db_files and (now - os.path.getmtime(item_path)) > 600:
                 logger.info(f"Cleaning up orphaned file: {filename}")
                 try:
-                    os.remove(file_path)
+                    os.remove(item_path)
                     # Also try to remove matching .wav, .json etc
-                    base = os.path.splitext(file_path)[0]
+                    base = os.path.splitext(item_path)[0]
                     for ext in ['.wav', '.json', '.txt']:
                         if os.path.exists(base + ext):
                             os.remove(base + ext)
@@ -246,8 +255,11 @@ def read_root():
 async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
         file_id = str(uuid.uuid4())
-        extension = os.path.splitext(file.filename)[1]
-        file_path = os.path.join(UPLOAD_DIR, f"{file_id}{extension}")
+        project_dir = os.path.join(UPLOAD_DIR, file_id)
+        os.makedirs(project_dir, exist_ok=True)
+        
+        # Preserve original filename for Resolve compatibility
+        file_path = os.path.join(project_dir, file.filename)
         
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -264,7 +276,7 @@ async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_d
         db.add(db_project)
         db.commit()
         
-        return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}{extension}"}
+        return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}/{file.filename}"}
     except Exception as e:
         logger.error(f"Upload failed: {e}")
         db.rollback()
@@ -488,6 +500,9 @@ class UploadTranscriptRequest(BaseModel):
 @app.post("/upload-transcript")
 async def upload_transcript_manual(request: UploadTranscriptRequest):
     import re
+    logger.info(f"Received manual transcript upload: {request.fileName} (size: {len(request.content)})")
+    if request.projectId:
+        logger.info(f"Target Project ID: {request.projectId}")
     
     def parse_time(t_str):
         # Supports 00:00:00.000 or 00:00:00,000 or 00:00.000

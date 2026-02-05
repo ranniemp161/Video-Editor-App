@@ -29,6 +29,7 @@ interface TimelineProps {
   onSplitAtPlayhead?: () => void;
   onSelectClipsInRange?: (startTime: number, endTime: number) => void;
   onSetTrackHeight?: (trackId: string, height: number) => void;
+  onClipsMove?: (clipIds: string[], delta: number) => void;
 }
 
 const HEADER_WIDTH = 120; // Increased to fit controls
@@ -187,6 +188,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   onSplitAtPlayhead,
   onSelectClipsInRange,
   onSetTrackHeight,
+  onClipsMove,
 }) => {
   const rulerRef = useRef<HTMLDivElement>(null);
   const tracksScrollRef = useRef<HTMLDivElement>(null);
@@ -211,11 +213,21 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
   const lastScrubTimeRef = useRef<number | null>(null);
   const scrollLeftRef = useRef(scrollLeft);
+  const selectedClipIdsRef = useRef(selectedClipIds);
+  const timelineRef = useRef(timeline);
 
-  // Keep ref in sync for event handlers
+  // Keep refs in sync for event handlers
   useEffect(() => {
     scrollLeftRef.current = scrollLeft;
   }, [scrollLeft]);
+
+  useEffect(() => {
+    selectedClipIdsRef.current = selectedClipIds;
+  }, [selectedClipIds]);
+
+  useEffect(() => {
+    timelineRef.current = timeline;
+  }, [timeline]);
 
   // Sync scroll between Ruler and Tracks
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -580,17 +592,29 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   // Keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Split logic
       if (e.key === 's' || e.key === 'S') {
         if (!e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
           onSplitAtPlayhead?.();
         }
       }
+
+      // 2. Movement logic (Shift + Arrows)
+      if (e.shiftKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const ids = selectedClipIdsRef.current;
+        if (ids.length > 0) {
+          e.preventDefault();
+          const step = 0.1; // 0.1 second step
+          const delta = (e.key === 'ArrowLeft' ? -1 : 1) * step;
+          onClipsMove?.(ids, delta);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onSplitAtPlayhead]);
+  }, [onSplitAtPlayhead, onClipsMove]);
 
   // Memoize split-able clip to avoid per-frame deep search
   const splitableClip = useMemo(() => {

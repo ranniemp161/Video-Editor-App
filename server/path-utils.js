@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,6 +10,8 @@ const projectRoot = path.resolve(__dirname, '..'); // Video-Editor-App root
 export const searchDirs = [
     // Current Project Priorities
     path.join(projectRoot, 'public'),
+    path.join(projectRoot, 'public', 'uploads'),
+    path.join(projectRoot, 'dist', 'uploads'),
     path.join(projectRoot, 'videos'),
 
     // User's Active Folders
@@ -39,6 +42,11 @@ export function findFile(filename) {
         return filename;
     }
 
+    // Skip blob URLs - they can't be resolved to disk paths
+    if (filename.startsWith('blob:')) {
+        return null;
+    }
+
     // 1. Exact Match Search
     for (const dir of searchDirs) {
         const fullPath = path.join(dir, cleanName);
@@ -50,9 +58,9 @@ export function findFile(filename) {
         }
     }
 
-    // 2. Smart Fallback: If exact match fails, check for ANY video file in priority folders
-    // This handles cases like "main-video.mp4" being missing but "RoughCutComposition (1).mp4" existing.
-    console.log(`[Path Utils] Exact match failed for ${filename}. Attempting smart fallback...`);
+    // DISABLED: Smart Fallback (causes incorrect filename mapping during XML export)
+    // console.log(`[Path Utils] Exact match failed for ${filename}. Attempting smart fallback...`);
+    /*
     const extensions = ['.mp4', '.mov', '.mkv', '.webm'];
 
     // Check main priority folders first
@@ -76,9 +84,39 @@ export function findFile(filename) {
             // Ignore readdir errors
         }
     }
+    */
 
     const warnMsg = `[Path Utils] File NOT FOUND: ${filename}`;
     console.warn(warnMsg);
-    fs.appendFileSync('data/transcribe_log.txt', `${warnMsg}\n`);
+    return null;
+}
+
+export function getMediaMetadata(filePath) {
+    if (!filePath || !fs.existsSync(filePath)) return null;
+
+    try {
+        const cmd = `ffprobe -v error -select_streams v:0 -show_entries stream=width,height,avg_frame_rate -of json "${filePath}"`;
+        const output = execSync(cmd).toString();
+        const data = JSON.parse(output);
+        const stream = data.streams[0];
+
+        if (stream) {
+            let fps = 30;
+            if (stream.avg_frame_rate && stream.avg_frame_rate.includes('/')) {
+                const [num, den] = stream.avg_frame_rate.split('/').map(Number);
+                fps = num / den;
+            } else if (stream.avg_frame_rate) {
+                fps = Number(stream.avg_frame_rate);
+            }
+
+            return {
+                width: stream.width,
+                height: stream.height,
+                fps: Math.round(fps * 1000) / 1000 // Keep precision but round slightly
+            };
+        }
+    } catch (e) {
+        console.error(`[Path Utils] Failed to get metadata for ${filePath}:`, e.message);
+    }
     return null;
 }

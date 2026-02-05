@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 
 import { renderTimeline, getRenderProgress } from './server/render-service.js';
 import { generateXML } from './server/xml-service.js';
+import { generateEDL } from './server/edl-service.js';
 import os from 'os';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -33,8 +34,25 @@ export default defineConfig(({ mode }) => {
           server.middlewares.use(async (req, res, next) => {
             const url = req.url || '';
 
-            // Only handle render-related endpoints here. 
-            // Everything else falls through to the proxy.
+            if (url.startsWith('/renders/') && req.method === 'GET') {
+              const fileName = url.replace('/renders/', '');
+              const filePath = path.join(__dirname, 'public', 'renders', fileName);
+              if (fs.existsSync(filePath)) {
+                res.writeHead(200, { 'Content-Type': 'video/mp4' });
+                fs.createReadStream(filePath).pipe(res);
+                return;
+              }
+            }
+
+            if (url.startsWith('/exports/') && req.method === 'GET') {
+              const fileName = url.replace('/exports/', '');
+              const filePath = path.join(__dirname, 'public', 'exports', fileName);
+              if (fs.existsSync(filePath)) {
+                res.writeHead(200, { 'Content-Type': 'application/xml' });
+                fs.createReadStream(filePath).pipe(res);
+                return;
+              }
+            }
 
             if (url.startsWith('/api/render-progress') && req.method === 'GET') {
               res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -82,7 +100,7 @@ export default defineConfig(({ mode }) => {
                   const fileName = `rough_cut_${Date.now()}.xml`;
                   const finalPath = path.join(exportsDir, fileName);
 
-                  console.log(`[API] Generating XML: ${finalPath}`);
+                  console.log(`[API] Generating XML (v5): ${finalPath}`);
                   generateXML(data, finalPath);
 
                   res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -96,8 +114,36 @@ export default defineConfig(({ mode }) => {
               return;
             }
 
+            if (url.startsWith('/api/export-edl') && req.method === 'POST') {
+              let body = '';
+              req.on('data', chunk => { body += chunk; });
+              req.on('end', async () => {
+                try {
+                  if (!body) throw new Error('Empty request body');
+                  const data = JSON.parse(body);
+                  const exportsDir = path.join(__dirname, 'public', 'exports');
+                  if (!fs.existsSync(exportsDir)) fs.mkdirSync(exportsDir, { recursive: true });
+
+                  const fileName = `rough_cut_${Date.now()}.edl`;
+                  const finalPath = path.join(exportsDir, fileName);
+
+                  console.log(`[API] Generating EDL: ${finalPath}`);
+                  generateEDL(data, finalPath);
+
+                  res.writeHead(200, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ success: true, path: `/exports/${fileName}` }));
+                } catch (err) {
+                  console.error('[API] EDL Export Error:', err);
+                  res.writeHead(500, { 'Content-Type': 'application/json' });
+                  res.end(JSON.stringify({ success: false, error: err.message }));
+                }
+              });
+              return;
+            }
+
             // Fallthrough to proxy for /api/upload, /api/project, /api/transcribe, etc.
             next();
+
           });
         }
       }
