@@ -55,6 +55,8 @@ interface ClipProps {
   onTrimStart: (e: React.MouseEvent, clip: TimelineClip) => void;
   onTrimEnd: (e: React.MouseEvent, clip: TimelineClip) => void;
   onUpdate: (id: string, updates: Partial<TimelineClip>) => void;
+  onShowTooltip?: (data: { clipId: string; x: number; y: number; name: string; duration: string; trimInfo: string }) => void;
+  onHideTooltip?: () => void;
 }
 
 const TimelineClipItem = memo(({
@@ -68,6 +70,8 @@ const TimelineClipItem = memo(({
   onDragEnd,
   onTrimStart,
   onTrimEnd,
+  onShowTooltip,
+  onHideTooltip,
 }: ClipProps) => {
   const { TRACK_HEIGHT, TRACK_GAP } = TIMELINE_CONSTANTS;
 
@@ -78,11 +82,28 @@ const TimelineClipItem = memo(({
   const clipWidthPx = Math.max(2, clipDuration * pixelsPerSecond);
   const showText = clipWidthPx > 40;
 
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    if (onShowTooltip) {
+      const duration = `Duration: ${clipDuration.toFixed(2)}s`;
+      const trimInfo = `Trim: ${clip.trimStart.toFixed(2)}s - ${clip.trimEnd.toFixed(2)}s`;
+      onShowTooltip({
+        clipId: clip.id,
+        x: e.clientX,
+        y: e.clientY,
+        name: clip.name || 'Unknown Clip',
+        duration,
+        trimInfo
+      });
+    }
+  };
+
   return (
     <div
       draggable={!isLocked}
       onDragStart={(e) => !isLocked && onDragStart(e, clip.id)}
       onDragEnd={onDragEnd}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onHideTooltip}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(clip.id, e.ctrlKey || e.metaKey);
@@ -210,6 +231,11 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   const [selectionBox, setSelectionBox] = useState<{ startX: number; startY: number; endX: number; endY: number } | null>(null);
   const [hoveredClip, setHoveredClip] = useState<string | null>(null);
   const [trimTooltip, setTrimTooltip] = useState<{ clipId: string; side: 'start' | 'end'; value: string } | null>(null);
+
+  // Phase 1 UX States
+  const [clipTooltip, setClipTooltip] = useState<{ clipId: string; x: number; y: number; name: string; duration: string; trimInfo: string } | null>(null);
+  const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const lastScrubTimeRef = useRef<number | null>(null);
   const scrollLeftRef = useRef(scrollLeft);
@@ -589,6 +615,13 @@ const TimelineComponent: React.FC<TimelineProps> = ({
     return asset || null;
   }, [assetMap]);
 
+  // Show toast feedback helper
+  const showToast = useCallback((message: string) => {
+    setFeedbackToast(message);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setFeedbackToast(null), 2000);
+  }, []);
+
   // Keyboard shortcut handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -597,6 +630,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         if (!e.ctrlKey && !e.metaKey && !e.altKey) {
           e.preventDefault();
           onSplitAtPlayhead?.();
+          showToast('Split at playhead');
         }
       }
 
@@ -608,13 +642,38 @@ const TimelineComponent: React.FC<TimelineProps> = ({
           const step = 0.1; // 0.1 second step
           const delta = (e.key === 'ArrowLeft' ? -1 : 1) * step;
           onClipsMove?.(ids, delta);
+          showToast(`Moved ${ids.length} clip${ids.length > 1 ? 's' : ''} ${e.key === 'ArrowLeft' ? 'left' : 'right'}`);
         }
+      }
+
+      // 3. Home/End - Jump to start/end
+      if (e.key === 'Home') {
+        e.preventDefault();
+        onPlayheadUpdate(0);
+        showToast('Jumped to start');
+      }
+      if (e.key === 'End') {
+        e.preventDefault();
+        onPlayheadUpdate(totalDuration);
+        showToast('Jumped to end');
+      }
+
+      // 4. PageUp/PageDown - Larger jumps
+      if (e.key === 'PageUp') {
+        e.preventDefault();
+        onPlayheadUpdate(Math.max(0, playheadPosition - 5));
+        showToast('← 5 seconds');
+      }
+      if (e.key === 'PageDown') {
+        e.preventDefault();
+        onPlayheadUpdate(Math.min(totalDuration, playheadPosition + 5));
+        showToast('→ 5 seconds');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onSplitAtPlayhead, onClipsMove]);
+  }, [onSplitAtPlayhead, onClipsMove, onPlayheadUpdate, totalDuration, playheadPosition, showToast]);
 
   // Memoize split-able clip to avoid per-frame deep search
   const splitableClip = useMemo(() => {
@@ -691,7 +750,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
             {isRippleMode ? '⚡ Ripple ON' : 'Ripple'}
           </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button onClick={() => setZoom(pixelsPerSecond * 0.8)} className="text-gray-500 hover:text-white transition-colors text-lg font-mono">-</button>
           <input
             type="range"
@@ -703,6 +762,8 @@ const TimelineComponent: React.FC<TimelineProps> = ({
             className="w-32 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
           />
           <button onClick={() => setZoom(pixelsPerSecond * 1.2)} className="text-gray-500 hover:text-white transition-colors text-lg font-mono">+</button>
+          {/* Zoom Percentage Display */}
+          <span className="text-xs text-gray-400 font-mono min-w-[45px] text-right">{Math.round((pixelsPerSecond / 30) * 100)}%</span>
         </div>
       </div>
 
@@ -862,6 +923,8 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                     onTrimStart={handleTrimStart}
                     onTrimEnd={handleTrimEnd}
                     onUpdate={onClipUpdate}
+                    onShowTooltip={setClipTooltip}
+                    onHideTooltip={() => setClipTooltip(null)}
                   />
                 );
               })}
@@ -943,6 +1006,32 @@ const TimelineComponent: React.FC<TimelineProps> = ({
           setScrollLeft(newScrollLeft);
         }}
       />
+
+      {/* Toast Notification */}
+      {feedbackToast && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[100] pointer-events-none transition-opacity duration-300 ease-in-out">
+          <div className="bg-black/90 text-white px-4 py-2 rounded-lg shadow-2xl border border-white/10 text-sm font-medium backdrop-blur-sm">
+            {feedbackToast}
+          </div>
+        </div>
+      )}
+
+      {/* Clip Tooltip */}
+      {clipTooltip && (
+        <div
+          className="fixed z-[101] pointer-events-none"
+          style={{
+            left: `${clipTooltip.x}px`,
+            top: `${clipTooltip.y - 60}px`
+          }}
+        >
+          <div className="bg-gray-900/95 text-white px-3 py-2 rounded-lg shadow-2xl border border-white/20 text-xs backdrop-blur-md">
+            <div className="font-semibold mb-1">{clipTooltip.name}</div>
+            <div className="text-gray-400">{clipTooltip.duration}</div>
+            <div className="text-gray-500 text-[10px] mt-1">{clipTooltip.trimInfo}</div>
+          </div>
+        </div>
+      )}
     </div >
   );
 };
