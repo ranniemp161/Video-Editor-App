@@ -115,6 +115,49 @@ def distribute_word_timestamps(sentence_start: float, sentence_end: float, words
     
     return result
 
+def find_zero_crossing(y: np.ndarray, sr: int, time_point: float, search_window: float = 0.05) -> float:
+    """
+    Finds the nearest zero-crossing point to the given time_point to avoid clicks.
+    search_window: +/- seconds to search
+    """
+    target_sample = int(time_point * sr)
+    window_samples = int(search_window * sr)
+    
+    start_idx = max(0, target_sample - window_samples)
+    end_idx = min(len(y), target_sample + window_samples)
+    
+    if start_idx >= end_idx:
+        return time_point
+        
+    segment = y[start_idx:end_idx]
+    # Find indices where sign changes
+    zero_crossings = np.where(np.diff(np.signbit(segment)))[0]
+    
+    if len(zero_crossings) == 0:
+        return time_point
+        
+    # Find closest zero crossing to the center of the window (target_sample)
+    closest_idx_in_segment = zero_crossings[np.argmin(np.abs(zero_crossings - (target_sample - start_idx)))]
+    
+    return (start_idx + closest_idx_in_segment) / sr
+
+def detect_audio_silence(y: np.ndarray, sr: int, top_db: int = 30) -> List[Dict]:
+    """
+    Detects silence intervals in an audio buffer.
+    """
+    non_silent_intervals = librosa.effects.split(y, top_db=top_db)
+    
+    silence_segments = []
+    last_end = 0.0
+    
+    for start_idx, end_idx in non_silent_intervals:
+        start_time = start_idx / sr
+        if start_time - last_end > 0.1: # Threshold for considering it silence
+            silence_segments.append({"start": last_end, "end": start_time})
+        last_end = end_idx / sr
+        
+    return silence_segments
+
 def refine_word_timestamps_with_audio(words: List[Dict], audio_path: str, start_sec: float, end_sec: float) -> List[Dict]:
     """
     Refine existing word timestamps by snapping them to actual audio onsets and energy peaks.
@@ -167,11 +210,19 @@ def refine_word_timestamps_with_audio(words: List[Dict], audio_path: str, start_
             # Ensure we don't drift too far
             snapped_start = max(rel_start - WINDOW, min(rel_start + WINDOW, snapped_start))
             
+            # --- NEW: Zero-Crossing Refinement ---
+            # To avoid clicks during cuts, find the nearest zero-crossing for the start
+            snapped_start = find_zero_crossing(y, sr, snapped_start)
+            
             # Reconstruct word dict
             new_word = word_dict.copy()
             new_word['start'] = (snapped_start + start_sec) * 1000.0
-            # Note: We don't snap the 'end' as aggressively to avoid overlapping next word
-            # But we ensure it starts after Previous word end
+            
+            # Also nudge the end point to a zero crossing if possible
+            rel_end = (word_dict['end'] / 1000.0) - start_sec
+            snapped_end = find_zero_crossing(y, sr, rel_end)
+            new_word['end'] = (snapped_end + start_sec) * 1000.0
+            
             refined_words.append(new_word)
 
         # Post-process: Ensure no overlaps and maintain sequence

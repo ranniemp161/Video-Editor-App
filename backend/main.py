@@ -11,9 +11,8 @@ import uvicorn
 import shutil
 from pathlib import Path
 
-from rough_cut import generate_rough_cut
 from expert_editor import analyze_transcript
-from word_timing import distribute_word_timestamps, refine_word_timestamps_with_audio
+from word_timing import distribute_word_timestamps, refine_word_timestamps_with_audio, find_zero_crossing
 from professional_rough_cut_v2 import ProfessionalRoughCutV2
 from thought_grouper import ThoughtGrouper
 
@@ -714,7 +713,25 @@ async def auto_cut(request: AutoCutRequest):
     logger.info(f"  • 'Cut that' signals: {stats['cut_that_signals']}")
     logger.info(f"  • Incomplete sentences removed: {stats['incomplete_sentences']}")
     
-    # 3. Convert segments to Timeline Clips
+    # 3. Load audio for zero-crossing snapping if possible
+    audio_buffer = None
+    sr = 16000
+    db = SessionLocal()
+    try:
+        db_project = db.query(models.Project).filter(models.Project.id == request.asset.id).first()
+        if db_project and os.path.exists(db_project.mediaPath):
+            # Extract/Load a bit of audio to find zero crossings
+            # To be efficient, we'll load the whole audio as it's usually small enough for librosa
+            # or we could load snippets. For now, let's load the whole thing if it's not too long.
+            wav_path = db_project.mediaPath + ".wav"
+            if os.path.exists(wav_path):
+                audio_buffer, _ = librosa.load(wav_path, sr=sr)
+    except Exception as e:
+        logger.warning(f"Auto-cut: Could not load audio for snapping: {e}")
+    finally:
+        db.close()
+
+    # 4. Convert segments to Timeline Clips
     clips = []
     timeline_pos = 0.0
     
@@ -724,11 +741,16 @@ async def auto_cut(request: AutoCutRequest):
         trim_start = seg['start']
         trim_end = seg['end']
         
-        # Calculate duration
+        # Snap to zero crossings to avoid clicks
+        if audio_buffer is not None:
+            trim_start = find_zero_crossing(audio_buffer, sr, trim_start)
+            trim_end = find_zero_crossing(audio_buffer, sr, trim_end)
+            
+        # Calculate duration after snapping
         clip_duration = trim_end - trim_start
         
         if clip_duration <= 0:
-            logger.warning(f"Auto-cut: Skipping clip {i} due to zero or negative duration")
+            logger.warning(f"Auto-cut: Skipping clip {i} due to zero or negative duration after snapping")
             continue
         
         clip = {
