@@ -52,6 +52,20 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
         return -1;
     }, [playheadPosition, timeline.tracks]);
 
+    // DYNAMIC VISIBILITY: Determine which parts of the asset are currently in the timeline
+    const activeAssetRanges = React.useMemo(() => {
+        if (!asset) return [];
+        return timeline.tracks.flatMap(t => t.clips)
+            .filter(c => c.assetId === asset.id || c.sourceFileName === asset.name)
+            .map(c => ({ start: c.trimStart, end: c.trimEnd }));
+    }, [asset, timeline.tracks]);
+
+    const isWordIncluded = React.useCallback((wordStart: number, wordEnd: number) => {
+        if (activeAssetRanges.length === 0) return false;
+        const midPoint = (wordStart + wordEnd) / 2;
+        return activeAssetRanges.some(range => midPoint >= range.start - 0.05 && midPoint <= range.end + 0.05);
+    }, [activeAssetRanges]);
+
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && asset) {
             onUploadTranscript(asset.id, e.target.files[0]);
@@ -202,7 +216,12 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                         {words.map((word, i) => {
                             const EPSILON = 0.05; // 50ms tolerance
                             const isCurrent = originalVideoTime >= (word.start / 1000 - EPSILON) && originalVideoTime < (word.end / 1000 + EPSILON);
+                            const isIncluded = isWordIncluded(word.start / 1000, word.end / 1000);
                             const isDeleted = (word as any).isDeleted || false;
+
+                            // SOURCE OF TRUTH: If it's in the timeline, it is NOT excluded.
+                            // This ensures words recovered via Alt + Arrow turn white immediately.
+                            const showAsExcluded = !isIncluded;
 
                             return (
                                 <span
@@ -217,9 +236,9 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                                     }}
                                     className={`cursor-pointer px-2 py-1.5 rounded-md transition-all duration-200 text-sm
                                           ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-[0_0_20px_rgba(38,198,218,0.4)] z-10' : ''}
-                                          ${isDeleted
-                                            ? 'text-red-500/40 line-through opacity-40 bg-red-500/5 border border-red-500/10'
-                                            : !isCurrent ? 'text-gray-300 hover:bg-white/5 hover:text-white hover:scale-105 hover:shadow-lg' : ''}
+                                          ${showAsExcluded
+                                            ? 'text-red-500/40 opacity-40 bg-red-500/5 border border-red-500/10'
+                                            : !isCurrent ? 'text-[#fafafa] hover:bg-white/5 hover:text-white hover:scale-105 hover:shadow-lg' : ''}
                                         `}
                                     title={`${formatTime(word.start / 1000)} ${isDeleteMode ? '(Click to Delete)' : '(Click to Seek)'}`}
                                 >

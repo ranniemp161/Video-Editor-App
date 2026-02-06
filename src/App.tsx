@@ -187,19 +187,16 @@ const App: React.FC = () => {
         case 'backspace': // Del/Backspace: Delete
           deleteClip();
           break;
-        case 'arrowleft': // Left: step back 1 frame
+        case 'arrowleft': // Left
           e.preventDefault();
-          if (e.shiftKey && e.altKey) {
-            // Shift + Alt + Left: Nudge START edge left
+          if (e.altKey) {
+            // Alt + Left: UNHIDE/REVEAL START edge (Expand Left)
             if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'start', 'left');
-          } else if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
-            // Shift + Ctrl + Left: Nudge END edge left
-            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'end', 'left');
           } else if (e.shiftKey) {
-            // Shift + Left: Nudge CLIP left
-            if (selectedClipIds.length > 0) nudgeClips(selectedClipIds, 'left');
-          } else if (e.altKey) {
-            // Alt + Left: Jump to previous marker
+            // Shift + Left: HIDE/SHRINK END edge (Trim Left)
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'end', 'left');
+          } else if (e.ctrlKey || e.metaKey) {
+            // Ctrl + Left: Jump to previous marker
             const prevMarker = getPreviousMarker(playheadPosition);
             if (prevMarker) setPlayheadPosition(prevMarker.time);
           } else {
@@ -207,19 +204,16 @@ const App: React.FC = () => {
             setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
           }
           break;
-        case 'arrowright': // Right: step forward 1 frame
+        case 'arrowright': // Right
           e.preventDefault();
-          if (e.shiftKey && e.altKey) {
-            // Shift + Alt + Right: Nudge START edge right
-            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'start', 'right');
-          } else if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
-            // Shift + Ctrl + Right: Nudge END edge right
+          if (e.altKey) {
+            // Alt + Right: UNHIDE/REVEAL END edge (Expand Right)
             if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'end', 'right');
           } else if (e.shiftKey) {
-            // Shift + Right: Nudge CLIP right
-            if (selectedClipIds.length > 0) nudgeClips(selectedClipIds, 'right');
-          } else if (e.altKey) {
-            // Alt + Right: Jump to next marker
+            // Shift + Right: HIDE/SHRINK START edge (Trim Right)
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'start', 'right');
+          } else if (e.ctrlKey || e.metaKey) {
+            // Ctrl + Right: Jump to next marker
             const nextMarker = getNextMarker(playheadPosition);
             if (nextMarker) setPlayheadPosition(nextMarker.time);
           } else {
@@ -236,7 +230,7 @@ const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [togglePlayback, timeline, playheadPosition, splitClip, selectedClipIds, deleteClip, selectAllClips, totalDuration, setPlayheadPosition, undo, redo, addMarker, getNextMarker, getPreviousMarker]);
+  }, [togglePlayback, timeline, playheadPosition, splitClip, selectedClipIds, deleteClip, selectAllClips, totalDuration, setPlayheadPosition, undo, redo, addMarker, getNextMarker, getPreviousMarker, nudgeClips, nudgeClipEdge, updateClip]);
 
   const handleAssetSelect = (asset: Asset) => {
     setSelectedAsset(asset);

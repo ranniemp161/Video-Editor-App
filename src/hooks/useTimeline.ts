@@ -681,8 +681,54 @@ export const useTimeline = () => {
 
   const nudgeClips = useCallback((clipIds: string[], direction: 'left' | 'right', amount: number = FRAME_DURATION) => {
     const delta = direction === 'left' ? -amount : amount;
-    moveClips(clipIds, delta);
-  }, [moveClips]);
+
+    if (isMagnetic) {
+      // In magnetic mode, nudging a whole clip SLIPS the content
+      // (Changes trimStart/trimEnd while keeping start/end fixed)
+      setTimeline(prev => {
+        const next = { ...prev };
+        let changed = false;
+
+        next.tracks = next.tracks.map(track => {
+          if (track.locked) return track;
+          return {
+            ...track,
+            clips: track.clips.map(clip => {
+              if (clipIds.includes(clip.id)) {
+                changed = true;
+                const asset = assets.find(a => a.id === clip.assetId);
+                const assetDuration = asset?.duration || clip.trimEnd;
+
+                // Guard boundaries
+                let newTrimStart = clip.trimStart + delta;
+                let newTrimEnd = clip.trimEnd + delta;
+
+                if (newTrimStart < 0) {
+                  newTrimEnd -= newTrimStart;
+                  newTrimStart = 0;
+                }
+                if (newTrimEnd > assetDuration) {
+                  newTrimStart -= (newTrimEnd - assetDuration);
+                  newTrimEnd = assetDuration;
+                }
+
+                return { ...clip, trimStart: newTrimStart, trimEnd: newTrimEnd };
+              }
+              return clip;
+            })
+          };
+        });
+
+        if (!changed) return prev;
+        setPast(p => [...p, prev].slice(-50));
+        setFuture([]);
+        return next;
+      });
+    } else {
+      // In non-magnetic mode, nudging moves the clip globally
+      moveClips(clipIds, delta);
+    }
+  }, [moveClips, isMagnetic, assets]);
 
   const nudgeClipEdge = useCallback((clipId: string, edge: 'start' | 'end', direction: 'left' | 'right', amount: number = FRAME_DURATION) => {
     const delta = direction === 'left' ? -amount : amount;
@@ -692,41 +738,62 @@ export const useTimeline = () => {
 
       next.tracks = next.tracks.map(track => {
         if (track.locked) return track;
-        return {
-          ...track,
-          clips: track.clips.map(clip => {
-            if (clip.id === clipId) {
-              changed = true;
-              if (edge === 'start') {
-                const newStart = Math.max(0, clip.start + delta);
-                const actualDelta = newStart - clip.start;
-                // If moving start, we shift the clip's start AND increase trimStart
-                return {
-                  ...clip,
-                  start: newStart,
-                  trimStart: Math.max(0, clip.trimStart + actualDelta)
-                };
-              } else {
-                const newEnd = clip.end + delta;
-                const actualDelta = newEnd - clip.end;
-                return {
-                  ...clip,
-                  end: newEnd,
-                  trimEnd: Math.max(clip.trimStart + 0.1, clip.trimEnd + actualDelta)
-                };
-              }
+        let clips = track.clips.map(clip => {
+          if (clip.id === clipId) {
+            changed = true;
+            if (edge === 'start') {
+              const asset = assets.find(a => a.id === clip.assetId);
+              // Nudging START edge primarily changes trimStart
+              const newTrimStart = Math.max(0, clip.trimStart + delta);
+              if (newTrimStart > clip.trimEnd - 0.1) return clip;
+
+              const durationChange = clip.trimStart - newTrimStart;
+              // Update start/end so duration (end-start) reflects the new trim
+              const newStart = Math.max(0, clip.start - durationChange);
+              const newEnd = newStart + (clip.trimEnd - newTrimStart);
+
+              return {
+                ...clip,
+                trimStart: newTrimStart,
+                start: newStart,
+                end: newEnd
+              };
+            } else {
+              const asset = assets.find(a => a.id === clip.assetId);
+              const assetDuration = asset?.duration || clip.end + 10;
+
+              const newTrimEnd = Math.max(clip.trimStart + 0.1, Math.min(assetDuration, clip.trimEnd + delta));
+
+              return {
+                ...clip,
+                trimEnd: newTrimEnd,
+                end: clip.start + (newTrimEnd - clip.trimStart)
+              };
             }
-            return clip;
-          })
-        };
+          }
+          return clip;
+        });
+
+        // Add magnetic ripple logic for edge nudging
+        if (isMagnetic) {
+          clips.sort((a, b) => a.start - b.start);
+          let currentPos = 0;
+          clips = clips.map(c => {
+            const d = c.end - c.start;
+            const updated = { ...c, start: currentPos, end: currentPos + d };
+            currentPos += d;
+            return updated;
+          });
+        }
+
+        return { ...track, clips };
       });
 
-      if (!changed) return prev;
       setPast(p => [...p, prev].slice(-50));
       setFuture([]);
       return next;
     });
-  }, []);
+  }, [isMagnetic, assets]);
 
   const splitClip = useCallback((clipId: string, position: number) => {
     setTimeline(prev => {
@@ -792,7 +859,26 @@ export const useTimeline = () => {
         ...prev,
         tracks: prev.tracks.map(track => {
           if (track.locked) return track;
-          let clips = track.clips.map(clip => clip.id === clipId ? { ...clip, ...updates } : clip);
+          let clips = track.clips.map(clip => {
+            if (clip.id === clipId) {
+              const merged = { ...clip, ...updates };
+
+              // Validation: Enforce asset boundaries if trimming changed
+              if (updates.trimStart !== undefined || updates.trimEnd !== undefined) {
+                const asset = assets.find(a => a.id === clip.assetId);
+                const duration = asset?.duration || clip.trimEnd;
+
+                if (merged.trimStart < 0) merged.trimStart = 0;
+                if (merged.trimEnd > duration) merged.trimEnd = duration;
+                if (merged.trimEnd - merged.trimStart < 0.1) {
+                  // Revert or clamp
+                  return clip;
+                }
+              }
+              return merged;
+            }
+            return clip;
+          });
           if (isMagnetic) {
             clips.sort((a, b) => a.start - b.start);
             let currentPos = 0;

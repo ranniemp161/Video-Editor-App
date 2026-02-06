@@ -156,6 +156,7 @@ const TimelineClipItem = memo(({
           <div className={`px-2 w-full truncate font-medium drop-shadow-md flex items-center gap-1.5 ${isLocked ? 'text-white/60' : 'text-white/95'}`}>
             {isOffline && <span className="text-red-400 font-bold bg-black/50 px-1 rounded">!</span>}
             <span>{clip.name || 'Unknown Clip'}</span>
+            <span className="text-[9px] opacity-60 ml-auto font-mono">{clipDuration.toFixed(2)}s</span>
           </div>
         )}
       </div>
@@ -558,20 +559,49 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   React.useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!trimming) return;
-      const deltaX = (e.clientX - trimming.initialX) / pixelsPerSecond;
+      let deltaX = (e.clientX - trimming.initialX) / pixelsPerSecond;
+
+      // --- WORD-AWARE SNAPPING ---
+      const targetClip = timeline.tracks.flatMap(t => t.clips).find(c => c.id === trimming.clipId);
+      const asset = targetClip ? getAssetByClip(targetClip) : null;
+
+      if (isSnappingEnabled && asset?.transcription?.words) {
+        const threshold = 0.15; // 150ms snapping radius
+        const words = asset.transcription.words;
+
+        if (trimming.side === 'start') {
+          const targetTrimStart = trimming.initialTrimStart + deltaX;
+          const closestWord = words.find(w => Math.abs((w.start / 1000) - targetTrimStart) < threshold);
+          if (closestWord) {
+            deltaX = (closestWord.start / 1000) - trimming.initialTrimStart;
+          }
+        } else {
+          const targetTrimEnd = trimming.initialTrimEnd + deltaX;
+          const closestWord = words.find(w => Math.abs((w.end / 1000) - targetTrimEnd) < threshold);
+          if (closestWord) {
+            deltaX = (closestWord.end / 1000) - trimming.initialTrimEnd;
+          }
+        }
+      }
 
       if (trimming.side === 'start') {
         const newStart = Math.max(0, trimming.initialClipStart + deltaX);
         const actualDelta = newStart - trimming.initialClipStart;
-        const newTrimStart = Math.max(0, trimming.initialTrimStart + actualDelta);
-        if (newStart < trimming.initialClipEnd - 0.1) {
+        const newTrimStart = trimming.initialTrimStart + actualDelta;
+
+        // Validation against source handled by hook, but we bound check here for UI smoothness
+        if (newTrimStart >= 0 && newStart < trimming.initialClipEnd - 0.1) {
           onClipUpdate(trimming.clipId, { start: newStart, trimStart: newTrimStart });
         }
       } else {
-        const newEnd = Math.max(trimming.initialClipStart + 0.1, trimming.initialClipEnd + deltaX);
-        const durationDelta = newEnd - trimming.initialClipEnd;
-        const newTrimEnd = trimming.initialTrimEnd + durationDelta;
-        onClipUpdate(trimming.clipId, { end: newEnd, trimEnd: newTrimEnd });
+        const newEnd = trimming.initialClipEnd + deltaX;
+        const actualDelta = newEnd - trimming.initialClipEnd;
+        const newTrimEnd = trimming.initialTrimEnd + actualDelta;
+
+        // Validation against source handled by hook
+        if (newEnd > trimming.initialClipStart + 0.1) {
+          onClipUpdate(trimming.clipId, { end: newEnd, trimEnd: newTrimEnd });
+        }
       }
     };
     const handleMouseUp = () => setTrimming(null);
@@ -1019,22 +1049,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         </div>
       )}
 
-      {/* Clip Tooltip */}
-      {clipTooltip && (
-        <div
-          className="fixed z-[101] pointer-events-none"
-          style={{
-            left: `${clipTooltip.x}px`,
-            top: `${clipTooltip.y - 60}px`
-          }}
-        >
-          <div className="bg-gray-900/95 text-white px-3 py-2 rounded-lg shadow-2xl border border-white/20 text-xs backdrop-blur-md">
-            <div className="font-semibold mb-1">{clipTooltip.name}</div>
-            <div className="text-gray-400">{clipTooltip.duration}</div>
-            <div className="text-gray-500 text-[10px] mt-1">{clipTooltip.trimInfo}</div>
-          </div>
-        </div>
-      )}
+      {/* Clip Tooltip removed as per user request */}
     </div >
   );
 };
