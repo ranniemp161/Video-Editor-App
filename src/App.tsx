@@ -29,6 +29,8 @@ const App: React.FC = () => {
     addMediaFiles,
     moveClip,
     moveClips,
+    nudgeClips,
+    nudgeClipEdge,
     splitClip,
     deleteClip,
     updateClip,
@@ -186,24 +188,42 @@ const App: React.FC = () => {
           deleteClip();
           break;
         case 'arrowleft': // Left: step back 1 frame
-          if (e.altKey) {
+          e.preventDefault();
+          if (e.shiftKey && e.altKey) {
+            // Shift + Alt + Left: Nudge START edge left
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'start', 'left');
+          } else if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
+            // Shift + Ctrl + Left: Nudge END edge left
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'end', 'left');
+          } else if (e.shiftKey) {
+            // Shift + Left: Nudge CLIP left
+            if (selectedClipIds.length > 0) nudgeClips(selectedClipIds, 'left');
+          } else if (e.altKey) {
             // Alt + Left: Jump to previous marker
-            e.preventDefault();
             const prevMarker = getPreviousMarker(playheadPosition);
             if (prevMarker) setPlayheadPosition(prevMarker.time);
-          } else if (!e.shiftKey) {
-            e.preventDefault();
+          } else {
+            // Default: step back 1 frame
             setPlayheadPosition(Math.max(0, playheadPosition - 0.1));
           }
           break;
         case 'arrowright': // Right: step forward 1 frame
-          if (e.altKey) {
+          e.preventDefault();
+          if (e.shiftKey && e.altKey) {
+            // Shift + Alt + Right: Nudge START edge right
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'start', 'right');
+          } else if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
+            // Shift + Ctrl + Right: Nudge END edge right
+            if (selectedClipIds.length === 1) nudgeClipEdge(selectedClipIds[0], 'end', 'right');
+          } else if (e.shiftKey) {
+            // Shift + Right: Nudge CLIP right
+            if (selectedClipIds.length > 0) nudgeClips(selectedClipIds, 'right');
+          } else if (e.altKey) {
             // Alt + Right: Jump to next marker
-            e.preventDefault();
             const nextMarker = getNextMarker(playheadPosition);
             if (nextMarker) setPlayheadPosition(nextMarker.time);
-          } else if (!e.shiftKey) {
-            e.preventDefault();
+          } else {
+            // Default: step forward 1 frame
             setPlayheadPosition(Math.min(totalDuration, playheadPosition + 0.1));
           }
           break;
@@ -249,7 +269,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#0f0f0f] flex flex-col font-sans text-gray-200 overflow-hidden">
+    <div className="h-screen w-screen bg-[#050505] flex flex-col font-sans text-gray-200 overflow-hidden selection:bg-[#26c6da]/30">
       <Header
         onImportClick={handleFileChange}
         renderToMP4={renderToMP4}
@@ -264,9 +284,9 @@ const App: React.FC = () => {
       <div className="flex-grow flex overflow-hidden">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        <div className="flex-grow flex flex-col overflow-hidden">
-          <div className="flex-[3] flex overflow-hidden border-b border-[#2d2d2d]">
-            <div className={`${activeTab === 'transcript' ? 'w-[500px]' : 'w-[320px]'} bg-[#1a1a1a] border-r border-[#2d2d2d] flex flex-col transition-all duration-200`}>
+        <div className="flex-grow flex flex-col overflow-hidden bg-[#050505]">
+          <div className="flex-[3] flex overflow-hidden border-b border-white/[0.05]">
+            <div className={`${activeTab === 'transcript' ? 'w-[500px]' : 'w-[320px]'} bg-[#0a0a0a] border-r border-white/[0.05] flex flex-col transition-all duration-300 ease-in-out`}>
               {activeTab === 'media' && (
                 <MediaPool
                   assets={assets}
@@ -321,14 +341,14 @@ const App: React.FC = () => {
               )}
             </div>
 
-            <div className="flex-grow flex flex-col bg-[#0f0f0f] relative group">
-              <div className="absolute top-0 left-0 right-0 h-8 px-4 flex items-center bg-[#1a1a1a]/40 border-b border-[#2d2d2d]/30 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Player-Timeline 01</span>
+            <div className="flex-grow flex flex-col bg-[#050505] relative group">
+              <div className="absolute top-0 left-0 right-0 h-10 px-4 flex items-center glass border-b border-white/[0.05] opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+                <span className="text-[9px] uppercase font-bold tracking-[0.3em] text-[#fafafa] font-display">Live Preview / Stage</span>
               </div>
               <div className="flex-grow flex items-center justify-center overflow-hidden">
                 <Preview clip={currentClip} playheadPosition={playheadPosition} isPlaying={isPlaying} />
               </div>
-              <div className="bg-[#1a1a1a] border-t border-[#2d2d2d]">
+              <div className="bg-[#0a0a0a] border-t border-white/[0.05]">
                 <PlaybackControls
                   isPlaying={isPlaying}
                   togglePlayback={togglePlayback}
@@ -341,7 +361,7 @@ const App: React.FC = () => {
 
             {/* Inspector Panel - Hidden in Transcript tab, visible in Media tab */}
             {activeTab !== 'transcript' && (
-              <div className="w-[300px] border-l border-[#2d2d2d]">
+              <div className="w-[300px] border-l border-white/[0.05] bg-[#0a0a0a]">
                 <Inspector
                   selectedAsset={selectedAsset || (currentClip?.asset ?? null)}
                   selectedClip={timeline.tracks.flatMap((t: any) => t.clips).find((c: any) => selectedClipIds.includes(c.id)) || null}
@@ -351,8 +371,8 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className="flex-[2] flex flex-col bg-[#0f0f0f] overflow-hidden">
-            <div className="h-9 px-4 flex items-center justify-between border-b border-[#2d2d2d] bg-[#1a1a1a]">
+          <div className="flex-[2] flex flex-col bg-[#050505] overflow-hidden">
+            <div className="h-10 px-4 flex items-center justify-between border-b border-white/[0.05] glass">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <button className="text-gray-400 hover:text-white p-1 transition-colors" title="Import Media"><AddIcon className="w-4 h-4" /></button>

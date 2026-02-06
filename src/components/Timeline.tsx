@@ -77,8 +77,9 @@ const TimelineClipItem = memo(({
 
   const isOffline = !asset || !asset.src;
   const isVideo = asset?.type === 'video';
+  // Transition to a more sophisticated palette
+  const clipBaseColor = isOffline ? '#3d0b0b' : (isVideo ? '#26c6da' : '#64a064');
   const clipDuration = clip.end - clip.start;
-  const clipColor = isOffline ? '#3d0b0b' : (isVideo ? '#4a8faa' : '#64a064');
   const clipWidthPx = Math.max(2, clipDuration * pixelsPerSecond);
   const showText = clipWidthPx > 40;
 
@@ -108,16 +109,17 @@ const TimelineClipItem = memo(({
         e.stopPropagation();
         onSelect(clip.id, e.ctrlKey || e.metaKey);
       }}
-      className={`absolute rounded-md overflow-hidden text-white text-[10px] flex flex-col transition-all select-none group ${isSelected
-        ? 'ring-2 ring-white z-20 shadow-lg'
-        : 'shadow-sm border border-black/10'
-        } ${isLocked ? 'opacity-60 grayscale-[0.5] cursor-not-allowed' : 'cursor-move active:opacity-80'}`}
+      className={`absolute rounded-lg overflow-hidden text-white text-[10px] flex flex-col transition-all select-none group border border-white/[0.08] ${isSelected
+        ? 'ring-2 ring-white z-20 shadow-[0_10px_30px_rgba(0,0,0,0.5)]'
+        : 'shadow-[0_2px_10px_rgba(0,0,0,0.3)]'
+        } ${isLocked ? 'opacity-40 grayscale-[0.8] cursor-not-allowed' : 'cursor-move active:scale-[0.98]'}`}
       style={{
         left: `${clip.start * pixelsPerSecond}px`,
         width: `${clipWidthPx}px`,
         height: `${TRACK_HEIGHT}px`,
         top: `${TRACK_GAP / 2}px`,
-        backgroundColor: clipColor,
+        background: `linear-gradient(to bottom, ${clipBaseColor}dd, ${clipBaseColor}ff)`,
+        boxShadow: isSelected ? '0 0 20px rgba(255,255,255,0.1)' : 'inset 0 1px 1px rgba(255,255,255,0.1)'
       }}
     >
       {asset && isVideo && clipWidthPx > 20 && (
@@ -174,13 +176,14 @@ TimelineClipItem.displayName = 'TimelineClipItem';
 const Playhead = memo(({ position, pixelsPerSecond }: { position: number, pixelsPerSecond: number }) => {
   return (
     <div
-      className="absolute top-0 bottom-0 w-[1px] bg-[#00E5FF] z-40 pointer-events-none will-change-transform"
+      className="absolute top-0 bottom-0 w-[2px] bg-[#26c6da] z-40 pointer-events-none will-change-transform"
       style={{
         transform: `translateX(${position * pixelsPerSecond}px)`,
-        boxShadow: '0 0 4px rgba(0, 229, 255, 0.4)'
+        boxShadow: '0 0 15px rgba(38, 198, 218, 0.8)'
       }}
     >
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-[#00E5FF] rotate-45 transform shadow-sm rounded-sm"></div>
+      <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-[#26c6da] rounded-sm transform scale-x-[0.3] scale-y-[1.5] shadow-[0_0_10px_rgba(38,198,218,0.5)]"></div>
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-[#26c6da] rounded-full opacity-20 blur-sm scale-150"></div>
     </div>
   );
 });
@@ -732,11 +735,11 @@ const TimelineComponent: React.FC<TimelineProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full flex flex-col bg-[#1e1e1e] overflow-hidden border-t border-[#333] ${isPanning ? 'cursor-grabbing' : ''}`}
+      className={`w-full h-full flex flex-col bg-[#0a0a0a] overflow-hidden border-t border-white/[0.05] ${isPanning ? 'cursor-grabbing' : ''}`}
       onMouseDown={handleGlobalMouseDown}
     >
       {/* Zoom / Controls Bar */}
-      <div className="flex items-center justify-between px-4 h-9 bg-[#1a1a1a] border-b border-[#333] gap-4">
+      <div className="flex items-center justify-between px-4 h-10 glass border-b border-white/[0.05] gap-4">
         <div className="flex items-center gap-2">
           {/* Ripple Edit Mode Toggle */}
           <button

@@ -16,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     ];
 
     return (
-        <div className="w-[72px] bg-[#0f0f0f] flex flex-col items-center py-4 gap-6 border-r border-[#2d2d2d]">
+        <div className="w-[72px] glass flex flex-col items-center py-6 gap-8 border-r border-white/5 z-50">
             {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -24,14 +24,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex flex-col items-center gap-1 group transition-colors ${isActive ? 'text-[#26c6da]' : 'text-gray-400 hover:text-white'
+                        className={`flex flex-col items-center gap-1.5 group transition-all duration-300 relative ${isActive ? 'text-[#26c6da]' : 'text-gray-500 hover:text-gray-300'
                             }`}
                     >
-                        <div className={`p-2 rounded-lg transition-colors ${isActive ? 'bg-[#26c6da]/10' : 'group-hover:bg-[#ffffff]/5'
+                        {isActive && (
+                            <div className="absolute -left-4 w-1 h-6 bg-[#26c6da] rounded-r-full shadow-[0_0_10px_rgba(38,198,218,0.5)]" />
+                        )}
+                        <div className={`p-2.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-[#26c6da]/15 shadow-[0_0_20px_rgba(38,198,218,0.1)]' : 'group-hover:bg-white/5'
                             }`}>
-                            <Icon className="w-6 h-6" />
+                            <Icon className={`w-6 h-6 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`} />
                         </div>
-                        <span className="text-[10px] font-medium">{tab.label}</span>
+                        <span className={`text-[9px] font-bold uppercase tracking-wider transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`}>{tab.label}</span>
                     </button>
                 );
             })}

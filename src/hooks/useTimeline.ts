@@ -3,6 +3,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { TimelineState, Asset, TimelineClip } from '../types';
 
 const basename = (path: string) => path.split(/[\\/]/).pop() || '';
+const FRAME_DURATION = 0.04; // 25fps default
 
 export const useTimeline = () => {
   const [timeline, setTimeline] = useState<TimelineState>({
@@ -678,6 +679,55 @@ export const useTimeline = () => {
     });
   }, [isMagnetic]);
 
+  const nudgeClips = useCallback((clipIds: string[], direction: 'left' | 'right', amount: number = FRAME_DURATION) => {
+    const delta = direction === 'left' ? -amount : amount;
+    moveClips(clipIds, delta);
+  }, [moveClips]);
+
+  const nudgeClipEdge = useCallback((clipId: string, edge: 'start' | 'end', direction: 'left' | 'right', amount: number = FRAME_DURATION) => {
+    const delta = direction === 'left' ? -amount : amount;
+    setTimeline(prev => {
+      const next = { ...prev };
+      let changed = false;
+
+      next.tracks = next.tracks.map(track => {
+        if (track.locked) return track;
+        return {
+          ...track,
+          clips: track.clips.map(clip => {
+            if (clip.id === clipId) {
+              changed = true;
+              if (edge === 'start') {
+                const newStart = Math.max(0, clip.start + delta);
+                const actualDelta = newStart - clip.start;
+                // If moving start, we shift the clip's start AND increase trimStart
+                return {
+                  ...clip,
+                  start: newStart,
+                  trimStart: Math.max(0, clip.trimStart + actualDelta)
+                };
+              } else {
+                const newEnd = clip.end + delta;
+                const actualDelta = newEnd - clip.end;
+                return {
+                  ...clip,
+                  end: newEnd,
+                  trimEnd: Math.max(clip.trimStart + 0.1, clip.trimEnd + actualDelta)
+                };
+              }
+            }
+            return clip;
+          })
+        };
+      });
+
+      if (!changed) return prev;
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]);
+      return next;
+    });
+  }, []);
+
   const splitClip = useCallback((clipId: string, position: number) => {
     setTimeline(prev => {
       const next = {
@@ -1030,6 +1080,8 @@ export const useTimeline = () => {
     addMediaFiles,
     moveClip,
     moveClips,
+    nudgeClips,
+    nudgeClipEdge,
     splitClip,
     deleteClip,
     updateClip,

@@ -16,12 +16,12 @@ export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, o
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#1a1a1a]">
-      <div className="px-4 py-2 border-b border-[#2d2d2d] flex items-center justify-between shadow-sm">
+    <div className="h-full flex flex-col bg-[#0a0a0a]">
+      <div className="px-4 h-10 border-b border-white/5 flex items-center justify-between glass sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <span className="text-xs font-semibold text-white">Import</span>
-          <div className="h-3 w-[1px] bg-[#333]"></div>
-          <span className="text-xs font-semibold text-[#26c6da]">Media</span>
+          <span className="text-[10px] font-bold text-[#fafafa] uppercase tracking-[0.2em] font-display">Project</span>
+          <div className="h-3 w-[1px] bg-white/10"></div>
+          <span className="text-[10px] font-bold text-[#26c6da] uppercase tracking-[0.2em] font-display">Media</span>
         </div>
       </div>
 
@@ -38,13 +38,13 @@ export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, o
           />
           <div
             onClick={handleUploadClick}
-            className="w-full aspect-[4/3] bg-[#0f0f0f] border-2 border-dashed border-[#2d2d2d] hover:border-[#26c6da]/40 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group mb-6 hover:bg-[#26c6da]/5"
+            className="w-full aspect-[4/3] bg-white/[0.02] border-2 border-dashed border-white/[0.05] hover:border-[#26c6da]/40 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group mb-6 hover:bg-[#26c6da]/5"
           >
-            <div className="w-12 h-12 bg-[#26c6da] rounded-full flex items-center justify-center text-[#0f0f0f] shadow-lg shadow-[#26c6da]/20 group-hover:scale-110 transition-transform mb-4">
-              <AddIcon className="w-7 h-7" />
+            <div className="w-14 h-14 bg-[#26c6da] rounded-full flex items-center justify-center text-[#0f0f0f] shadow-[0_0_30px_rgba(38,198,218,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_40px_rgba(38,198,218,0.5)] transition-all duration-300 mb-4">
+              <AddIcon className="w-8 h-8" />
             </div>
-            <span className="text-[14px] font-bold text-white uppercase tracking-tight">Import</span>
-            <span className="text-[11px] text-gray-500 mt-2 text-center px-4 leading-tight">Drag and drop videos, photos, and audio files here</span>
+            <span className="text-[14px] font-bold text-white uppercase tracking-wider font-display">Import Media</span>
+            <span className="text-[11px] text-gray-500 mt-2 text-center px-6 leading-relaxed opacity-60">Drag and drop your creative assets here to begin your journey</span>
           </div>
 
           {/* Assets List */}
@@ -57,7 +57,7 @@ export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, o
                 <div
                   key={asset.id}
                   onClick={() => onAddToTimeline(asset)}
-                  className="group relative aspect-video bg-[#0f0f0f] rounded-lg overflow-hidden cursor-pointer border border-[#2d2d2d] hover:border-[#26c6da] transition-all shadow-sm active:scale-[0.98]"
+                  className="group relative aspect-video bg-white/[0.03] rounded-xl overflow-hidden cursor-pointer border border-white/[0.05] hover:border-[#26c6da]/50 transition-all duration-300 shadow-lg active:scale-[0.98]"
                 >
                   {asset.src ? (
                     <div className="w-full h-full relative">
@@ -84,11 +84,11 @@ export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, o
         </div>
       </div>
 
-      <div className="p-3 border-t border-[#2d2d2d] grid grid-cols-3 gap-2 bg-[#1a1a1a]">
-        {[{ icon: MediaIcon, label: 'AI Media' }, { icon: EffectsIcon, label: 'Effects' }, { icon: FilmIcon, label: 'Record' }].map((item, i) => (
-          <div key={i} className="flex flex-col items-center gap-1.5 p-2 rounded bg-[#252525] border border-transparent hover:border-[#333] hover:bg-[#2d2d2d] cursor-pointer group transition-all">
-            <item.icon className="w-5 h-5 text-gray-400 group-hover:text-[#26c6da] transition-colors" />
-            <span className="text-[9px] font-medium text-gray-400 group-hover:text-gray-200">{item.label}</span>
+      <div className="p-4 glass-light border-t border-white/5 grid grid-cols-3 gap-2">
+        {[{ icon: MediaIcon, label: 'AI Assets' }, { icon: EffectsIcon, label: 'FX' }, { icon: FilmIcon, label: 'Record' }].map((item, i) => (
+          <div key={i} className="flex flex-col items-center gap-1.5 p-2 rounded-xl bg-white/[0.03] border border-transparent hover:border-white/10 hover:bg-white/5 cursor-pointer group transition-all duration-300">
+            <item.icon className="w-5 h-5 text-gray-500 group-hover:text-[#26c6da] transition-all duration-300 group-hover:scale-110" />
+            <span className="text-[8px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-300">{item.label}</span>
           </div>
         ))}
       </div>

@@ -133,13 +133,13 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
 
 
     return (
-        <div className="flex-grow flex flex-col overflow-hidden bg-[#1a1a1a]">
-            <div className="h-8 px-3 flex items-center justify-between border-b border-[#2d2d2d] bg-[#252525]">
+        <div className="flex-grow flex flex-col overflow-hidden bg-[#0f0f0f]">
+            <div className="h-10 px-4 flex items-center justify-between border-b border-[#ffffff0a] glass sticky top-0 z-20">
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Transcript</span>
+                    <span className="text-[10px] font-bold text-[#fafafa] uppercase tracking-[0.2em] font-display">Transcript</span>
                     {asset.transcription.source && (
-                        <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase ${asset.transcription.source === 'ai' ? 'bg-[#26c6da22] text-[#26c6da]' : 'bg-purple-900/40 text-purple-400'}`}>
-                            {asset.transcription.source === 'ai' ? 'AI GEN' : 'UPLOADED'}
+                        <span className={`text-[8px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${asset.transcription.source === 'ai' ? 'bg-[#26c6da15] text-[#26c6da] border border-[#26c6da33]' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}`}>
+                            {asset.transcription.source === 'ai' ? 'AI Generated' : 'Uploaded'}
                         </span>
                     )}
                 </div>
@@ -147,41 +147,41 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setIsDeleteMode(!isDeleteMode)}
-                        className={`text-[9px] font-bold uppercase transition-colors px-2 py-0.5 rounded ${isDeleteMode ? 'bg-red-900/40 text-red-500' : 'text-gray-400 hover:text-white'}`}
+                        className={`text-[9px] font-bold uppercase tracking-wider transition-all px-2.5 py-1 rounded-md border ${isDeleteMode ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'text-gray-400 hover:text-white border-transparent hover:border-white/10'}`}
                         title={isDeleteMode ? "Click words to delete" : "Click words to seek"}
                     >
                         {isDeleteMode ? "MODE: DELETE" : "MODE: NAVIGATE"}
                     </button>
-                    <div className="w-[1px] h-3 bg-[#333]"></div>
+                    <div className="w-[1px] h-3 bg-white/5"></div>
                     {/* Thought View Toggle */}
                     {asset.transcription.thoughts && (
                         <>
                             <button
                                 onClick={() => setShowThoughts(!showThoughts)}
-                                className={`text-[9px] font-bold uppercase transition-colors px-2 py-0.5 rounded ${showThoughts ? 'bg-cyan-900/40 text-cyan-400' : 'text-gray-400 hover:text-white'}`}
+                                className={`text-[9px] font-bold uppercase tracking-wider transition-all px-2.5 py-1 rounded-md border ${showThoughts ? 'bg-cyan-500/10 text-[#26c6da] border-[#26c6da]/20' : 'text-gray-400 hover:text-white border-transparent hover:border-white/10'}`}
                                 title={showThoughts ? "Show words" : "Show thought groups"}
                             >
                                 {showThoughts ? "VIEW: THOUGHTS" : "VIEW: WORDS"}
                             </button>
-                            <div className="w-[1px] h-3 bg-[#333]"></div>
+                            <div className="w-[1px] h-3 bg-white/5"></div>
                         </>
                     )}
-                    <label className="cursor-pointer text-[9px] text-[#26c6da] hover:underline font-bold uppercase" title="Upload Replacement Transcript">
+                    <label className="cursor-pointer text-[9px] text-[#26c6da] hover:text-[#4dd0e1] font-bold uppercase tracking-wider transition-colors" title="Upload Replacement Transcript">
                         REPLACE
                         <input type="file" accept=".srt,.vtt,.json,.txt" className="hidden" onChange={handleUpload} />
                     </label>
-                    <div className="w-[1px] h-3 bg-[#333]"></div>
+                    <div className="w-[1px] h-3 bg-white/5"></div>
                     <button
                         onClick={() => onAutoCut(asset.id)}
-                        className="text-[9px] text-[#26c6da] hover:underline font-bold uppercase"
+                        className="text-[9px] text-[#26c6da] hover:text-[#4dd0e1] font-bold uppercase tracking-wider transition-colors"
                     >
                         Auto-Cut
                     </button>
-                    <div className="w-[1px] h-3 bg-[#333]"></div>
+                    <div className="w-[1px] h-3 bg-white/5"></div>
                     {asset?.transcription && (
                         <button
                             onClick={() => onExport(asset.transcription!)}
-                            className="text-[9px] text-gray-400 hover:text-white hover:underline font-bold uppercase transition-colors"
+                            className="text-[9px] text-gray-400 hover:text-white font-bold uppercase tracking-wider transition-colors"
                         >
                             TXT
                         </button>
@@ -198,7 +198,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     />
                 ) : (
                     // Word View (Default)
-                    <div className="flex flex-wrap gap-x-1.5 gap-y-2 leading-relaxed">
+                    <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 leading-relaxed font-medium">
                         {words.map((word, i) => {
                             const EPSILON = 0.05; // 50ms tolerance
                             const isCurrent = originalVideoTime >= (word.start / 1000 - EPSILON) && originalVideoTime < (word.end / 1000 + EPSILON);
@@ -209,17 +209,17 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                                     key={i}
                                     ref={isCurrent ? currentWordRef : null}
                                     onClick={(e) => {
-                                        // Navigate mode: standard seek
-                                        // Delete mode: toggle delete
                                         if (isDeleteMode && onToggleWord) {
                                             onToggleWord(word.start / 1000);
                                         } else {
                                             onSeek(word.start / 1000);
                                         }
                                     }}
-                                    className={`cursor-pointer px-1.5 py-1 rounded transition-all text-sm
-                                          ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-lg z-10' : ''}
-                                          ${isDeleted ? 'line-through text-red-500 opacity-50 bg-red-900/20' : 'text-gray-300 hover:bg-[#333] hover:text-white'}
+                                    className={`cursor-pointer px-2 py-1.5 rounded-md transition-all duration-200 text-sm
+                                          ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-[0_0_20px_rgba(38,198,218,0.4)] z-10' : ''}
+                                          ${isDeleted
+                                            ? 'text-red-500/40 line-through opacity-40 bg-red-500/5 border border-red-500/10'
+                                            : !isCurrent ? 'text-gray-300 hover:bg-white/5 hover:text-white hover:scale-105 hover:shadow-lg' : ''}
                                         `}
                                     title={`${formatTime(word.start / 1000)} ${isDeleteMode ? '(Click to Delete)' : '(Click to Seek)'}`}
                                 >
