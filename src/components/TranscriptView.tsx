@@ -19,6 +19,45 @@ interface TranscriptViewProps {
     timeline: TimelineState; // Use TimelineState type
 }
 
+// Optimized Word Component to prevent 50,000 re-renders per frame
+// Optimized Word Component to prevent 50,000 re-renders per frame
+const TranscriptWord = React.memo(({
+    word,
+    index,
+    // isCurrent, // REMOVED: Managed via Direct DOM
+    isIncluded,
+    isSelected,
+    handleWordClick,
+    handleContextMenu
+}: any) => {
+    // const wordRef = useRef<HTMLSpanElement>(null); // REMOVED: Using ID for selection
+
+    return (
+        <span
+            id={`word-${index}`} // Added ID for O(1) DOM access
+            onClick={(e) => handleWordClick(index, e)}
+            onContextMenu={(e) => handleContextMenu(e, index, isIncluded)}
+            className={`transcript-word cursor-pointer px-2 py-0.5 rounded-sm transition-all duration-75 text-sm border border-transparent
+                  ${isSelected ? 'bg-[#26c6da] text-[#0f0f0f] font-bold' : ''}
+                  ${!isIncluded && !isSelected
+                    ? 'text-red-500/40 opacity-40 line-through decoration-red-500/30'
+                    : !isSelected ? 'text-[#fafafa] hover:bg-white/5 hover:text-white' : ''}
+                `}
+            title={`${formatTime(word.start / 1000)}`}
+        >
+            {word.word}
+        </span>
+    );
+}, (prev, next) => {
+    // Custom comparison for performance
+    return (
+        prev.isIncluded === next.isIncluded &&
+        prev.isSelected === next.isSelected &&
+        prev.word === next.word // Word object reference usually stable
+    );
+});
+TranscriptWord.displayName = 'TranscriptWord';
+
 export const TranscriptView: React.FC<TranscriptViewProps> = ({
     asset,
     playheadPosition,
@@ -56,7 +95,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
 
     const words = React.useMemo(() => asset?.transcription?.words || [], [asset]);
 
-    const handleWordClick = (index: number, e: React.MouseEvent) => {
+    const handleWordClick = React.useCallback((index: number, e: React.MouseEvent) => {
         if (e.button === 2) return; // Ignore right click here, handled by onContextMenu
 
         if (e.shiftKey && selectionStart !== null) {
@@ -70,16 +109,19 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             // Seeking logic
             const word = words[index];
             if (word) {
+                // Seek slightly before the word starts (pre-roll) to catch the attack
+                const seekTime = Math.max(0, (word.start / 1000) - 0.1);
+
                 if (isDeleteMode && onToggleWord) {
                     onToggleWord(word.start / 1000);
                 } else {
-                    onSeek(word.start / 1000);
+                    onSeek(seekTime);
                 }
             }
         }
-    };
+    }, [selectionStart, words, isDeleteMode, onToggleWord, onSeek]);
 
-    const handleContextMenu = (e: React.MouseEvent, index: number, isIncluded: boolean) => {
+    const handleContextMenu = React.useCallback((e: React.MouseEvent, index: number, isIncluded: boolean) => {
         e.preventDefault();
         setContextMenu({
             x: e.clientX,
@@ -98,7 +140,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             setSelectionStart(index);
             setSelectionEnd(null);
         }
-    };
+    }, [selectionStart, selectionEnd]);
 
     const handleDeleteRange = React.useCallback(() => {
         if (selectionStart === null || !onDeleteRange) return;
@@ -173,11 +215,18 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             .map(c => ({ start: c.trimStart, end: c.trimEnd }));
     }, [asset, timeline.tracks]);
 
-    const isWordIncluded = React.useCallback((wordStart: number, wordEnd: number) => {
-        if (activeAssetRanges.length === 0) return false;
-        const midPoint = (wordStart + wordEnd) / 2;
-        return activeAssetRanges.some(range => midPoint >= range.start - 0.05 && midPoint <= range.end + 0.05);
-    }, [activeAssetRanges]);
+    // OPTIMIZATION: Pre-calculate inclusion status for ALL words when timeline changes
+    // This prevents O(N*M) calculations on every frame inside the render loop
+    const wordInclusionStatus = React.useMemo(() => {
+        if (activeAssetRanges.length === 0) return new Array(words.length).fill(false);
+
+        return words.map(word => {
+            const wordStart = word.start / 1000;
+            const wordEnd = word.end / 1000;
+            const midPoint = (wordStart + wordEnd) / 2;
+            return activeAssetRanges.some(range => midPoint >= range.start - 0.05 && midPoint <= range.end + 0.05);
+        });
+    }, [words, activeAssetRanges]);
 
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && asset) {
@@ -186,21 +235,65 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     };
 
 
-    // Find current word for auto-scroll dependency
-    const currentWord = React.useMemo(() => {
-        const EPSILON = 0.05;
-        return words.find(w => originalVideoTime >= (w.start / 1000 - EPSILON) && originalVideoTime < (w.end / 1000 + EPSILON));
-    }, [words, originalVideoTime]);
+    // OPTIMIZATION: Direct DOM Manipulation for Highlighting
+    // This bypasses the React Render Cycle entirely for the frequent "current word" updates
+    const activeWordIndexRef = useRef<number>(-1);
 
-    // Auto-scroll to current word
     useEffect(() => {
-        if (currentWordRef.current && scrollContainerRef.current) {
-            currentWordRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
+        const EPSILON = 0.05;
+        // Binary Search for performance O(log N)
+        let low = 0;
+        let high = words.length - 1;
+        let foundIndex = -1;
+
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            const word = words[mid];
+            const start = word.start / 1000;
+            const end = word.end / 1000;
+
+            if (originalVideoTime >= (start - EPSILON) && originalVideoTime < (end + EPSILON)) {
+                foundIndex = mid;
+                break;
+            } else if (originalVideoTime < start) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
         }
-    }, [currentWord]); // Only trigger when the current word object changes!
+
+        // DOM Update
+        if (foundIndex !== activeWordIndexRef.current) {
+            // Remove highlight from previous
+            if (activeWordIndexRef.current !== -1) {
+                const prevEl = document.getElementById(`word-${activeWordIndexRef.current}`);
+                if (prevEl) {
+                    prevEl.classList.remove('bg-[#26c6da22]', 'text-[#26c6da]', 'font-bold', 'shadow-[0_0_10px_rgba(38,198,218,0.2)]');
+                    prevEl.classList.add('text-[#fafafa]'); // Restore default color
+                }
+            }
+
+            // Add highlight to new
+            if (foundIndex !== -1) {
+                const newEl = document.getElementById(`word-${foundIndex}`);
+                if (newEl) {
+                    newEl.classList.remove('text-[#fafafa]');
+                    newEl.classList.add('bg-[#26c6da22]', 'text-[#26c6da]', 'font-bold', 'shadow-[0_0_10px_rgba(38,198,218,0.2)]');
+
+                    // Scroll into view (throttled/debounced ideally, but here direct)
+                    if (scrollContainerRef.current) {
+                        const container = scrollContainerRef.current;
+                        const offset = newEl.offsetTop - container.offsetTop - (container.clientHeight / 2) + (newEl.clientHeight / 2);
+                        container.scrollTo({ top: offset, behavior: 'smooth' });
+                    }
+                }
+            }
+            activeWordIndexRef.current = foundIndex;
+        }
+
+    }, [originalVideoTime, words]);
+
+    // Auto-scroll logic is now integrated into the Direct DOM effect above for synchronization
 
     if (!asset) {
         return (
@@ -327,13 +420,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     // Word View (Default)
                     <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 leading-relaxed font-medium">
                         {words.map((word, i) => {
-                            const EPSILON = 0.05; // 50ms tolerance
-                            const isCurrent = originalVideoTime >= (word.start / 1000 - EPSILON) && originalVideoTime < (word.end / 1000 + EPSILON);
-                            const isIncluded = isWordIncluded(word.start / 1000, word.end / 1000);
-                            const isDeleted = (word as any).isDeleted || false;
-
-                            // SOURCE OF TRUTH: If it's in the timeline, it is NOT excluded.
-                            const showAsExcluded = !isIncluded;
+                            const isIncluded = wordInclusionStatus[i];
 
                             // Selection state
                             const isSelected = selectionStart !== null && (
@@ -342,22 +429,16 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                             );
 
                             return (
-                                <span
+                                <TranscriptWord
                                     key={i}
-                                    ref={isCurrent ? currentWordRef : null}
-                                    onClick={(e) => handleWordClick(i, e)}
-                                    onContextMenu={(e) => handleContextMenu(e, i, isIncluded)}
-                                    className={`cursor-pointer px-2 py-0.5 rounded-sm transition-all duration-75 text-sm border border-transparent
-                                          ${isCurrent ? 'bg-[#26c6da22] text-[#26c6da] font-bold shadow-[0_0_10px_rgba(38,198,218,0.2)]' : ''}
-                                          ${isSelected ? 'bg-[#26c6da] text-[#0f0f0f] font-bold' : ''}
-                                          ${showAsExcluded && !isSelected
-                                            ? 'text-red-500/40 opacity-40 line-through decoration-red-500/30'
-                                            : !isCurrent && !isSelected ? 'text-[#fafafa] hover:bg-white/5 hover:text-white' : ''}
-                                        `}
-                                    title={`${formatTime(word.start / 1000)}`}
-                                >
-                                    {word.word}
-                                </span>
+                                    word={word}
+                                    index={i}
+                                    // isCurrent prop REMOVED - Handled by Direct DOM
+                                    isIncluded={isIncluded}
+                                    isSelected={isSelected}
+                                    handleWordClick={handleWordClick}
+                                    handleContextMenu={handleContextMenu}
+                                />
                             );
                         })}
                     </div>

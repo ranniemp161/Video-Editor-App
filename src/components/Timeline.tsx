@@ -191,6 +191,137 @@ const Playhead = memo(({ position, pixelsPerSecond }: { position: number, pixels
 
 Playhead.displayName = 'Playhead';
 
+// --- Extracted Memoized Components for Performance ---
+
+const TimelineRuler = memo(({
+  rulerRef,
+  handleScroll,
+  handleScrubStart,
+  handleContextMenu, // Pass this down
+  setIsPanning,     // Pass setter
+  lastMouseXRef,    // Pass ref
+  timelineWidth,
+  pixelsPerSecond,
+  rulerData
+}: any) => (
+  <div
+    className="flex-grow overflow-hidden relative cursor-pointer select-none border-l border-[#333]"
+    ref={rulerRef}
+    onScroll={handleScroll}
+    onMouseDown={(e) => {
+      if (e.button === 2 || e.altKey) {
+        e.preventDefault();
+        setIsPanning(true);
+        lastMouseXRef.current = e.clientX;
+        return;
+      }
+      handleScrubStart(e);
+    }}
+    onContextMenu={handleContextMenu}
+    style={{
+      backgroundImage: 'linear-gradient(to bottom, #1a1a1a, #121212)',
+    }}
+  >
+    <div className="h-full relative" style={{ width: `${timelineWidth}px` }}>
+      {rulerData.ticks.map((tick: any, idx: number) => (
+        <div
+          key={idx}
+          style={{ left: `${tick.time * pixelsPerSecond}px` }}
+          className={`absolute bottom-0 border-l ${tick.isMajor
+            ? 'h-[10px] border-white/20'
+            : tick.isMid
+              ? 'h-[6px] border-white/10'
+              : 'h-[4px] border-white/5'
+            }`}
+        >
+          {tick.isMajor && (
+            <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] text-white/40 font-mono tracking-wider pointer-events-none select-none">
+              {formatTime(tick.time)}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+));
+TimelineRuler.displayName = 'TimelineRuler';
+
+const TimelineTracks = memo(({
+  timeline,
+  TRACK_HEIGHT,
+  TRACK_GAP,
+  pixelsPerSecond,
+  scrollLeft,
+  containerWidth,
+  selectedClipIds,
+  onSelectClip,
+  handleDragStart,
+  setDraggingClip,
+  handleTrimStart,
+  handleTrimEnd,
+  onClipUpdate,
+  setClipTooltip,
+  handleDragOver,  // Pass these down
+  handleDrop,      // Pass these down
+  setIsSelectingBox, // Pass this down
+  setSelectionBox,   // Pass this down
+  tracksScrollRef,   // Pass ref
+  getAssetByClip     // Pass helper
+}: any) => {
+  return (
+    <>
+      {timeline.tracks.map((track: any, trackIdx: number) => (
+        <div
+          key={track.id}
+          className="absolute w-full border-b border-[#2a2a2a] bg-[#1e1e1e] hover:bg-[#232323] transition-colors"
+          style={{
+            top: `${trackIdx * (TRACK_HEIGHT + TRACK_GAP)}px`,
+            height: `${TRACK_HEIGHT + TRACK_GAP}px`,
+          }}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, track.id)}
+          onMouseDown={(e) => {
+            if (e.shiftKey && tracksScrollRef.current) {
+              e.preventDefault();
+              const rect = tracksScrollRef.current.getBoundingClientRect();
+              const startX = e.clientX - rect.left + scrollLeft;
+              const startY = e.clientY - rect.top;
+              setSelectionBox({ startX, startY, endX: startX, endY: startY });
+              setIsSelectingBox(true);
+            }
+          }}
+        >
+          {track.clips.map((clip: any) => {
+            const visibleStart = scrollLeft / pixelsPerSecond;
+            const visibleEnd = (scrollLeft + containerWidth) / pixelsPerSecond;
+            if (clip.end < visibleStart || clip.start > visibleEnd) return null;
+
+            return (
+              <TimelineClipItem
+                key={clip.id}
+                clip={clip}
+                asset={getAssetByClip(clip)}
+                pixelsPerSecond={pixelsPerSecond}
+                isSelected={selectedClipIds.includes(clip.id)}
+                isLocked={track.locked}
+                onSelect={onSelectClip}
+                onDragStart={handleDragStart}
+                onDragEnd={() => setDraggingClip(null)}
+                onTrimStart={handleTrimStart}
+                onTrimEnd={handleTrimEnd}
+                onUpdate={onClipUpdate}
+                onShowTooltip={setClipTooltip}
+                onHideTooltip={() => setClipTooltip(null)}
+              />
+            );
+          })}
+        </div>
+      ))}
+    </>
+  );
+});
+TimelineTracks.displayName = 'TimelineTracks';
+
 const TimelineComponent: React.FC<TimelineProps> = ({
   timeline,
   assets,
@@ -826,45 +957,18 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         </div>
 
         {/* Ruler Area */}
-        <div
-          className="flex-grow overflow-hidden relative cursor-pointer select-none border-l border-[#333]"
-          ref={rulerRef}
-          onScroll={handleScroll}
-          onMouseDown={(e) => {
-            if (e.button === 2 || e.altKey) { // Right Click or Alt+Drag to pan
-              e.preventDefault();
-              setIsPanning(true);
-              lastMouseXRef.current = e.clientX;
-              return;
-            }
-            handleScrubStart(e);
-          }}
-          onContextMenu={(e) => e.preventDefault()} // Block context menu for right-click pan
-          style={{
-            backgroundImage: 'linear-gradient(to bottom, #1a1a1a, #121212)',
-          }}
-        >
-          <div className="h-full relative" style={{ width: `${timelineWidth}px` }}>
-            {rulerData.ticks.map((tick, idx) => (
-              <div
-                key={idx}
-                style={{ left: `${tick.time * pixelsPerSecond}px` }}
-                className={`absolute bottom-0 border-l ${tick.isMajor
-                  ? 'h-[10px] border-white/20'
-                  : tick.isMid
-                    ? 'h-[6px] border-white/10'
-                    : 'h-[4px] border-white/5'
-                  }`}
-              >
-                {tick.isMajor && (
-                  <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] text-white/40 font-mono tracking-wider pointer-events-none select-none">
-                    {formatTime(tick.time)}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <TimelineRuler
+          rulerRef={rulerRef}
+          handleScroll={handleScroll}
+          handleScrubStart={handleScrubStart}
+          handleContextMenu={(e: any) => e.preventDefault()}
+          setIsPanning={setIsPanning}
+          lastMouseXRef={lastMouseXRef}
+          timelineWidth={timelineWidth}
+          pixelsPerSecond={pixelsPerSecond}
+          rulerData={rulerData}
+        />
+
       </div>
 
       {/* Tracks Area */}
@@ -912,57 +1016,29 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         </div>
 
         <div className="relative" style={{ width: `${timelineWidth}px`, height: `${timeline.tracks.length * (TRACK_HEIGHT + TRACK_GAP)}px` }}>
-          {/* Track Rows */}
-          {timeline.tracks.map((track, trackIdx) => (
-            <div
-              key={track.id}
-              className="absolute w-full border-b border-[#2a2a2a] bg-[#1e1e1e] hover:bg-[#232323] transition-colors"
-              style={{
-                top: `${trackIdx * (TRACK_HEIGHT + TRACK_GAP)}px`,
-                height: `${TRACK_HEIGHT + TRACK_GAP}px`,
-              }}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, track.id)}
-              onMouseDown={(e) => {
-                // Shift + Click to start marquee selection
-                if (e.shiftKey && tracksScrollRef.current) {
-                  e.preventDefault();
-                  const rect = tracksScrollRef.current.getBoundingClientRect();
-                  const startX = e.clientX - rect.left + scrollLeft;
-                  const startY = e.clientY - rect.top;
-                  setSelectionBox({ startX, startY, endX: startX, endY: startY });
-                  setIsSelectingBox(true);
-                }
-              }}
-            >
-              {/* Clips */}
-              {track.clips.map(clip => {
-                // Virtualization: Check visibility
-                const visibleStart = scrollLeft / pixelsPerSecond;
-                const visibleEnd = (scrollLeft + containerWidth) / pixelsPerSecond;
-                if (clip.end < visibleStart || clip.start > visibleEnd) return null;
-
-                return (
-                  <TimelineClipItem
-                    key={clip.id}
-                    clip={clip}
-                    asset={getAssetByClip(clip)}
-                    pixelsPerSecond={pixelsPerSecond}
-                    isSelected={selectedClipIds.includes(clip.id)}
-                    isLocked={track.locked}
-                    onSelect={onSelectClip}
-                    onDragStart={handleDragStart}
-                    onDragEnd={() => setDraggingClip(null)}
-                    onTrimStart={handleTrimStart}
-                    onTrimEnd={handleTrimEnd}
-                    onUpdate={onClipUpdate}
-                    onShowTooltip={setClipTooltip}
-                    onHideTooltip={() => setClipTooltip(null)}
-                  />
-                );
-              })}
-            </div>
-          ))}
+          {/* Track Rows - Memoized */}
+          <TimelineTracks
+            timeline={timeline}
+            TRACK_HEIGHT={TRACK_HEIGHT}
+            TRACK_GAP={TRACK_GAP}
+            pixelsPerSecond={pixelsPerSecond}
+            scrollLeft={scrollLeft}
+            containerWidth={containerWidth}
+            selectedClipIds={selectedClipIds}
+            onSelectClip={onSelectClip}
+            handleDragStart={handleDragStart}
+            setDraggingClip={setDraggingClip}
+            handleTrimStart={handleTrimStart}
+            handleTrimEnd={handleTrimEnd}
+            onClipUpdate={onClipUpdate}
+            setClipTooltip={setClipTooltip}
+            handleDragOver={handleDragOver}
+            handleDrop={handleDrop}
+            setIsSelectingBox={setIsSelectingBox}
+            setSelectionBox={setSelectionBox}
+            tracksScrollRef={tracksScrollRef}
+            getAssetByClip={getAssetByClip}
+          />
 
           {/* Playhead */}
           <Playhead position={playheadPosition} pixelsPerSecond={pixelsPerSecond} />
