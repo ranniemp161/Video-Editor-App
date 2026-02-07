@@ -14,6 +14,7 @@ from pathlib import Path
 from expert_editor import analyze_transcript
 from word_timing import distribute_word_timestamps, refine_word_timestamps_with_audio, find_zero_crossing
 from professional_rough_cut_v2 import ProfessionalRoughCutV2
+from feedback_loop import FeedbackLoop
 from thought_grouper import ThoughtGrouper
 
 from database import SessionLocal, engine, Base, get_db
@@ -825,5 +826,20 @@ async def analyze_thoughts(request: AnalyzeThoughtsRequest):
         "summary": summary
     }
 
+@app.post('/api/train-feedback')
+def train_feedback(data: dict):
+    try:
+        project_id = data.get('projectId', 'default_project')
+        timeline = data.get('timeline')
+        
+        feedback_loop = FeedbackLoop()
+        result = feedback_loop.process_feedback(project_id, timeline)
+        
+        return result
+    except Exception as e:
+        logger.exception("Feedback processing failed")
+        return {"success": False, "error": str(e)}, 500
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

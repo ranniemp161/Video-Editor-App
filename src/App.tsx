@@ -273,6 +273,7 @@ const App: React.FC = () => {
         exportToXML={exportToXML}
         exportToEDL={exportToEDL}
         deleteProject={deleteProject}
+        timelineState={timeline}
       />
 
       <div className="flex-grow flex overflow-hidden">

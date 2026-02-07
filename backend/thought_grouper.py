@@ -26,8 +26,9 @@ class ThoughtGrouper:
         self.thoughts = []
         
         # Thresholds
-        self.THOUGHT_PAUSE_THRESHOLD = 0.8  # 800ms pause = likely thought boundary
-        self.SEMANTIC_SIMILARITY_THRESHOLD = 0.5  # 50% keyword overlap
+        self.THOUGHT_PAUSE_THRESHOLD = 0.4  # Reduced: Only merge if thoughts are very close (rushed)
+        self.SEMANTIC_SIMILARITY_THRESHOLD = 0.8  # Increased: Only merge sentences if they are almost identical in topic
+        self.REPETITION_THRESHOLD = 0.85  # Strict: Only flag as repetition if highly similar (85%+)
         
         # Common stop words to ignore in semantic analysis
         self.STOP_WORDS = {
@@ -197,12 +198,19 @@ class ThoughtGrouper:
         """Extract meaningful keywords from text."""
         # Lowercase and remove punctuation
         text = text.lower()
-        text = re.sub(r'[^\w\s]', '', text)
+        # Keep internal apostrophes for words like "don't"
+        text = re.sub(r"[^\w\s']", '', text)
         
         # Split into words and filter stop words
         words = text.split()
-        keywords = {w for w in words if w not in self.STOP_WORDS and len(w) > 2}
+        # Only keep words with length >= 3 and not in stop words
+        # Adjusted to >= 3 to catch words like "so", "do" if they are important
+        keywords = {w for w in words if w not in self.STOP_WORDS and len(w) >= 3}
         
+        # Critical Fix: If keyword set is empty/small, don't rely on it for similarity (avoids false positives on short sentences)
+        if len(keywords) < 2:
+            return set(words) # Fallback to all words to be safer/stricter
+            
         return keywords
     
     def _score_coherence(self, thoughts: List[Dict]):
@@ -296,12 +304,15 @@ class ThoughtGrouper:
                     )
                     
                     # Mark as repetition if:
-                    # - Very high semantic similarity (>0.6) OR
+                    # - Very high semantic similarity OR
                     # - Has exact phrase matches of significant length
-                    if similarity > 0.6 or exact_match:
+                    # - BUT only if it's within a reasonable lookback (e.g. 10 thoughts)
+                    is_recent = (i - thoughts.index(prev_thought)) <= 10
+                    
+                    if (similarity > self.REPETITION_THRESHOLD or exact_match) and is_recent:
                         thought_type = 'repetition'
                         logger.info(f"Repetition detected at {thought['start_time']:.1f}s "
-                                  f"(similar to {prev_thought['start_time']:.1f}s, "
+                                  f"(similar/identical to {prev_thought['start_time']:.1f}s, "
                                   f"similarity={similarity:.2f})")
                         break
             

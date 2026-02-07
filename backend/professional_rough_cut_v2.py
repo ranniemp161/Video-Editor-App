@@ -27,8 +27,9 @@ class ProfessionalRoughCutV2:
         self.segments = []
         
         # Thresholds
-        self.SILENCE_THRESHOLD = 1.0  # Split segments if gap > 1s (Catch retakes better)
-        self.SENTENCE_SPLIT_GAP = 0.4  # Smaller gap for internal restarts
+        # Thresholds
+        self.SILENCE_THRESHOLD = 2.0  # User Request: Remove silence > 2.0s
+        self.SENTENCE_SPLIT_GAP = 0.4
         self.REPETITION_SIMILARITY = 0.7 
         self.MIN_SEGMENT_LENGTH = 3
         
@@ -38,8 +39,23 @@ class ProfessionalRoughCutV2:
             'silence_duration_removed': 0,
             'repetitions_removed': 0,
             'cut_that_signals': 0,
-            'incomplete_sentences': 0
+            'incomplete_sentences': 0,
+            'phrase_stutters_removed': 0
         }
+        
+        # Initialize ML Components
+        try:
+            from ml_data_collector import MLDataCollector
+            from feature_extractor import FeatureExtractor
+            from ml_engine import RoughCutModel
+            
+            self.data_collector = MLDataCollector()
+            self.feature_extractor = FeatureExtractor()
+            self.ml_model = RoughCutModel() # Will load if exists
+            self.use_ml = True
+        except ImportError:
+            logger.warning("ML dependencies not found. Running in heuristic-only mode.")
+            self.use_ml = False
     
     def analyze(self) -> List[Dict]:
         """
@@ -78,7 +94,20 @@ class ProfessionalRoughCutV2:
         logger.info(f"{len(segments)} segments after repetition removal")
         if segments is None: logger.error("Step 5 returned None")
         
-        # Step 5: Convert to timeline segments
+        # Step 5.5: Remove intra-sentence phrase stutters (e.g., "well I have well I have")
+        segments = self._remove_phrase_stutters(segments)
+        logger.info(f"{len(segments)} segments after phrase stutter removal")
+        
+        # Step 6: Semantic Thought Analysis & Filtering (New)
+        segments = self._semantic_filtering(segments)
+        logger.info(f"{len(segments)} segments after semantic filtering")
+        if segments is None: logger.error("Step 6 returned None")
+        
+        # Step 7: ML Logging (Record decisions for future training)
+        if self.use_ml:
+            self._log_decisions(segments)
+        
+        # Final Step: Convert to timeline segments
         self.segments = self._finalize_segments(segments)
         
         logger.info(f"Final rough cut: {len(self.segments)} segments")
@@ -86,8 +115,8 @@ class ProfessionalRoughCutV2:
     
     def _split_by_silence(self) -> List[Dict]:
         """
-        Split transcript into segments by removing silences > 2 seconds.
-        Preserve natural pauses between sentences.
+        Split transcript into segments by removing silences > 1 second.
+        Respects word-level 'isDeleted' flags from expert editor.
         """
         if not self.words:
             return []
@@ -97,6 +126,13 @@ class ProfessionalRoughCutV2:
         current_start_idx = 0
         
         for i in range(len(self.words)):
+            # Special check: skip words already marked as deleted by expert editor
+            if self.words[i].get('isDeleted', False):
+                # If we were building a segment, and hit a deleted word, 
+                # we don't necessarily end the segment, but we don't add this word.
+                # However, for simplicity in rough cut segments, we'll exclude deleted words later.
+                pass
+            
             current_segment_words.append(i)
             
             # Check gap to next word
@@ -116,7 +152,7 @@ class ProfessionalRoughCutV2:
                             'end_idx': i,
                             'start_time': self.words[current_start_idx]['start'],
                             'end_time': self.words[i]['end'],
-                            'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words])
+                            'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words if not self.words[idx].get('isDeleted', False)])
                         })
                     
                     # Start new segment
@@ -133,7 +169,7 @@ class ProfessionalRoughCutV2:
                 'end_idx': len(self.words) - 1,
                 'start_time': self.words[current_start_idx]['start'],
                 'end_time': self.words[-1]['end'],
-                'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words])
+                'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words if not self.words[idx].get('isDeleted', False)])
             })
         
         return segments
@@ -206,13 +242,23 @@ class ProfessionalRoughCutV2:
                 before_words = []
                 after_words = []
                 in_after = False
+                skip_next = False
                 
                 for i, word in enumerate(words_list):
-                    if word.lower() in ['cut', 'that', 'this'] and not in_after:
+                    if skip_next:
+                        skip_next = False
+                        continue
+                        
+                    cur_clean = re.sub(r'[^\w]', '', word.lower())
+                    
+                    if cur_clean in ['cut'] and not in_after:
                         # Check if this is part of "cut that"
-                        if i < len(words_list) - 1 and words_list[i].lower() == 'cut':
-                            if words_list[i + 1].lower() in ['that', 'this']:
+                        if i < len(words_list) - 1:
+                            next_word = words_list[i+1]
+                            next_clean = re.sub(r'[^\w]', '', next_word.lower())
+                            if next_clean in ['that', 'this']:
                                 in_after = True
+                                skip_next = True # Skip the "that/this" word
                                 continue
                     
                     if in_after:
@@ -221,26 +267,63 @@ class ProfessionalRoughCutV2:
                         before_words.append(word)
                 
                 # Find last complete sentence in before_words
-                before_text = ' '.join(before_words)
+                before_text = ' '.join(before_words).strip()
+                
+                # We want to find the END of the previous sentence.
+                # If before_text ends with punctuation, that's likely the "bad" sentence's end.
+                # So we search in the text *excluding* the trailing punctuation to find the *previous* one.
+                
+                search_text = before_text
+                if search_text and search_text[-1] in '.!?':
+                    search_text = search_text[:-1]
+                    
                 last_sentence_end = max(
-                    before_text.rfind('.'),
-                    before_text.rfind('!'),
-                    before_text.rfind('?')
+                    search_text.rfind('.'),
+                    search_text.rfind('!'),
+                    search_text.rfind('?')
                 )
                 
                 if last_sentence_end > 0:
                     # Keep up to last complete sentence
                     kept_before = before_text[:last_sentence_end + 1].strip()
                 else:
-                    # No complete sentence before, discard all
+                    # No complete sentence before, discard all before words
                     kept_before = ""
                 
                 # Reconstruct segment with content after "cut that"
                 new_text = (kept_before + ' ' + ' '.join(after_words)).strip()
                 
                 if new_text:
-                    # Update segment text
+                    # CRITICAL FIX: Must update word_indices to match the new text
+                    # We need to map the kept words back to their original indices
+                    
+                    # 1. Re-split kept_before to count words
+                    kept_before_count = len(kept_before.split()) if kept_before else 0
+                    
+                    # 2. Count words in after_words
+                    after_count = len(after_words)
+                    
+                    # 3. Total original words
+                    total_original = len(words_list)
+                    
+                    # 4. Indices logic:
+                    # kept_before corresponds to first N words
+                    # after_words corresponds to last M words
+                    
+                    new_indices = []
+                    if kept_before_count > 0:
+                        new_indices.extend(segment['word_indices'][:kept_before_count])
+                    
+                    if after_count > 0:
+                        new_indices.extend(segment['word_indices'][-after_count:])
+                        
+                    segment['word_indices'] = new_indices
                     segment['text'] = new_text
+                    # Update timings based on new indices
+                    if new_indices:
+                        segment['start_time'] = self.words[new_indices[0]]['start']
+                        segment['end_time'] = self.words[new_indices[-1]]['end']
+
                     processed.append(segment)
                     logger.info(f"After 'cut that' processing: \"{new_text[:50]}...\"")
             else:
@@ -264,10 +347,31 @@ class ProfessionalRoughCutV2:
             matches = list(re.finditer(r'[.!?]', text))
             
             if not matches:
-                # No punctuation at all. If it's short and followed by a restart, kill it.
+                # No punctuation at all. 
+                
+                # 1. Check for trailing connectors (User Rule: Incomplete Sentences)
+                word_indices = segment['word_indices']
+                words_text = segment['text'].split()
+                if words_text:
+                    last_word = words_text[-1].lower()
+                    trailing_connectors = ['and', 'but', 'so', 'or', 'then', 'because', 'the', 'a']
+                    
+                    if last_word in trailing_connectors:
+                        # Trim the connector
+                        # "I went to the store and" -> "I went to the store"
+                        word_indices = word_indices[:-1]
+                        segment['word_indices'] = word_indices
+                        segment['text'] = ' '.join(words_text[:-1])
+                        if word_indices:
+                            segment['end_time'] = self.words[word_indices[-1]]['end']
+                        logger.info(f"Trimmed trailing connector '{last_word}' from unpunctuated segment")
+
+                # 2. If it's short and followed by a restart (or empty after trim), kill it.
                 if len(segment['word_indices']) < 6 and i < len(segments) - 1:
-                    continue
-                cleaned.append(segment)
+                     continue
+                
+                if segment['word_indices']:
+                    cleaned.append(segment)
                 continue
             
             last_match = matches[-1]
@@ -283,8 +387,18 @@ class ProfessionalRoughCutV2:
                 if i < len(segments) - 1:
                     next_text = segments[i + 1]['text'].lower()
                     restarts = ['so ', 'i mean', 'what i meant', 'let me', 'actually', 'the ', 'it ']
+                    
+                    # Condition 1: Next segment starts with a restart
                     if any(next_text.startswith(r) for r in restarts):
                         should_trim = True
+                    
+                    # Condition 2: Current segment trails off with a connector (User Rule: Incomplete Sentences)
+                    # "I went to the store and..." [Pause causing split] -> Trim "and"
+                    trailing_connectors = ['and', 'but', 'so', 'or', 'then', 'because', 'the', 'a']
+                    last_word = trailing_words[-1].lower() if trailing_words else ""
+                    if last_word in trailing_connectors:
+                        should_trim = True
+                        logger.info(f"Detected trail-off ending with '{last_word}'")
                 
                 if should_trim:
                     # SURGICAL CUT: Keep only up to the punctuation
@@ -355,7 +469,9 @@ class ProfessionalRoughCutV2:
                     if w1 == w2: match_count += 1
                     else: break
                 
-                if match_count >= 3:
+                # STRICTER: Must match the full extracted prefix (up to 4 words)
+                # This prevents "I really like apples" and "I really like oranges" from clustering
+                if match_count == len(anchor_prefix) and match_count >= 3:
                      cluster.append(j)
             
             if len(cluster) > 1:
@@ -450,20 +566,207 @@ class ProfessionalRoughCutV2:
     
     def _calculate_similarity(self, text1: str, text2: str) -> float:
         """
-        Calculate sequence similarity between two texts using difflib.
-        This ensures word order is preserved in the comparison.
+        Calculate sequence similarity.
+        Also uses Semantic Keyword matching from ThoughtGrouper if available to catch rephrasings.
         """
-        # Normalize
+        # 1. Structural Similarity (difflib)
         t1 = text1.lower().strip()
         t2 = text2.lower().strip()
+        t1_clean = re.sub(r"[^\w\s']", '', t1)
+        t2_clean = re.sub(r"[^\w\s']", '', t2)
         
-        # Remove punctuation for better matching
-        t1_clean = re.sub(r'[^\w\s]', '', t1)
-        t2_clean = re.sub(r'[^\w\s]', '', t2)
-        
-        # Use SequenceMatcher for order-aware similarity
         matcher = difflib.SequenceMatcher(None, t1_clean, t2_clean)
-        return matcher.ratio()
+        struct_score = matcher.ratio()
+        
+        # 2. Semantic Keyword Similarity (Bag of Words)
+        # This catches "I want to go" vs "I need to leave" (different structure, similar keywords)
+        
+        # Simple Jaccard implementation to avoid circular imports or heavy dependencies
+        def get_keywords(text):
+            stops = {'the','a','an','is','are','was','were','to','of','in','on','at','for','with','as','by','and','or','but','so','if','then','it','that','this','i','you','he','she','we','they'}
+            words = set(re.sub(r"[^\w\s']", '', text.lower()).split())
+            return {w for w in words if w not in stops and len(w) > 2}
+            
+        k1 = get_keywords(text1)
+        k2 = get_keywords(text2)
+        
+        sem_score = 0.0
+        if k1 and k2:
+            intersection = len(k1 & k2)
+            union = len(k1 | k2)
+            sem_score = intersection / union
+            
+        # Return the higher of the two scores
+        # We want to catch EITHER structural repetition OR semantic repetition
+        return max(struct_score, sem_score)
+
+    def _log_decisions(self, kept_segments: List[Dict]):
+        """
+        Log decisions to ML Data Collector.
+        For Phase 1, we will just log the KEPT ones to build a baseline of "Good" segments.
+        """
+        if not self.use_ml: return
+        
+        project_id = "default_project" # To be passed in later
+        
+        for i, segment in enumerate(kept_segments):
+            prev = kept_segments[i-1] if i > 0 else None
+            next_seg = kept_segments[i+1] if i < len(kept_segments) - 1 else None
+            
+            try:
+                features = self.feature_extractor.extract_features(segment, prev, next_seg)
+                
+                # We log "KEEP" because the heuristic kept it
+                # We need exact start/end time from word indices
+                start_time = self.words[segment['word_indices'][0]]['start']
+                end_time = self.words[segment['word_indices'][-1]]['end']
+                
+                self.data_collector.log_decision(
+                    project_id=project_id,
+                    segment_id=f"seg_{segment['word_indices'][0]}",
+                    start=start_time,
+                    end=end_time,
+                    features=features,
+                    heuristic_decision="KEEP",
+                    segment_text=segment['text']
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log ML decision: {e}")
+
+    def _remove_phrase_stutters(self, segments: List[Dict]) -> List[Dict]:
+        """
+        Detects and removes immediate phrase repetitions within a segment.
+        Example: "Well I have well I have already gone" -> "Well I have already gone"
+        Rule: Identical sequence of words repeated immediately.
+              Sequence length must be >= 2 words (preserves "very very happy").
+        """
+        cleaned_segments = []
+        
+        for segment in segments:
+            # Reconstruct word objects for this segment
+            # We need to modify word_indices to "delete" words
+            # But since segments are defined by word_indices, we can just modify the list of indices
+            
+            indices = segment['word_indices']
+            words_in_seg = [self.words[idx]['word'].lower().strip() for idx in indices]
+            # Remove punctuation for comparison
+            clean_words = [re.sub(r'[^\w\']', '', w) for w in words_in_seg]
+            
+            to_remove_local_indices = set()
+            
+            n = len(clean_words)
+            i = 0
+            while i < n:
+                # Check for repetition of length k
+                # Try lengths from max possible down to 2
+                best_k = 0
+                
+                # Limit max phrase length to check (e.g., 6 words is a long stutter)
+                max_k = min(6, (n - i) // 2)
+                
+                for k in range(max_k, 1, -1):
+                    # Check if sequence [i:i+k] == [i+k:i+2k]
+                    if i + 2*k <= n:
+                        phrase1 = clean_words[i : i+k]
+                        phrase2 = clean_words[i+k : i+2*k]
+                        
+                        if phrase1 == phrase2:
+                            best_k = k
+                            break
+                
+                if best_k > 0:
+                    # Found a stutter of length best_k!
+                    # Mark the FIRST occurrence for removal (i to i+best_k)
+                    for offset in range(best_k):
+                        to_remove_local_indices.add(i + offset)
+                    
+                    self.stats['phrase_stutters_removed'] += 1
+                    logger.info(f"Phrase Stutter: Removed \"{' '.join(words_in_seg[i:i+best_k])}\" at {self.words[indices[i]]['start']:.1f}s")
+                    
+                    # Advance past the first part
+                    i += best_k 
+                    # We continue checking from the second part (in case it repeats 3 times?)
+                    # If "A A A", we remove first A, then check second A...
+                    # Current logic: Remove first "Well I have". Next loop checks second "Well I have".
+                    # If 3rd exists, it will delete 2nd. Correct.
+                else:
+                    i += 1
+            
+            # Reconstruct segment
+            new_indices = [idx for i, idx in enumerate(indices) if i not in to_remove_local_indices]
+            
+            if new_indices:
+                segment['word_indices'] = new_indices
+                segment['text'] = ' '.join([self.words[idx]['word'] for idx in new_indices])
+                segment['start_time'] = self.words[new_indices[0]]['start']
+                segment['end_time'] = self.words[new_indices[-1]]['end']
+                cleaned_segments.append(segment)
+                
+        return cleaned_segments
+
+    def _semantic_filtering(self, segments: List[Dict]) -> List[Dict]:
+        """
+        Integrates ThoughtGrouper to identify and remove repetitive thoughts 
+        and fillers that string-matching might miss.
+        """
+        if not segments:
+            return []
+
+        # 1. Prepare words for ThoughtGrouper
+        # Segments might have been modified/trimmed, so we need to reconstruct the word list
+        all_words = []
+        for seg in segments:
+            for idx in seg['word_indices']:
+                all_words.append(self.words[idx])
+
+        # 2. Run ThoughtGrouper
+        from thought_grouper import ThoughtGrouper
+        grouper = ThoughtGrouper(all_words)
+        thoughts = grouper.group_into_thoughts()
+
+        # 3. Filter segments based on thought classification
+        # We need to map segments back to thoughts or vice versa
+        # For simplicity, we'll keep segments that belong to 'main_point' or 'tangent'
+        # and discard 'repetition' or 'filler'.
+        
+        filtered_segments = []
+        # Store segments by their word indices to easily check inclusion
+        segments_by_first_idx = {seg['word_indices'][0]: seg for seg in segments}
+        
+        for thought in thoughts:
+            # STRICTER FILTERING:
+            # We explicitly ignore 'repetition' or 'filler' tags from ThoughtGrouper if they seem too aggressive.
+            # But since we tightened ThoughtGrouper itself, we can trust 'repetition' more.
+            # However, let's add a safety check: length of repetition.
+            
+            should_remove = False
+            
+            if thought['type'] == 'repetition':
+                # Only remove if it's not a "huge" thought (safety net)
+                if thought['word_count'] < 50: 
+                    should_remove = True
+                    self.stats['repetitions_removed'] += 1
+            
+            elif thought['type'] == 'filler':
+                 # Only delete small fillers
+                 if thought['word_count'] <= 3 and thought['coherence_score'] < 0.6:
+                     should_remove = True
+            
+            if should_remove:
+                logger.info(f"Semantic Filter: Discarding {thought['type']} thought: \"{thought['text'][:50]}...\"")
+                continue
+            
+            # Find which segments belong to this thought
+            # A thought can span multiple segments if they were split by punctuation/silence
+            for idx in thought['word_indices']:
+                if idx in segments_by_first_idx:
+                    filtered_segments.append(segments_by_first_idx[idx])
+
+        # Note: This logic assumes segments are whole units within thoughts.
+        # Since _refine_segmentation splits by punctuation and ThoughGrouper merges by sentences, 
+        # mapping by the first index of a segment should be reliable.
+        
+        return filtered_segments
     
     def _finalize_segments(self, segments: List[Dict]) -> List[Dict]:
         """
@@ -472,25 +775,36 @@ class ProfessionalRoughCutV2:
         """
         final = []
         
-        # Padding in seconds (100ms)
-        PADDING_START = 0.08  # Slightly less at start to keep it snappy
-        PADDING_END = 0.15    # Slightly more at end for natural decay
+        # Padding in seconds (User Request: 0.3-0.5s natural pause)
+        # We split it between start/end. 
+        # Start: 0.15s, End: 0.25s -> Total ~0.4s padding between cuts
+        PADDING_START = 0.15  
+        PADDING_END = 0.25    
         
         for segment in segments:
-            if len(segment['word_indices']) < self.MIN_SEGMENT_LENGTH:
-                continue  # Skip very short segments
+            # Filter out words that are marked as deleted within the segment
+            filtered_indices = [idx for idx in segment['word_indices'] if not self.words[idx].get('isDeleted', False)]
+            
+            if len(filtered_indices) < self.MIN_SEGMENT_LENGTH:
+                # If skipping, log why if it's due to deletion
+                if len(segment['word_indices']) >= self.MIN_SEGMENT_LENGTH:
+                    logger.debug(f"Skipping segment at {segment['start_time']:.1f}s because too many words were flagged for deletion")
+                continue
+            
+            # Actual start and end based on filtered words
+            actual_start = self.words[filtered_indices[0]]['start']
+            actual_end = self.words[filtered_indices[-1]]['end']
             
             # Apply padding but stay within word boundaries if it's the very first/last word of the asset
-            # (Though usually we have silence there anyway)
-            padded_start = max(0, segment['start_time'] - PADDING_START)
-            padded_end = segment['end_time'] + PADDING_END
+            padded_start = max(0, actual_start - PADDING_START)
+            padded_end = actual_end + PADDING_END
             
             final.append({
                 'start': padded_start,
                 'end': padded_end,
-                'text': segment['text'],
-                'word_count': len(segment['word_indices']),
-                'word_indices': segment['word_indices']
+                'text': ' '.join([self.words[idx]['word'] for idx in filtered_indices]),
+                'word_count': len(filtered_indices),
+                'word_indices': filtered_indices
             })
         
         return final
