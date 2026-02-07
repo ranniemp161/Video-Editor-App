@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 import { renderTimeline, getRenderProgress } from './server/render-service.js';
 import { generateXML } from './server/xml-service.js';
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     plugins: [
+      tailwindcss(),
       react(),
       {
         name: 'vite-plugin-render-api',
