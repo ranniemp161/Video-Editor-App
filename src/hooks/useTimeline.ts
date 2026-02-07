@@ -281,9 +281,12 @@ export const useTimeline = () => {
   }, [projectId, segments]);
 
   const deleteProject = useCallback(async () => {
-    if (!projectId) return;
+    if (!projectId) {
+      alert("No project to delete. Upload a video first!");
+      return;
+    }
 
-    if (!confirm("Are you sure you want to delete this project and all its video files from your computer? This cannot be undone.")) {
+    if (!confirm("Are you sure you want to delete this project and all its video files? This cannot be undone.")) {
       return;
     }
 
@@ -302,11 +305,18 @@ export const useTimeline = () => {
           ]
         });
         setPlayheadPosition(0);
+        setSelectedClipIds([]);
+        setPast([]);
+        setFuture([]);
         localStorage.removeItem('currentProjectId');
+        alert("Project deleted successfully!");
         console.log("Project and files deleted successfully.");
+      } else {
+        alert("Failed to delete project. Please try again.");
       }
     } catch (e) {
       console.error("Failed to delete project", e);
+      alert("Error deleting project. Please try again.");
     }
   }, [projectId]);
 
