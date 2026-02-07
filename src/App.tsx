@@ -24,15 +24,20 @@ const App: React.FC = () => {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
+  };
+
   // Show login screen if not authenticated
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
   }
 
-  return <VideoEditor />;
+  return <VideoEditor onLogout={handleLogout} />;
 };
 
-const VideoEditor: React.FC = () => {
+const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const {
     timeline,
     assets,
@@ -294,6 +299,7 @@ const VideoEditor: React.FC = () => {
         exportToEDL={exportToEDL}
         deleteProject={deleteProject}
         timelineState={timeline}
+        onLogout={onLogout}
       />
 
       <div className="flex-grow flex overflow-hidden">

@@ -27,7 +27,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div className="w-full max-w-md p-8">
                 <div className="bg-[#0a0a0a] border border-white/[0.05] rounded-lg p-8 shadow-xl">
                     <div className="mb-8 text-center">
-                        <h1 className="text-2xl font-bold text-white mb-2">Video Editor</h1>
+                        <h1 className="text-2xl font-bold text-white mb-2">SubiShop Video Editor</h1>
                         <p className="text-gray-400 text-sm">Enter password to access</p>
                     </div>
 

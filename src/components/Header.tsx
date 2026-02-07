@@ -11,6 +11,7 @@ interface HeaderProps {
   exportToEDL: () => void;
   deleteProject: () => void;
   timelineState?: any; // Pass timeline for training
+  onLogout: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,7 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   exportToXML,
   exportToEDL,
   deleteProject,
-  timelineState
+  timelineState,
+  onLogout
 }) => {
   const [isTraining, setIsTraining] = React.useState(false);
 
@@ -90,6 +92,17 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-4">
         <button className="text-gray-400 hover:text-white transition-colors">
           <MenuIcon className="w-5 h-5" />
+        </button>
+        <div className="h-4 w-[1px] bg-[#333]"></div>
+        <button
+          onClick={onLogout}
+          className="px-3 py-1 text-[10px] uppercase tracking-wider font-bold bg-white/[0.05] hover:bg-white/[0.1] text-gray-400 hover:text-white border border-white/[0.05] transition-all rounded-full active:scale-95 flex items-center gap-1.5"
+          title="Logout"
+        >
+          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+          </svg>
+          LOGOUT
         </button>
         <div className="h-4 w-[1px] bg-[#333]"></div>
         <span className="text-xs text-gray-500 font-medium tracking-wide flex items-center gap-2">
