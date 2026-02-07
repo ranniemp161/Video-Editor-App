@@ -1,4 +1,4 @@
-
+``
 import React, { useState, ChangeEvent } from 'react';
 import { MediaPool } from '@/components/MediaPool';
 import { Preview } from '@/components/Preview';
@@ -297,29 +297,76 @@ const App: React.FC = () => {
                   playheadPosition={playheadPosition}
                   timeline={timeline}
                   onSeek={(originalTime) => {
-                    // Map original video timestamp to current timeline position
-                    const EPSILON = 0.05; // 50ms tolerance for cuts
+                    console.log('🎯 SEEK DEBUG: Word clicked at source time:', originalTime.toFixed(3), 'seconds');
+
+                    // 1. Try to find precise clip
+                    const EPSILON = 0.001;
 
                     for (const track of timeline.tracks) {
                       for (const clip of track.clips) {
-                        // Check if original time falls within this clip's source range (with epsilon)
-                        if (originalTime >= (clip.trimStart - EPSILON) && originalTime <= (clip.trimEnd + EPSILON)) {
-                          // Calculate offset within the clip, clamped to clip bounds
-                          // Add a tiny PREROLL (30ms) to ensure we hear the start of the word clearly
-                          const PREROLL = 0.03;
-                          const offsetInClip = Math.max(0, originalTime - clip.trimStart - PREROLL);
-                          const targetPosition = clip.start + offsetInClip;
+                        const matchesAsset = clip.assetId === activeTranscriptAsset?.id || clip.sourceFileName === activeTranscriptAsset?.name;
+
+                        console.log(`  Checking clip: trimStart=${clip.trimStart.toFixed(2)}, trimEnd=${clip.trimEnd.toFixed(2)}, timelineStart=${clip.start.toFixed(2)}`);
+
+                        // Check if time is within the TRIMMED range of the clip
+                        if (matchesAsset && originalTime >= (clip.trimStart - EPSILON) && originalTime < (clip.trimEnd + EPSILON)) {
+                          // Calculates exact timeline position
+                          const offsetInClip = originalTime - clip.trimStart;
+                          const timelineTime = clip.start + offsetInClip;
+
+                          // Apply pre-roll (0.1s) HERE, on the timeline time
+                          const targetPosition = Math.max(0, timelineTime - 0.1);
+
+                          console.log('✅ FOUND CLIP! Timeline position:', targetPosition.toFixed(3));
                           setPlayheadPosition(targetPosition);
-                          return; // Found it! Exit entirely.
+                          return;
                         }
                       }
                     }
 
-                    // Fallback: If not found in any clip, only seek if timeline is empty or single-clip
-                    // otherwise it's safer to stay put to avoid jumping to "nowhere"
-                    const allClips = timeline.tracks.flatMap(t => t.clips);
-                    if (allClips.length <= 1) {
-                      setPlayheadPosition(originalTime);
+                    console.log('⚠️ No exact clip match, using fallback...');
+
+                    // 2. Fallback: Smart Seek for words that might be slightly outside cut boundaries
+                    // Find the nearest clip in the timeline that contains this source time range
+                    const assetClips = timeline.tracks
+                      .flatMap(t => t.clips)
+                      .filter(c => c.assetId === activeTranscriptAsset?.id || c.sourceFileName === activeTranscriptAsset?.name)
+                      .sort((a, b) => a.start - b.start);
+
+                    if (assetClips.length > 0) {
+                      let closestClip = null;
+                      let minDistance = Number.MAX_VALUE;
+
+                      for (const clip of assetClips) {
+                        // Check distance to clip boundaries
+                        const distStart = Math.abs(originalTime - clip.trimStart);
+                        const distEnd = Math.abs(originalTime - clip.trimEnd);
+                        const localMin = Math.min(distStart, distEnd);
+
+                        if (localMin < minDistance) {
+                          minDistance = localMin;
+                          closestClip = clip;
+                        }
+                      }
+
+                      if (closestClip) {
+                        console.log('📍 Closest clip found:', closestClip.trimStart.toFixed(2), 'to', closestClip.trimEnd.toFixed(2));
+
+                        // If original time is before clip, jump to start
+                        if (originalTime < closestClip.trimStart) {
+                          console.log('  → Seeking to clip START');
+                          setPlayheadPosition(closestClip.start);
+                        }
+                        // If original time is after clip, jump to end (or start of next?)
+                        else if (originalTime > closestClip.trimEnd) {
+                          setPlayheadPosition(closestClip.end - 0.1);
+                        }
+                        // Should be covered by main loop, but theoretically possible fallback
+                        else {
+                          const offset = originalTime - closestClip.trimStart;
+                          setPlayheadPosition(closestClip.start + offset - 0.1);
+                        }
+                      }
                     }
                   }}
                   onTranscribe={transcribeAsset}

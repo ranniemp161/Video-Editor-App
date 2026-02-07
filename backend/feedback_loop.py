@@ -10,6 +10,12 @@ import os
 import logging
 from typing import List, Dict
 
+# Import ML Engine to trigger retraining
+try:
+    from ml_engine import RoughCutModel
+except ImportError:
+    RoughCutModel = None
+
 logger = logging.getLogger(__name__)
 
 class FeedbackLoop:
@@ -88,5 +94,14 @@ class FeedbackLoop:
         with open(self.log_file, 'w', encoding='utf-8') as f:
             f.write('\n'.join(updated_lines) + '\n')
             
+        if match_count > 0 and RoughCutModel:
+            logger.info("Triggering ML Model Retraining...")
+            try:
+                model = RoughCutModel()
+                model.train(self.log_file)
+                logger.info("Model retraining complete.")
+            except Exception as e:
+                logger._log(logging.ERROR, f"Failed to retrain model: {e}", [])
+
         logger.info(f"Feedback Loop: Updated {match_count} records based on timeline overlap.")
         return { "success": True, "updated_count": match_count }

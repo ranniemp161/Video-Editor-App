@@ -311,8 +311,10 @@ class ThoughtGrouper:
                     
                     if (similarity > self.REPETITION_THRESHOLD or exact_match) and is_recent:
                         thought_type = 'repetition'
+                        thought['repeated_thought_idx'] = thoughts.index(prev_thought)
                         logger.info(f"Repetition detected at {thought['start_time']:.1f}s "
                                   f"(similar/identical to {prev_thought['start_time']:.1f}s, "
+                                  f"idx={thought['repeated_thought_idx']}, "
                                   f"similarity={similarity:.2f})")
                         break
             
@@ -338,8 +340,8 @@ class ThoughtGrouper:
         words1 = text1.lower().split()
         words2 = text2.lower().split()
         
-        # Check for matching sequences of at least 4 words
-        min_sequence_length = 4
+        # Check for matching sequences of at least 8 words
+        min_sequence_length = 8
         
         for i in range(len(words1) - min_sequence_length + 1):
             # Get a sequence of 4+ words from text1

@@ -30,7 +30,7 @@ class ProfessionalRoughCutV2:
         # Thresholds
         self.SILENCE_THRESHOLD = 2.0  # User Request: Remove silence > 2.0s
         self.SENTENCE_SPLIT_GAP = 0.4
-        self.REPETITION_SIMILARITY = 0.7 
+        self.REPETITION_SIMILARITY = 0.85 # Stricter
         self.MIN_SEGMENT_LENGTH = 3
         
         # Statistics
@@ -102,6 +102,12 @@ class ProfessionalRoughCutV2:
         segments = self._semantic_filtering(segments)
         logger.info(f"{len(segments)} segments after semantic filtering")
         if segments is None: logger.error("Step 6 returned None")
+        
+        # Step 6.5: ML Overrides (Personalization Layer)
+        # If the model has learned that specific patterns should be CUT, it overrides heuristics.
+        if self.use_ml:
+            segments = self._apply_ml_overrides(segments)
+            logger.info(f"{len(segments)} segments after ML overrides")
         
         # Step 7: ML Logging (Record decisions for future training)
         if self.use_ml:
@@ -394,7 +400,13 @@ class ProfessionalRoughCutV2:
                     
                     # Condition 2: Current segment trails off with a connector (User Rule: Incomplete Sentences)
                     # "I went to the store and..." [Pause causing split] -> Trim "and"
-                    trailing_connectors = ['and', 'but', 'so', 'or', 'then', 'because', 'the', 'a']
+                    trailing_connectors = [
+                        'and', 'but', 'so', 'or', 'then', 'because', 'the', 'a',
+                        'almost', 'very', 'really', 'too', 'quite',
+                        'is', 'are', 'was', 'were', 'am',
+                        'in', 'on', 'at', 'for', 'with', 'by', 'of',
+                        'if', 'when', 'while', 'because', 'although'
+                    ]
                     last_word = trailing_words[-1].lower() if trailing_words else ""
                     if last_word in trailing_connectors:
                         should_trim = True
@@ -442,7 +454,20 @@ class ProfessionalRoughCutV2:
             
             # Normalize prefix
             def get_prefix(t):
-                return re.sub(r'[^\w\s]', '', t.lower()).split()[:4]
+                # Contraction normalization
+                t = t.lower()
+                replacements = {
+                    "you're": "you are", "i'm": "i am", "we're": "we are", "they're": "they are",
+                    "it's": "it is", "he's": "he is", "she's": "she is", "that's": "that is",
+                    "what's": "what is", "don't": "do not", "doesn't": "does not", "didn't": "did not",
+                    "can't": "cannot", "won't": "will not", "isn't": "is not", "aren't": "are not",
+                    "wasn't": "was not", "weren't": "were not", "i've": "i have", "you've": "you have",
+                    "we've": "we have", "they've": "they have", "i'll": "i will", "you'll": "you will"
+                }
+                for k, v in replacements.items():
+                    t = t.replace(k, v)
+                    
+                return re.sub(r'[^\w\s]', '', t).split()[:4]
             
             anchor_prefix = get_prefix(curr['text'])
             if not anchor_prefix:
@@ -476,21 +501,68 @@ class ProfessionalRoughCutV2:
             
             if len(cluster) > 1:
                 # We have a retake cluster!
-                # Logic: Keep the one with the most words AND punctuation
-                def score(idx):
-                    seg = segments[idx]
-                    word_count = len(seg['word_indices'])
-                    has_punct = 10 if seg['text'].strip().endswith(('.', '!', '?')) else 0
-                    return word_count + has_punct + (idx * 0.1) # Tie-break to the LATEST take
+                # REVISED LOGIC (Divergent Endings Protection):
+                # Instead of picking one winner and discarding all others, we check PAIRWISE.
+                # We only discard 'A' if 'A' is clearly a false start of 'B' (or vice versa).
+                #
+                # Criteria for A superseding B:
+                # 1. B is a substring of A (B is textually contained in A)
+                # 2. A and B are highly similar (>85%) and A is longer/later
+                # 3. B looks like a cut-off version of A (same start, B has no punctuation, A continues)
                 
-                best_idx = max(cluster, key=score)
+                # We'll mark indices to discard within this cluster
+                cluster_discard = set()
                 
-                for idx in cluster:
-                    if idx != best_idx:
-                        indices_to_discard.add(idx)
-                        logger.info(f"Consolidated Take Cluster: Discarding false start/fragment at {segments[idx]['start_time']:.1f}s: \"{segments[idx]['text'][:30]}...\"")
+                # Sort by index (chronological) to compare
+                sorted_cluster = sorted(cluster)
                 
-                self.stats['repetitions_removed'] += (len(cluster) - 1)
+                for idx_a in sorted_cluster:
+                    if idx_a in cluster_discard: continue
+                    
+                    seg_a = segments[idx_a]
+                    text_a = re.sub(r'[^\w\s]', '', seg_a['text'].lower())
+                    
+                    for idx_b in sorted_cluster:
+                        if idx_a == idx_b: continue
+                        if idx_b in cluster_discard: continue
+                        
+                        seg_b = segments[idx_b]
+                        text_b = re.sub(r'[^\w\s]', '', seg_b['text'].lower())
+                        
+                        # CHECK: Does A supersede B? (Should B be deleted?)
+                        should_delete_b = False
+                        
+                        # Rule 1: Substring (B is inside A)
+                        if text_b in text_a and len(text_b) < len(text_a):
+                            should_delete_b = True
+                            logger.info(f"Consolidate: '{seg_b['text'][:20]}...' is substring of '{seg_a['text'][:20]}...' -> Delete B")
+                            
+                        # Rule 2: High Similarity (Duplicate takes)
+                        elif self._calculate_similarity(seg_a['text'], seg_b['text']) > 0.85:
+                            # If very similar, keep the later/longer one.
+                            # Since we are iterating all pairs, we just need to decide if we kill B here.
+                            # We prefer Later or Longer.
+                            score_a = len(seg_a['word_indices']) + (idx_a * 0.1)
+                            score_b = len(seg_b['word_indices']) + (idx_b * 0.1)
+                            
+                            if score_a > score_b:
+                                should_delete_b = True
+                                logger.info(f"Consolidate: '{seg_b['text'][:20]}...' similar to '{seg_a['text'][:20]}...' but worse score -> Delete B")
+                                
+                        # Rule 3: B is a prefix of A (cut off)
+                        # We already know they share the 4-word prefix.
+                        # Check if B is short and unpunctuated, while A is long and punctated.
+                        elif len(seg_b['word_indices']) < len(seg_a['word_indices']) and \
+                             not seg_b['text'].strip().endswith(('.', '!', '?')) and \
+                             text_a.startswith(text_b):
+                                should_delete_b = True
+                                logger.info(f"Consolidate: '{seg_b['text'][:20]}...' is prefix of '{seg_a['text'][:20]}...' -> Delete B")
+
+                        if should_delete_b:
+                            cluster_discard.add(idx_b)
+                            indices_to_discard.add(idx_b)
+
+                self.stats['repetitions_removed'] += len(cluster_discard)
                 
             i += 1
                 
@@ -704,6 +776,39 @@ class ProfessionalRoughCutV2:
                 
         return cleaned_segments
 
+    def _apply_ml_overrides(self, segments: List[Dict]) -> List[Dict]:
+        """
+        Apply trained ML model to filter segments.
+        If model predicts 'CUT' with high confidence (>0.8), we remove the segment
+        even if heuristics kept it.
+        """
+        if not segments or not self.ml_model or not self.ml_model.model:
+            return segments
+            
+        kept = []
+        removed_count = 0
+        
+        for i, segment in enumerate(segments):
+            prev_seg = segments[i-1] if i > 0 else None
+            next_seg = segments[i+1] if i < len(segments) - 1 else None
+            
+            # Predict CUT probability
+            # 1.0 = Definite CUT
+            # 0.0 = Definite KEEP
+            prob_cut = self.ml_model.predict(segment, prev_seg, next_seg)
+            
+            # Threshold: 0.8 (conservative, only cut if very sure)
+            if prob_cut > 0.8:
+                removed_count += 1
+                logger.info(f"ML Override: Removed segment at {segment['start_time']:.1f}s (Prob Cut: {prob_cut:.2f})")
+            else:
+                kept.append(segment)
+                
+        if removed_count > 0:
+            logger.info(f"ML Model removed {removed_count} segments that heuristics would have kept.")
+            
+        return kept
+
     def _semantic_filtering(self, segments: List[Dict]) -> List[Dict]:
         """
         Integrates ThoughtGrouper to identify and remove repetitive thoughts 
@@ -733,27 +838,44 @@ class ProfessionalRoughCutV2:
         # Store segments by their word indices to easily check inclusion
         segments_by_first_idx = {seg['word_indices'][0]: seg for seg in segments}
         
-        for thought in thoughts:
-            # STRICTER FILTERING:
-            # We explicitly ignore 'repetition' or 'filler' tags from ThoughtGrouper if they seem too aggressive.
-            # But since we tightened ThoughtGrouper itself, we can trust 'repetition' more.
-            # However, let's add a safety check: length of repetition.
-            
-            should_remove = False
-            
+        indices_to_remove = set()
+        
+        for i, thought in enumerate(thoughts):
             if thought['type'] == 'repetition':
-                # Only remove if it's not a "huge" thought (safety net)
-                if thought['word_count'] < 50: 
-                    should_remove = True
-                    self.stats['repetitions_removed'] += 1
-            
+                 # KEEP LAST LOGIC:
+                 # If this is a repetition of an earlier thought, we remove the EARLIER thought (the source).
+                 # And we keep THIS thought (promote it to main_point).
+                 source_idx = thought.get('repeated_thought_idx')
+                 
+                 if source_idx is not None:
+                     # Remove the source
+                     # SAFEGUARD: Only remove if the repetition is substantial
+                     # Determine if we are cutting a massive block for a small repetition
+                     source_thought = thoughts[source_idx]
+                     
+                     # If source is huge (>50 words) and current is small (<10 words), likely a false positive match
+                     if source_thought['word_count'] > 50 and thought['word_count'] < 10:
+                         logger.info(f"Semantic Filter: ABORTED 'Keep Last'. Source {source_idx} is too big ({source_thought['word_count']} words) to be replaced by small repetition ({thought['word_count']} words).")
+                     else:
+                         indices_to_remove.add(source_idx)
+                         logger.info(f"Semantic Filter: 'Keep Last' triggered. Removing source thought {source_idx} in favor of later version {i}.")
+                         
+                         # Promote current thought so it isn't removed in next pass (unless IT is later repeated)
+                         thought['type'] = 'main_point' 
+                 else:
+                     # Fallback: If we don't know source, remove this one
+                     if thought['word_count'] < 8:
+                        indices_to_remove.add(i)
+                        self.stats['repetitions_removed'] += 1
+
             elif thought['type'] == 'filler':
                  # Only delete small fillers
                  if thought['word_count'] <= 3 and thought['coherence_score'] < 0.6:
-                     should_remove = True
-            
-            if should_remove:
-                logger.info(f"Semantic Filter: Discarding {thought['type']} thought: \"{thought['text'][:50]}...\"")
+                     indices_to_remove.add(i)
+
+        for i, thought in enumerate(thoughts):
+            if i in indices_to_remove:
+                logger.info(f"Semantic Filter: Discarding thought {i} ({thought['type']}): \"{thought['text'][:50]}...\"")
                 continue
             
             # Find which segments belong to this thought

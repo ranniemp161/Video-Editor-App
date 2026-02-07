@@ -109,13 +109,11 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             // Seeking logic
             const word = words[index];
             if (word) {
-                // Seek slightly before the word starts (pre-roll) to catch the attack
-                const seekTime = Math.max(0, (word.start / 1000) - 0.1);
-
+                // Seek directly to word start (pre-roll handled in App.tsx now for accuracy)
                 if (isDeleteMode && onToggleWord) {
                     onToggleWord(word.start / 1000);
                 } else {
-                    onSeek(seekTime);
+                    onSeek(word.start / 1000);
                 }
             }
         }
@@ -280,12 +278,12 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     newEl.classList.remove('text-[#fafafa]');
                     newEl.classList.add('bg-[#26c6da22]', 'text-[#26c6da]', 'font-bold', 'shadow-[0_0_10px_rgba(38,198,218,0.2)]');
 
-                    // Scroll into view (throttled/debounced ideally, but here direct)
-                    if (scrollContainerRef.current) {
-                        const container = scrollContainerRef.current;
-                        const offset = newEl.offsetTop - container.offsetTop - (container.clientHeight / 2) + (newEl.clientHeight / 2);
-                        container.scrollTo({ top: offset, behavior: 'smooth' });
-                    }
+                    // Scroll into view DISABLED as per user request to avoid annoyance
+                    // if (scrollContainerRef.current) {
+                    //     const container = scrollContainerRef.current;
+                    //     const offset = newEl.offsetTop - container.offsetTop - (container.clientHeight / 2) + (newEl.clientHeight / 2);
+                    //     container.scrollTo({ top: offset, behavior: 'smooth' });
+                    // }
                 }
             }
             activeWordIndexRef.current = foundIndex;

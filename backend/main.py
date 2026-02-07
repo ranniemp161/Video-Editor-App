@@ -151,6 +151,15 @@ async def transcribe_generic(request: TranscribeRequest):
                     words=sub_words
                 )
                 
+                # ENHANCEMENT: Refine with audio analysis for accurate timestamps
+                if os.path.exists(wav_path):
+                    smart_words = refine_word_timestamps_with_audio(
+                        words=smart_words,
+                        audio_path=wav_path,
+                        start_sec=start_ms / 1000.0,
+                        end_sec=end_ms / 1000.0
+                    )
+                
                 for sw in smart_words:
                     words.append({
                         "word": sw['word'],
@@ -414,12 +423,21 @@ async def transcribe_project(project_id: str, db: Session = Depends(get_db)):
                 
                 sub_words = text.split()
                 if not sub_words: continue
-                
+                # Use syllable-based distribution
                 smart_words = distribute_word_timestamps(
                     sentence_start=start_ms / 1000.0,
                     sentence_end=end_ms / 1000.0,
                     words=sub_words
                 )
+                
+                # ENHANCEMENT: Refine with audio analysis for accurate timestamps
+                if os.path.exists(wav_path):
+                    smart_words = refine_word_timestamps_with_audio(
+                        words=smart_words,
+                        audio_path=wav_path,
+                        start_sec=start_ms / 1000.0,
+                        end_sec=end_ms / 1000.0
+                    )
                 
                 for sw in smart_words:
                     all_words.append({
@@ -671,6 +689,19 @@ class AssetInfo(BaseModel):
     name: str
     duration: float
 
+class TrainFeedbackRequest(BaseModel):
+    projectId: str
+    finalTimeline: dict
+
+@app.post("/train-feedback")
+async def train_feedback(request: TrainFeedbackRequest):
+    """
+    Endpoint to receive final user timeline and update training data.
+    """
+    loop = FeedbackLoop()
+    result = loop.process_feedback(request.projectId, request.finalTimeline)
+    return result
+
 class AutoCutRequest(BaseModel):
     words: List[dict]
     asset: AssetInfo
@@ -826,19 +857,7 @@ async def analyze_thoughts(request: AnalyzeThoughtsRequest):
         "summary": summary
     }
 
-@app.post('/api/train-feedback')
-def train_feedback(data: dict):
-    try:
-        project_id = data.get('projectId', 'default_project')
-        timeline = data.get('timeline')
-        
-        feedback_loop = FeedbackLoop()
-        result = feedback_loop.process_feedback(project_id, timeline)
-        
-        return result
-    except Exception as e:
-        logger.exception("Feedback processing failed")
-        return {"success": False, "error": str(e)}, 500
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
