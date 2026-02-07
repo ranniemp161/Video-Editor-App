@@ -9,12 +9,30 @@ import { Sidebar } from '@/components/Sidebar';
 import { Inspector } from '@/components/Inspector';
 import { TranscriptView } from '@/components/TranscriptView';
 import { AddIcon } from '@/components/icons';
+import { Login } from '@/components/Login';
 import { useTimeline } from '@/hooks/useTimeline';
 import { useMarkers } from '@/hooks/useMarkers';
 import { Asset } from '@/types';
 import { formatTime } from '@/utils/time';
 
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  return <VideoEditor />;
+};
+
+const VideoEditor: React.FC = () => {
   const {
     timeline,
     assets,
