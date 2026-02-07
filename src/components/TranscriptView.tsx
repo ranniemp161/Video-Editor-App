@@ -14,6 +14,8 @@ interface TranscriptViewProps {
     isTranscribing: boolean;
     progress?: number;
     onToggleWord?: (start: number) => void;
+    onDeleteRange?: (start: number, end: number) => void;
+    onRestoreRange?: (start: number, end: number) => void;
     timeline: TimelineState; // Use TimelineState type
 }
 
@@ -28,6 +30,8 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     isTranscribing,
     progress = 0,
     onToggleWord,
+    onDeleteRange,
+    onRestoreRange,
     timeline
 }) => {
     // ALL HOOKS MUST BE AT THE TOP - React Rules of Hooks
@@ -35,6 +39,115 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     const currentWordRef = useRef<HTMLSpanElement>(null);
     const [isDeleteMode, setIsDeleteMode] = React.useState(false);
     const [showThoughts, setShowThoughts] = React.useState(false); // New: thought view toggle
+
+    // Context Menu State
+    const [contextMenu, setContextMenu] = React.useState<{ x: number; y: number; index: number; isIncluded: boolean } | null>(null);
+
+    // Close context menu on click elsewhere
+    useEffect(() => {
+        const checkClose = () => setContextMenu(null);
+        window.addEventListener('click', checkClose);
+        return () => window.removeEventListener('click', checkClose);
+    }, []);
+
+    // --- SELECTION LOGIC ---
+    const [selectionStart, setSelectionStart] = React.useState<number | null>(null);
+    const [selectionEnd, setSelectionEnd] = React.useState<number | null>(null);
+
+    const words = React.useMemo(() => asset?.transcription?.words || [], [asset]);
+
+    const handleWordClick = (index: number, e: React.MouseEvent) => {
+        if (e.button === 2) return; // Ignore right click here, handled by onContextMenu
+
+        if (e.shiftKey && selectionStart !== null) {
+            // Range Selection
+            setSelectionEnd(index);
+        } else {
+            // Single Selection / Seek
+            setSelectionStart(index);
+            setSelectionEnd(null);
+
+            // Seeking logic
+            const word = words[index];
+            if (word) {
+                if (isDeleteMode && onToggleWord) {
+                    onToggleWord(word.start / 1000);
+                } else {
+                    onSeek(word.start / 1000);
+                }
+            }
+        }
+    };
+
+    const handleContextMenu = (e: React.MouseEvent, index: number, isIncluded: boolean) => {
+        e.preventDefault();
+        setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            index,
+            isIncluded
+        });
+
+        // If the right-clicked word is NOT part of the current selection, update selection to just this word
+        const isInsideSelection = selectionStart !== null && (
+            (selectionEnd === null && index === selectionStart) ||
+            (selectionEnd !== null && index >= Math.min(selectionStart, selectionEnd) && index <= Math.max(selectionStart, selectionEnd))
+        );
+
+        if (!isInsideSelection) {
+            setSelectionStart(index);
+            setSelectionEnd(null);
+        }
+    };
+
+    const handleDeleteRange = React.useCallback(() => {
+        if (selectionStart === null || !onDeleteRange) return;
+
+        const startIdx = selectionStart;
+        const endIdx = selectionEnd !== null ? selectionEnd : selectionStart;
+        const min = Math.min(startIdx, endIdx);
+        const max = Math.max(startIdx, endIdx);
+        const startWord = words[min];
+        const endWord = words[max];
+
+        if (startWord && endWord) {
+            onDeleteRange(startWord.start / 1000, endWord.end / 1000);
+            // Clear selection after delete
+            setSelectionStart(null);
+            setSelectionEnd(null);
+        }
+    }, [selectionStart, selectionEnd, words, onDeleteRange]);
+
+    const handleRestoreRange = React.useCallback(() => {
+        if (selectionStart === null || !onRestoreRange) return;
+
+        const startIdx = selectionStart;
+        const endIdx = selectionEnd !== null ? selectionEnd : selectionStart;
+
+        const min = Math.min(startIdx, endIdx);
+        const max = Math.max(startIdx, endIdx);
+
+        const startWord = words[min];
+        const endWord = words[max];
+
+        if (startWord && endWord) {
+            onRestoreRange(startWord.start / 1000, endWord.end / 1000);
+            setSelectionStart(null);
+            setSelectionEnd(null);
+        }
+    }, [selectionStart, selectionEnd, words, onRestoreRange]);
+
+
+    // Handle Delete Key
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (selectionStart !== null && (e.key === 'Delete' || e.key === 'Backspace')) {
+                handleDeleteRange();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectionStart, handleDeleteRange]);
 
     // OPTIMIZATION: Calculate originalTime ONCE per render
     const originalVideoTime = React.useMemo(() => {
@@ -72,7 +185,6 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
         }
     };
 
-    const words = React.useMemo(() => asset?.transcription?.words || [], [asset]);
 
     // Find current word for auto-scroll dependency
     const currentWord = React.useMemo(() => {
@@ -144,6 +256,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
             </div>
         );
     }
+
 
 
     return (
@@ -220,27 +333,28 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                             const isDeleted = (word as any).isDeleted || false;
 
                             // SOURCE OF TRUTH: If it's in the timeline, it is NOT excluded.
-                            // This ensures words recovered via Alt + Arrow turn white immediately.
                             const showAsExcluded = !isIncluded;
+
+                            // Selection state
+                            const isSelected = selectionStart !== null && (
+                                (selectionEnd === null && i === selectionStart) ||
+                                (selectionEnd !== null && i >= Math.min(selectionStart, selectionEnd) && i <= Math.max(selectionStart, selectionEnd))
+                            );
 
                             return (
                                 <span
                                     key={i}
                                     ref={isCurrent ? currentWordRef : null}
-                                    onClick={(e) => {
-                                        if (isDeleteMode && onToggleWord) {
-                                            onToggleWord(word.start / 1000);
-                                        } else {
-                                            onSeek(word.start / 1000);
-                                        }
-                                    }}
-                                    className={`cursor-pointer px-2 py-1.5 rounded-md transition-all duration-200 text-sm
-                                          ${isCurrent ? 'bg-[#26c6da] text-[#0f0f0f] font-bold scale-110 shadow-[0_0_20px_rgba(38,198,218,0.4)] z-10' : ''}
-                                          ${showAsExcluded
-                                            ? 'text-red-500/40 opacity-40 bg-red-500/5 border border-red-500/10'
-                                            : !isCurrent ? 'text-[#fafafa] hover:bg-white/5 hover:text-white hover:scale-105 hover:shadow-lg' : ''}
+                                    onClick={(e) => handleWordClick(i, e)}
+                                    onContextMenu={(e) => handleContextMenu(e, i, isIncluded)}
+                                    className={`cursor-pointer px-2 py-0.5 rounded-sm transition-all duration-75 text-sm border border-transparent
+                                          ${isCurrent ? 'bg-[#26c6da22] text-[#26c6da] font-bold shadow-[0_0_10px_rgba(38,198,218,0.2)]' : ''}
+                                          ${isSelected ? 'bg-[#26c6da] text-[#0f0f0f] font-bold' : ''}
+                                          ${showAsExcluded && !isSelected
+                                            ? 'text-red-500/40 opacity-40 line-through decoration-red-500/30'
+                                            : !isCurrent && !isSelected ? 'text-[#fafafa] hover:bg-white/5 hover:text-white' : ''}
                                         `}
-                                    title={`${formatTime(word.start / 1000)} ${isDeleteMode ? '(Click to Delete)' : '(Click to Seek)'}`}
+                                    title={`${formatTime(word.start / 1000)}`}
                                 >
                                     {word.word}
                                 </span>
@@ -249,6 +363,38 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     </div>
                 )}
             </div>
+            {/* Context Menu */}
+            {contextMenu && (
+                <div
+                    className="fixed bg-[#1f1f1f] border border-[#ffffff1a] rounded-lg shadow-xl z-50 py-1 min-w-[120px]"
+                    style={{ top: contextMenu.y, left: contextMenu.x }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {contextMenu.isIncluded ? (
+                        <button
+                            onClick={() => {
+                                handleDeleteRange();
+                                setContextMenu(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-xs hover:bg-[#ffffff0a] text-red-400 hover:text-red-300 transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Delete
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                handleRestoreRange();
+                                setContextMenu(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-xs hover:bg-[#ffffff0a] text-[#26c6da] hover:text-[#4dd0e1] transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Restore
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

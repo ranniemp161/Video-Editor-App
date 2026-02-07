@@ -66,6 +66,8 @@ const App: React.FC = () => {
     selectClipsInRange,
     setTrackHeight,
     deleteProject,
+    deleteClipRange,
+    restoreClipRange,
   } = useTimeline();
 
   const [activeTab, setActiveTab] = useState('media');
@@ -327,6 +329,16 @@ const App: React.FC = () => {
                   isTranscribing={!!isTranscribing}
                   progress={transcriptionProgress}
                   onToggleWord={(start) => toggleSegmentDelete(start)}
+                  onDeleteRange={(start, end) => {
+                    if (activeTranscriptAsset?.id) {
+                      deleteClipRange(activeTranscriptAsset.id, start, end);
+                    }
+                  }}
+                  onRestoreRange={(start, end) => {
+                    if (activeTranscriptAsset?.id) {
+                      restoreClipRange(activeTranscriptAsset.id, start, end);
+                    }
+                  }}
                 />
               )}
               {activeTab !== 'media' && activeTab !== 'transcript' && (

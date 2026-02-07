@@ -795,6 +795,230 @@ export const useTimeline = () => {
     });
   }, [isMagnetic, assets]);
 
+  // Helper to re-pack a track (remove gaps) if magnetic
+  const packTrack = useCallback((clips: TimelineClip[]) => {
+    const sorted = [...clips].sort((a, b) => a.start - b.start);
+    let currentPos = 0;
+    return sorted.map(c => {
+      const duration = c.end - c.start; // Keep duration fixed
+      // If we adjusted trims, duration might have changed, so trust (trimEnd - trimStart) if needed?
+      // Actually source of truth for length is usually (trimEnd - trimStart).
+      // Let's recalculate duration from trims to be safe.
+      const trueDuration = c.trimEnd - c.trimStart;
+      const updated = {
+        ...c,
+        start: currentPos,
+        end: currentPos + trueDuration
+      };
+      currentPos += trueDuration;
+      return updated;
+    });
+  }, []);
+
+  const deleteClipRange = useCallback((assetId: string, rangeStart: number, rangeEnd: number) => {
+    setTimeline(prev => {
+      const next = { ...prev };
+      let changed = false;
+
+      next.tracks = next.tracks.map(track => {
+        if (track.locked) return track;
+
+        // processing clips
+        let newClips: TimelineClip[] = [];
+        let trackChanged = false;
+
+        for (const clip of track.clips) {
+          // Only affect clips that belong to the target asset
+          // (Strictly speaking, transcript delete should only affect the specific file, 
+          // but in this app 'assetId' might be shared or valid. 
+          // We should match by assetId.)
+          if (clip.assetId !== assetId) {
+            newClips.push(clip);
+            continue;
+          }
+
+          // Check overlap
+          // Clip covers source time: [trimStart, trimEnd]
+          // Delete range: [rangeStart, rangeEnd]
+
+          // No overlap
+          if (rangeEnd <= clip.trimStart || rangeStart >= clip.trimEnd) {
+            newClips.push(clip);
+            continue;
+          }
+
+          trackChanged = true;
+          changed = true;
+
+          // Overlap scenarios
+          const deleteStart = Math.max(rangeStart, clip.trimStart);
+          const deleteEnd = Math.min(rangeEnd, clip.trimEnd);
+
+          // 1. Fully contained delete (Split into two)
+          // Clip: |oooooooooooo|
+          // Del:     |xxxx|
+          // Res: |ooo|    |oooo|
+          if (deleteStart > clip.trimStart && deleteEnd < clip.trimEnd) {
+            // First part
+            const firstDuration = deleteStart - clip.trimStart;
+            newClips.push({
+              ...clip,
+              id: clip.id + '-part1',
+              trimEnd: deleteStart,
+              end: clip.start + firstDuration
+            });
+
+            // Second part
+            const secondStart = deleteEnd;
+            const secondDuration = clip.trimEnd - secondStart;
+            newClips.push({
+              ...clip,
+              id: clip.id + '-part2',
+              trimStart: secondStart,
+              start: clip.start + firstDuration, // Will be fixed by packTrack if magnetic, but good to approx
+              trimEnd: clip.trimEnd,
+              end: clip.start + firstDuration + secondDuration
+            });
+          }
+          // 2. Delete covers start
+          // Clip: |oooooooooooo|
+          // Del: |xxxx|
+          // Res:      |oooo|
+          else if (deleteStart <= clip.trimStart && deleteEnd < clip.trimEnd) {
+            const newTrimStart = deleteEnd;
+            const newDuration = clip.trimEnd - newTrimStart;
+            newClips.push({
+              ...clip,
+              trimStart: newTrimStart,
+              start: clip.start, // Will be packed
+              end: clip.start + newDuration
+            });
+          }
+          // 3. Delete covers end
+          // Clip: |oooooooooooo|
+          // Del:        |xxxx|
+          // Res: |oooooo|
+          else if (deleteStart > clip.trimStart && deleteEnd >= clip.trimEnd) {
+            const newTrimEnd = deleteStart;
+            const newDuration = newTrimEnd - clip.trimStart;
+            newClips.push({
+              ...clip,
+              trimEnd: newTrimEnd,
+              end: clip.start + newDuration
+            });
+          }
+          // 4. Delete covers entire clip
+          else {
+            // Do not push to newClips (delete it)
+          }
+        }
+
+        if (trackChanged && isMagnetic) {
+          newClips = packTrack(newClips);
+        }
+
+        return { ...track, clips: newClips };
+      });
+
+      if (!changed) return prev;
+
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]); // Clear redo stack on new action
+      return next;
+    });
+  }, [isMagnetic, packTrack]);
+
+  const restoreClipRange = useCallback((assetId: string, rangeStart: number, rangeEnd: number) => {
+    // Capture current playhead position from scope
+    const currentPlayhead = playheadPosition;
+
+    setTimeline(prev => {
+      // Default to first track (Video 1) which is usually index 0
+      const activeTrackIndex = 0;
+      const track = prev.tracks[activeTrackIndex];
+
+      if (track.locked) return prev;
+
+      const duration = rangeEnd - rangeStart;
+      const newClip: TimelineClip = {
+        id: crypto.randomUUID(),
+        assetId,
+        start: currentPlayhead, // Default to playhead if no better spot found
+        end: currentPlayhead + duration,
+        trimStart: rangeStart,
+        trimEnd: rangeEnd,
+        sourceFileName: assets.find(a => a.id === assetId)?.name || 'Restored Clip',
+        trackId: track.id, // Explicitly set trackId
+        name: assets.find(a => a.id === assetId)?.name || 'Restored Clip',
+      };
+
+      // Smart Insertion Logic:
+      // Try to find a clip from the same asset that ends near rangeStart, or starts near rangeEnd
+      let insertTime = currentPlayhead;
+      let inserted = false;
+
+      // Find nearest neighbor from same asset
+      const sameAssetClips = track.clips.filter(c => c.assetId === assetId).sort((a, b) => a.trimStart - b.trimStart);
+
+      // Check if we can append to a preceeding clip
+      const preceeding = sameAssetClips.find(c => Math.abs(c.trimEnd - rangeStart) < 0.1);
+      if (preceeding) {
+        insertTime = preceeding.end;
+        inserted = true;
+      } else {
+        // Check if we can prepend to a following clip
+        const following = sameAssetClips.find(c => Math.abs(c.trimStart - rangeEnd) < 0.1);
+        if (following) {
+          insertTime = following.start - duration;
+          inserted = true;
+        }
+      }
+
+      if (inserted) {
+        newClip.start = insertTime;
+        newClip.end = insertTime + duration;
+      }
+
+      let newClips = [...track.clips, newClip];
+
+      if (isMagnetic) {
+        // If inserted at specific point (smart insertion):
+        // We need to shift all clips after `insertTime` by `duration`.
+        newClips = track.clips.map(c => {
+          if (c.start >= insertTime) {
+            return { ...c, start: c.start + duration, end: c.end + duration };
+          }
+          return c;
+        });
+        newClip.start = insertTime;
+        newClip.end = insertTime + duration;
+        newClips.push(newClip);
+
+        newClips = packTrack(newClips);
+      } else {
+        // Standard Insert
+        newClips = track.clips.map(c => {
+          if (c.start >= insertTime) {
+            return { ...c, start: c.start + duration, end: c.end + duration };
+          }
+          return c;
+        });
+        newClip.start = insertTime;
+        newClip.end = insertTime + duration;
+        newClips.push(newClip);
+      }
+
+      const next = {
+        ...prev,
+        tracks: prev.tracks.map((t, i) => i === activeTrackIndex ? { ...t, clips: newClips } : t)
+      };
+
+      setPast(p => [...p, prev].slice(-50));
+      setFuture([]); // Clear redo stack on new action
+      return next;
+    });
+  }, [playheadPosition, isMagnetic, packTrack, assets, setPast, setFuture]);
+
   const splitClip = useCallback((clipId: string, position: number) => {
     setTimeline(prev => {
       const next = {
@@ -1205,5 +1429,7 @@ export const useTimeline = () => {
     rippleDelete,
     setTrackHeight,
     deleteProject,
+    deleteClipRange,
+    restoreClipRange,
   };
 };
