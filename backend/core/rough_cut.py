@@ -17,11 +17,18 @@ logger = logging.getLogger(__name__)
 
 
 class ProfessionalRoughCutV2:
-    def __init__(self, words: List[Dict]):
+    def __init__(self, words: List[Dict], ml_cut_threshold: float = 0.8):
         """
         Initialize with word-level transcript.
         Words expected format: [{'word': str, 'start': float, 'end': float}, ...]
         Times in seconds.
+        
+        Args:
+            words: List of word dictionaries with timing info
+            ml_cut_threshold: ML confidence threshold for cutting segments (0.0-1.0)
+                             0.8 = Conservative (fewer ML cuts, default)
+                             0.6 = Moderate
+                             0.4 = Aggressive (more ML cuts)
         """
         self.words = words
         self.segments = []
@@ -32,6 +39,7 @@ class ProfessionalRoughCutV2:
         self.SENTENCE_SPLIT_GAP = 0.4
         self.REPETITION_SIMILARITY = 0.85 # Stricter
         self.MIN_SEGMENT_LENGTH = 3
+        self.ML_CUT_THRESHOLD = ml_cut_threshold  # Configurable ML threshold
         
         # Statistics
         self.stats = {
@@ -797,10 +805,10 @@ class ProfessionalRoughCutV2:
             # 0.0 = Definite KEEP
             prob_cut = self.ml_model.predict(segment, prev_seg, next_seg)
             
-            # Threshold: 0.8 (conservative, only cut if very sure)
-            if prob_cut > 0.8:
+            # Use configurable threshold
+            if prob_cut > self.ML_CUT_THRESHOLD:
                 removed_count += 1
-                logger.info(f"ML Override: Removed segment at {segment['start_time']:.1f}s (Prob Cut: {prob_cut:.2f})")
+                logger.info(f"ML Override: Removed segment at {segment['start_time']:.1f}s (Prob Cut: {prob_cut:.2f}, Threshold: {self.ML_CUT_THRESHOLD})")
             else:
                 kept.append(segment)
                 

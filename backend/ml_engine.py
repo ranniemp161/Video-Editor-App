@@ -27,10 +27,26 @@ class RoughCutModel:
         self.model_path = os.path.join(model_dir, "rough_cut_model.pkl")
         self.model = None
         self.extractor = FeatureExtractor()
+        
+        # Updated feature names to match enhanced FeatureExtractor
+        # Total: 20 features (was 8)
         self.feature_names = [
+            # Original timing features (5)
             'duration', 'word_count', 'speech_rate', 
-            'pause_before', 'pause_after', 
-            'stop_word_ratio', 'starts_with_repeat', 'has_filler'
+            'pause_before', 'pause_after',
+            
+            # Original text features (4)
+            'stop_word_ratio', 'starts_with_repeat', 'has_filler', 'filler_count',
+            
+            # New linguistic complexity features (4)
+            'unique_word_ratio', 'avg_word_length', 
+            'question_count', 'exclamation_count',
+            
+            # New sentiment features (3)
+            'sentiment_positive', 'sentiment_negative', 'sentiment_subjectivity',
+            
+            # New contextual features (2)
+            'position_in_video', 'time_since_last_cut'
         ]
         
         self.load_model()
@@ -74,16 +90,25 @@ class RoughCutModel:
         # Train/Test Split
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
-        # Initialize and Train
+        # Initialize and Train with Enhanced Hyperparameters
         logger.info(f"Training on {len(X_train)} examples...")
-        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        self.model = RandomForestClassifier(
+            n_estimators=200,            # More trees = better accuracy (was 100)
+            max_depth=15,                # Prevent overfitting
+            min_samples_split=10,        # Require more samples to split nodes
+            min_samples_leaf=5,          # Smoother decision boundaries
+            max_features='sqrt',         # Feature randomness for diversity
+            class_weight='balanced',     # Handle imbalanced KEEP/CUT data
+            random_state=42,
+            n_jobs=-1                    # Use all CPU cores for speed
+        )
         self.model.fit(X_train, y_train)
         
-        # Evaluate
+        # Evaluate with detailed metrics
         y_pred = self.model.predict(X_test)
         logger.info("Training complete.")
-        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
-        logger.info(f"\n{classification_report(y_test, y_pred)}")
+        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+        logger.info(f"\n{classification_report(y_test, y_pred, target_names=['KEEP', 'CUT'])}")
         
         # Save
         self.save_model()
