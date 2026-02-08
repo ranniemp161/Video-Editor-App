@@ -5,11 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from db import SessionLocal, engine, Base
+from db import SessionLocal, engine, Base, RoughCutResult
 from api import projects_router, transcripts_router, editing_router
 from api.projects import cleanup_orphaned_files
 
-# Create tables
+# Create tables (RoughCutResult must be imported above for SQLAlchemy to see it)
 Base.metadata.create_all(bind=engine)
 
 logging.basicConfig(level=logging.INFO)

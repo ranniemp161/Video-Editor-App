@@ -360,6 +360,50 @@ export const useTimeline = () => {
     fetchSegments();
   }, [projectId, generateTimelineFromSegments]);
 
+  // Session Recovery: Check for saved rough cut results on page load
+  useEffect(() => {
+    if (!projectId) return;
+
+    const checkForSavedRoughCut = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/rough-cut-status/${projectId}`);
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        // If we found saved rough cut results and timeline is empty, restore them
+        if (data.found && data.clips && data.clips.length > 0) {
+          // Check if timeline already has clips (user might have manually added some)
+          const hasExistingClips = timeline.tracks.some(t => t.clips.length > 0);
+
+          if (!hasExistingClips) {
+            console.log(`🔄 Session Recovery: Restoring ${data.clips.length} clips from ${new Date(data.createdAt * 1000).toLocaleTimeString()}`);
+
+            // Restore clips to timeline
+            setTimeline(prev => ({
+              ...prev,
+              tracks: prev.tracks.map(track =>
+                track.id === 'v1' ? { ...track, clips: data.clips } : track
+              )
+            }));
+
+            // Show success notification
+            console.log('✅ Timeline restored from database');
+
+            // Optionally show stats if available
+            if (data.statistics) {
+              console.log('📊 Restored Statistics:', data.statistics);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Session recovery failed:", e);
+      }
+    };
+
+    checkForSavedRoughCut();
+  }, [projectId, timeline.tracks]); // Depend on timeline.tracks to avoid race conditions
+
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
 
   const transcribeAsset = useCallback(async (assetId: string, fileName: string) => {
