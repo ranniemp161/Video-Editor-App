@@ -8,7 +8,9 @@ from .requests import (
     AssetInfo,
     TrainFeedbackRequest,
     AutoCutRequest,
-    AnalyzeThoughtsRequest
+    AnalyzeThoughtsRequest,
+    ExportEDLRequest,
+    ExportXMLRequest
 )
 
 __all__ = [
@@ -20,5 +22,8 @@ __all__ = [
     'AssetInfo',
     'TrainFeedbackRequest',
     'AutoCutRequest',
-    'AnalyzeThoughtsRequest'
+    'AnalyzeThoughtsRequest',
+    'ExportEDLRequest',
+    'ExportXMLRequest'
 ]
+

@@ -162,3 +162,186 @@ async def train_feedback(request: TrainFeedbackRequest):
     loop = FeedbackLoop()
     result = loop.process_feedback(request.projectId, request.finalTimeline)
     return result
+
+
+from schemas import ExportEDLRequest, ExportXMLRequest
+from fastapi.responses import Response
+import io
+
+
+def seconds_to_timecode(seconds: float, fps: int = 30) -> str:
+    """Convert seconds to timecode format HH:MM:SS:FF"""
+    total_frames = round(seconds * fps)
+    hours = total_frames // (fps * 3600)
+    minutes = (total_frames % (fps * 3600)) // (fps * 60)
+    secs = (total_frames % (fps * 60)) // fps
+    frames = total_frames % fps
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}:{frames:02d}"
+
+
+@router.post("/export-edl")
+async def export_edl(request: ExportEDLRequest):
+    """
+    Export timeline as CMX 3600 EDL format for DaVinci Resolve.
+    Returns the EDL file content directly as a downloadable file.
+    """
+    tracks = request.timeline.tracks
+    assets = request.assets
+    
+    # Find video track
+    video_track = next((t for t in tracks if t.type == 'video'), None)
+    if not video_track or not video_track.clips:
+        return {"success": False, "error": "No video clips to export"}
+    
+    # Sort clips by start time
+    video_clips = sorted(video_track.clips, key=lambda c: c.start)
+    
+    # Build EDL content
+    edl_lines = [
+        "TITLE: Rough Cut Export",
+        "FCM: NON-DROP FRAME",
+        ""
+    ]
+    
+    record_in = 0.0
+    
+    for idx, clip in enumerate(video_clips):
+        # Find matching asset
+        asset = next((a for a in assets if a.id == clip.assetId), None)
+        if not asset:
+            continue
+        
+        duration = clip.end - clip.start
+        if duration <= 0:
+            continue
+        
+        # Get clip name (max 8 chars for EDL reel name)
+        clip_name = clip.sourceFileName or clip.name or asset.name or "CLIP"
+        reel_name = clip_name[:8].upper().replace(" ", "_")
+        
+        # Source in/out (from original video)
+        source_in = clip.trimStart
+        source_out = source_in + duration
+        
+        # Record in/out (on timeline)
+        record_out = record_in + duration
+        
+        # Event number (3 digits)
+        event_num = f"{idx + 1:03d}"
+        
+        # EDL line format: {event} {reel} {track} {edit} {src_in} {src_out} {rec_in} {rec_out}
+        edl_lines.append(
+            f"{event_num}  {reel_name.ljust(8)} V     C        "
+            f"{seconds_to_timecode(source_in)} {seconds_to_timecode(source_out)} "
+            f"{seconds_to_timecode(record_in)} {seconds_to_timecode(record_out)}"
+        )
+        
+        # Add clip name comment
+        edl_lines.append(f"* FROM CLIP NAME: {clip_name}")
+        
+        # Add source file comment if available
+        if asset.src:
+            edl_lines.append(f"* SOURCE FILE: {asset.src}")
+        
+        edl_lines.append("")
+        
+        record_in = record_out
+    
+    edl_content = "\n".join(edl_lines)
+    
+    logger.info(f"EDL Export: Generated {len(video_clips)} events")
+    
+    return Response(
+        content=edl_content,
+        media_type="text/plain",
+        headers={
+            "Content-Disposition": f"attachment; filename=rough_cut_{int(time.time())}.edl"
+        }
+    )
+
+
+@router.post("/export-xml")
+async def export_xml(request: ExportXMLRequest):
+    """
+    Export timeline as FCP 7 XML format for DaVinci Resolve.
+    Returns the XML file content directly as a downloadable file.
+    """
+    tracks = request.timeline.tracks
+    assets = request.assets
+    
+    # Find video track
+    video_track = next((t for t in tracks if t.type == 'video'), None)
+    if not video_track or not video_track.clips:
+        return {"success": False, "error": "No video clips to export"}
+    
+    # Sort clips by start time
+    video_clips = sorted(video_track.clips, key=lambda c: c.start)
+    
+    # Calculate total duration
+    total_duration = max(c.end for c in video_clips) if video_clips else 0
+    
+    FPS = 30
+    
+    # Build FCP 7 XML
+    xml_lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<!DOCTYPE xmeml>',
+        '<xmeml version="4">',
+        '  <sequence>',
+        '    <name>Rough Cut Export</name>',
+        f'    <duration>{int(total_duration * FPS)}</duration>',
+        '    <rate>',
+        '      <timebase>30</timebase>',
+        '      <ntsc>FALSE</ntsc>',
+        '    </rate>',
+        '    <media>',
+        '      <video>',
+        '        <track>',
+    ]
+    
+    for idx, clip in enumerate(video_clips):
+        asset = next((a for a in assets if a.id == clip.assetId), None)
+        if not asset:
+            continue
+        
+        clip_name = clip.sourceFileName or clip.name or asset.name or "Clip"
+        
+        xml_lines.extend([
+            '          <clipitem>',
+            f'            <name>{clip_name}</name>',
+            f'            <duration>{int((clip.end - clip.start) * FPS)}</duration>',
+            '            <rate>',
+            '              <timebase>30</timebase>',
+            '              <ntsc>FALSE</ntsc>',
+            '            </rate>',
+            f'            <start>{int(clip.start * FPS)}</start>',
+            f'            <end>{int(clip.end * FPS)}</end>',
+            f'            <in>{int(clip.trimStart * FPS)}</in>',
+            f'            <out>{int(clip.trimEnd * FPS)}</out>',
+            '            <file>',
+            f'              <name>{asset.name}</name>',
+            f'              <duration>{int(asset.duration * FPS)}</duration>',
+            '            </file>',
+            '          </clipitem>',
+        ])
+    
+    xml_lines.extend([
+        '        </track>',
+        '      </video>',
+        '    </media>',
+        '  </sequence>',
+        '</xmeml>',
+    ])
+    
+    xml_content = "\n".join(xml_lines)
+    
+    logger.info(f"XML Export: Generated {len(video_clips)} clips")
+    
+    return Response(
+        content=xml_content,
+        media_type="application/xml",
+        headers={
+            "Content-Disposition": f"attachment; filename=rough_cut_{int(time.time())}.xml"
+        }
+    )
+

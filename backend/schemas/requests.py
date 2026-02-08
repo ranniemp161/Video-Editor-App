@@ -63,3 +63,53 @@ class AutoCutRequest(BaseModel):
 class AnalyzeThoughtsRequest(BaseModel):
     """Request to analyze thought groupings."""
     words: List[dict]
+
+
+class TimelineClip(BaseModel):
+    """A clip in the timeline."""
+    id: str
+    assetId: str
+    trackId: str
+    name: str
+    sourceFileName: Optional[str] = None
+    start: float
+    end: float
+    trimStart: float
+    trimEnd: float
+    opacity: Optional[int] = 100
+    volume: Optional[int] = 100
+
+
+class TimelineTrack(BaseModel):
+    """A track in the timeline."""
+    id: str
+    type: str
+    clips: List[TimelineClip]
+    muted: Optional[bool] = False
+    locked: Optional[bool] = False
+
+
+class TimelineState(BaseModel):
+    """Timeline state structure."""
+    tracks: List[TimelineTrack]
+
+
+class ExportAsset(BaseModel):
+    """Asset info for export."""
+    id: str
+    name: str
+    duration: float
+    src: Optional[str] = None
+
+
+class ExportEDLRequest(BaseModel):
+    """Request to export EDL file."""
+    timeline: TimelineState
+    assets: List[ExportAsset]
+
+
+class ExportXMLRequest(BaseModel):
+    """Request to export XML file."""
+    timeline: TimelineState
+    assets: List[ExportAsset]
+

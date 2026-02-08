@@ -565,18 +565,44 @@ export const useTimeline = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      const result = await response.json();
-      if (result.success) {
-        // Trigger download
-        const link = document.createElement('a');
-        link.href = result.path;
-        link.download = basename(result.path);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+
+      if (!response.ok) {
+        throw new Error(`Export failed: ${response.status}`);
       }
+
+      // Check if response is JSON (error case) or blob (success case)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        if (result.success === false) {
+          alert(result.error || 'Export failed');
+          return;
+        }
+        // Fallback for vite dev server mock (returns path)
+        if (result.path) {
+          const link = document.createElement('a');
+          link.href = result.path;
+          link.download = basename(result.path);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+      }
+
+      // Handle direct file download from production backend
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rough_cut_${Date.now()}.xml`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('XML Export failed:', err);
+      alert('XML Export failed. Please try again.');
     }
   }, [timeline, assets]);
 
@@ -598,17 +624,44 @@ export const useTimeline = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      const result = await response.json();
-      if (result.success) {
-        const link = document.createElement('a');
-        link.href = result.path;
-        link.download = basename(result.path);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+
+      if (!response.ok) {
+        throw new Error(`Export failed: ${response.status}`);
       }
+
+      // Check if response is JSON (error case) or blob (success case)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await response.json();
+        if (result.success === false) {
+          alert(result.error || 'Export failed');
+          return;
+        }
+        // Fallback for vite dev server mock (returns path)
+        if (result.path) {
+          const link = document.createElement('a');
+          link.href = result.path;
+          link.download = basename(result.path);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+      }
+
+      // Handle direct file download from production backend
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rough_cut_${Date.now()}.edl`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error('EDL Export failed:', err);
+      alert('EDL Export failed. Please try again.');
     }
   }, [timeline, assets]);
 

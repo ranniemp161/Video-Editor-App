@@ -1,0 +1,171 @@
+TITLE: Rough Cut Export
+FCM: NON-DROP FRAME
+
+001  MAIN-VID V     C        00:00:41:06 00:00:50:23 00:00:00:00 00:00:09:17
+* FROM CLIP NAME: main-video.mp4
+
+002  MAIN-VID V     C        00:00:51:06 00:01:04:00 00:00:09:17 00:00:22:11
+* FROM CLIP NAME: main-video.mp4
+
+003  MAIN-VID V     C        00:02:28:05 00:02:30:06 00:00:22:11 00:00:24:13
+* FROM CLIP NAME: main-video.mp4
+
+004  MAIN-VID V     C        00:02:34:27 00:02:42:17 00:00:24:13 00:00:32:03
+* FROM CLIP NAME: main-video.mp4
+
+005  MAIN-VID V     C        00:02:44:21 00:03:07:14 00:00:32:03 00:00:54:25
+* FROM CLIP NAME: main-video.mp4
+
+006  MAIN-VID V     C        00:03:08:09 00:03:43:28 00:00:54:25 00:01:30:14
+* FROM CLIP NAME: main-video.mp4
+
+007  MAIN-VID V     C        00:04:31:14 00:04:44:17 00:01:30:14 00:01:43:16
+* FROM CLIP NAME: main-video.mp4
+
+008  MAIN-VID V     C        00:05:07:05 00:05:13:00 00:01:43:16 00:01:49:12
+* FROM CLIP NAME: main-video.mp4
+
+009  MAIN-VID V     C        00:05:28:21 00:05:36:11 00:01:49:12 00:01:57:02
+* FROM CLIP NAME: main-video.mp4
+
+010  MAIN-VID V     C        00:06:25:17 00:06:46:24 00:01:57:02 00:02:18:10
+* FROM CLIP NAME: main-video.mp4
+
+011  MAIN-VID V     C        00:06:55:14 00:07:00:20 00:02:18:10 00:02:23:15
+* FROM CLIP NAME: main-video.mp4
+
+012  MAIN-VID V     C        00:07:38:09 00:07:50:14 00:02:23:15 00:02:35:19
+* FROM CLIP NAME: main-video.mp4
+
+013  MAIN-VID V     C        00:07:53:09 00:08:14:08 00:02:35:19 00:02:56:18
+* FROM CLIP NAME: main-video.mp4
+
+014  MAIN-VID V     C        00:08:31:20 00:08:45:23 00:02:56:18 00:03:10:21
+* FROM CLIP NAME: main-video.mp4
+
+015  MAIN-VID V     C        00:09:11:12 00:09:16:17 00:03:10:21 00:03:15:25
+* FROM CLIP NAME: main-video.mp4
+
+016  MAIN-VID V     C        00:09:34:20 00:09:57:18 00:03:15:25 00:03:38:23
+* FROM CLIP NAME: main-video.mp4
+
+017  MAIN-VID V     C        00:10:00:27 00:10:14:11 00:03:38:23 00:03:52:07
+* FROM CLIP NAME: main-video.mp4
+
+018  MAIN-VID V     C        00:10:25:08 00:11:02:29 00:03:52:07 00:04:29:28
+* FROM CLIP NAME: main-video.mp4
+
+019  MAIN-VID V     C        00:11:29:14 00:11:35:09 00:04:29:28 00:04:35:24
+* FROM CLIP NAME: main-video.mp4
+
+020  MAIN-VID V     C        00:11:39:27 00:12:12:02 00:04:35:24 00:05:07:28
+* FROM CLIP NAME: main-video.mp4
+
+021  MAIN-VID V     C        00:12:13:09 00:12:24:03 00:05:07:28 00:05:18:22
+* FROM CLIP NAME: main-video.mp4
+
+022  MAIN-VID V     C        00:12:37:09 00:12:46:11 00:05:18:22 00:05:27:24
+* FROM CLIP NAME: main-video.mp4
+
+023  MAIN-VID V     C        00:12:49:24 00:13:04:12 00:05:27:24 00:05:42:12
+* FROM CLIP NAME: main-video.mp4
+
+024  MAIN-VID V     C        00:13:10:29 00:13:13:20 00:05:42:12 00:05:45:03
+* FROM CLIP NAME: main-video.mp4
+
+025  MAIN-VID V     C        00:13:21:09 00:13:29:15 00:05:45:03 00:05:53:09
+* FROM CLIP NAME: main-video.mp4
+
+026  MAIN-VID V     C        00:13:35:20 00:13:40:05 00:05:53:09 00:05:57:25
+* FROM CLIP NAME: main-video.mp4
+
+027  MAIN-VID V     C        00:13:40:09 00:13:51:17 00:05:57:25 00:06:09:02
+* FROM CLIP NAME: main-video.mp4
+
+028  MAIN-VID V     C        00:13:52:26 00:13:57:05 00:06:09:02 00:06:13:12
+* FROM CLIP NAME: main-video.mp4
+
+029  MAIN-VID V     C        00:14:00:11 00:14:14:05 00:06:13:12 00:06:27:07
+* FROM CLIP NAME: main-video.mp4
+
+030  MAIN-VID V     C        00:14:18:11 00:14:28:03 00:06:27:07 00:06:37:00
+* FROM CLIP NAME: main-video.mp4
+
+031  MAIN-VID V     C        00:14:31:17 00:15:15:26 00:06:37:00 00:07:21:09
+* FROM CLIP NAME: main-video.mp4
+
+032  MAIN-VID V     C        00:15:16:15 00:15:20:21 00:07:21:09 00:07:25:15
+* FROM CLIP NAME: main-video.mp4
+
+033  MAIN-VID V     C        00:15:24:20 00:15:39:05 00:07:25:15 00:07:40:00
+* FROM CLIP NAME: main-video.mp4
+
+034  MAIN-VID V     C        00:15:48:23 00:15:54:29 00:07:40:00 00:07:46:07
+* FROM CLIP NAME: main-video.mp4
+
+035  MAIN-VID V     C        00:16:00:12 00:16:13:20 00:07:46:07 00:07:59:14
+* FROM CLIP NAME: main-video.mp4
+
+036  MAIN-VID V     C        00:16:33:02 00:16:55:23 00:07:59:14 00:08:22:05
+* FROM CLIP NAME: main-video.mp4
+
+037  MAIN-VID V     C        00:17:02:02 00:17:06:21 00:08:22:05 00:08:26:25
+* FROM CLIP NAME: main-video.mp4
+
+038  MAIN-VID V     C        00:17:14:06 00:17:21:17 00:08:26:25 00:08:34:05
+* FROM CLIP NAME: main-video.mp4
+
+039  MAIN-VID V     C        00:17:35:25 00:17:47:05 00:08:34:05 00:08:45:14
+* FROM CLIP NAME: main-video.mp4
+
+040  MAIN-VID V     C        00:17:49:21 00:17:57:14 00:08:45:14 00:08:53:06
+* FROM CLIP NAME: main-video.mp4
+
+041  MAIN-VID V     C        00:18:05:04 00:18:10:29 00:08:53:06 00:08:59:00
+* FROM CLIP NAME: main-video.mp4
+
+042  MAIN-VID V     C        00:18:14:26 00:18:26:29 00:08:59:00 00:09:11:03
+* FROM CLIP NAME: main-video.mp4
+
+043  MAIN-VID V     C        00:18:34:27 00:18:42:11 00:09:11:03 00:09:18:17
+* FROM CLIP NAME: main-video.mp4
+
+044  MAIN-VID V     C        00:18:49:02 00:18:51:11 00:09:18:17 00:09:20:26
+* FROM CLIP NAME: main-video.mp4
+
+045  MAIN-VID V     C        00:18:54:28 00:19:00:11 00:09:20:26 00:09:26:08
+* FROM CLIP NAME: main-video.mp4
+
+046  MAIN-VID V     C        00:19:00:27 00:19:06:23 00:09:26:08 00:09:32:03
+* FROM CLIP NAME: main-video.mp4
+
+047  MAIN-VID V     C        00:19:09:15 00:19:20:12 00:09:32:03 00:09:43:00
+* FROM CLIP NAME: main-video.mp4
+
+048  MAIN-VID V     C        00:19:29:02 00:19:52:03 00:09:43:00 00:10:06:02
+* FROM CLIP NAME: main-video.mp4
+
+049  MAIN-VID V     C        00:19:53:15 00:20:09:29 00:10:06:02 00:10:22:16
+* FROM CLIP NAME: main-video.mp4
+
+050  MAIN-VID V     C        00:20:11:08 00:20:33:15 00:10:22:16 00:10:44:23
+* FROM CLIP NAME: main-video.mp4
+
+051  MAIN-VID V     C        00:20:37:12 00:20:39:23 00:10:44:23 00:10:47:04
+* FROM CLIP NAME: main-video.mp4
+
+052  MAIN-VID V     C        00:20:43:08 00:20:48:00 00:10:47:04 00:10:51:26
+* FROM CLIP NAME: main-video.mp4
+
+053  MAIN-VID V     C        00:20:57:06 00:21:01:05 00:10:51:26 00:10:55:24
+* FROM CLIP NAME: main-video.mp4
+
+054  MAIN-VID V     C        00:21:01:09 00:21:14:03 00:10:55:24 00:11:08:18
+* FROM CLIP NAME: main-video.mp4
+
+055  MAIN-VID V     C        00:21:20:14 00:21:32:17 00:11:08:18 00:11:20:21
+* FROM CLIP NAME: main-video.mp4
+
+056  MAIN-VID V     C        00:22:43:24 00:22:48:23 00:11:20:21 00:11:25:19
+* FROM CLIP NAME: main-video.mp4
+
