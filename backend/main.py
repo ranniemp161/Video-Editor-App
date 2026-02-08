@@ -11,7 +11,7 @@ import uvicorn
 import shutil
 from pathlib import Path
 
-from expert_editor import analyze_transcript
+# from expert_editor import analyze_transcript
 from word_timing import distribute_word_timestamps, refine_word_timestamps_with_audio, find_zero_crossing
 from professional_rough_cut_v2 import ProfessionalRoughCutV2
 from feedback_loop import FeedbackLoop
@@ -206,8 +206,16 @@ def delete_project(project_id: str, db: Session = Depends(get_db)):
         logger.error(f"Error deleting files for project {project_id}: {e}")
 
     # 2. Delete from DB
-    db.delete(db_project)
-    db.commit()
+    try:
+        # Explicitly delete segments first to avoid cascade issues or foreign key constraints
+        db.query(models.Segment).filter(models.Segment.projectId == project_id).delete()
+        
+        db.delete(db_project)
+        db.commit()
+    except Exception as e:
+        logger.error(f"Error deleting project from DB {project_id}: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error during deletion: {str(e)}")
     
     return {"success": True}
 
@@ -250,8 +258,8 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
         logger.info(f"Target Project ID: {request.projectId}")
     
     def parse_time(t_str):
-        # Supports 00:00:00.000 or 00:00:00,000 or 00:00.000
-        t_str = t_str.replace(',', '.')
+        # Supports 00:00:00.000 or 00:00:00,000 or 00:00.000 or 00:00.00
+        t_str = t_str.strip().replace(',', '.')
         try:
             parts = t_str.split(':')
             if len(parts) == 3:
@@ -260,7 +268,8 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
             elif len(parts) == 2:
                 m, s = parts
                 return int(m) * 60 + float(s)
-        except:
+        except Exception as e:
+            logger.warning(f"Failed to parse time '{t_str}': {e}")
             return 0.0
         return 0.0
 
@@ -280,8 +289,8 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
                     "end": w.get("end", 0) * 1000 if w.get("end", 0) < 10000 else w.get("end", 0),
                     "type": w.get("type", "speech")
                 })
-            from expert_editor import analyze_transcript
-            words = analyze_transcript(words)
+            # from expert_editor import analyze_transcript
+            # words = analyze_transcript(words)
             
             return {
                 "success": True, 
@@ -294,25 +303,62 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
         pass # Not JSON
 
     # Check for VTT-style timestamps
-    # Pattern: 00:00:41,366 --> 00:00:43,066
-    vtt_pattern = re.compile(r'(\d{1,2}:?\d{2}:\d{2}[.,]\d{3})\s-->\s(\d{1,2}:?\d{2}:\d{2}[.,]\d{3})')
+    # Pattern: 00:00:41,366 --> 00:00:43,066 (Flexible whitespace)
+    # Improved regex to support optional hours (MM:SS,mmm or H:MM:SS,mmm)
+    # Using non-capturing group (?:...) for optional hours part so that main groups remain 1 and 2
+    vtt_pattern = re.compile(r'((?:\d{1,2}:)?\d{1,2}:\d{2}[.,]\d{2,3})\s*-->\s*((?:\d{1,2}:)?\d{1,2}:\d{2}[.,]\d{2,3})')
     
+    # Handle UTF-8 BOM
+    if text.startswith('\ufeff'):
+        text = text[1:]
+        
     lines = text.split('\n')
-    has_vtt = any(vtt_pattern.search(line) for line in lines[:20]) # Check first 20 lines
+    has_vtt = any(vtt_pattern.search(line) for line in lines[:30]) # Check first 30 lines
     
     if has_vtt:
+        logger.info("Detected SRT/VTT format")
         current_start = 0.0
         current_end = 0.0
+        block_lines = []
         
         for line in lines:
             line = line.strip()
-            if not line: continue
+            if not line:
+                # End of block reached? Process accumulated lines for this timestamp
+                if block_lines and current_end > current_start:
+                    all_text = " ".join(block_lines)
+                    line_words = all_text.split()
+                    if line_words:
+                        smart_words = distribute_word_timestamps(
+                            sentence_start=current_start,
+                            sentence_end=current_end,
+                            words=line_words
+                        )
+                        words.extend(smart_words)
+                    block_lines = []
+                continue
             
             # Check for timestamp
             match = vtt_pattern.search(line)
             if match:
-                current_start = parse_time(match.group(1))
-                current_end = parse_time(match.group(2))
+                # If we had a previous block without a blank line separator, process it now
+                if block_lines and current_end > current_start:
+                    all_text = " ".join(block_lines)
+                    line_words = all_text.split()
+                    if line_words:
+                        smart_words = distribute_word_timestamps(
+                            sentence_start=current_start,
+                            sentence_end=current_end,
+                            words=line_words
+                        )
+                        words.extend(smart_words)
+                    block_lines = []
+                    
+                t1_str = match.group(1)
+                t2_str = match.group(2)
+                current_start = parse_time(t1_str)
+                current_end = parse_time(t2_str)
+                # logger.debug(f"Parsed timestamp: {t1_str} -> {t2_str} ({current_start} -> {current_end})")
                 continue
                 
             # If line is just numbers (cue ID), skip
@@ -322,40 +368,42 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
             # It's text content
             # Clean HTML tags if any
             line = re.sub(r'<[^>]+>', '', line)
-            
-            # Use smart word timing estimation based on syllables
-            line_words = line.split()
-            if not line_words: continue
-            
-            # Use syllable-based distribution
-            smart_words = distribute_word_timestamps(
-                sentence_start=current_start,
-                sentence_end=current_end,
-                words=line_words
-            )
-            
-            # Optional: Refine with audio if projectId is known
-            if request.projectId:
-                db = SessionLocal()
-                try:
-                    db_project = db.query(models.Project).filter(models.Project.id == request.projectId).first()
-                    if db_project:
-                        # Ensure we have audio
-                        wav_path = db_project.mediaPath + ".wav"
-                        if os.path.exists(wav_path):
-                            smart_words = refine_word_timestamps_with_audio(
-                                words=smart_words,
-                                audio_path=wav_path,
-                                start_sec=current_start,
-                                end_sec=current_end
-                            )
-                finally:
-                    db.close()
-            
-            words.extend(smart_words)
+            if line:
+                block_lines.append(line)
         
-        from expert_editor import analyze_transcript
-        words = analyze_transcript(words)
+        # Process final block if file doesn't end with blank line
+        if block_lines and current_end > current_start:
+            all_text = " ".join(block_lines)
+            line_words = all_text.split()
+            if line_words:
+                smart_words = distribute_word_timestamps(
+                    sentence_start=current_start,
+                    sentence_end=current_end,
+                    words=line_words
+                )
+                words.extend(smart_words)
+
+        # Optional: Refine with audio if projectId is known
+        if words and request.projectId:
+            db = SessionLocal()
+            try:
+                db_project = db.query(models.Project).filter(models.Project.id == request.projectId).first()
+                if db_project:
+                    wav_path = db_project.mediaPath + ".wav"
+                    if os.path.exists(wav_path):
+                        # Group by original sentence boundaries for better refinement?
+                        # For now, just pass all words
+                        words = refine_word_timestamps_with_audio(
+                            words=words,
+                            audio_path=wav_path,
+                            start_sec=words[0]['start']/1000,
+                            end_sec=words[-1]['end']/1000
+                        )
+            finally:
+                db.close()
+        
+        # from expert_editor import analyze_transcript
+        # words = analyze_transcript(words)
     else:
         # Fallback to crude splitting (e.g. for plain txt)
         raw_words = text.split()

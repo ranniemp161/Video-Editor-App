@@ -324,11 +324,17 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                     console.log('🎯 SEEK DEBUG: Word clicked at source time:', originalTime.toFixed(3), 'seconds');
 
                     // 1. Try to find precise clip
-                    const EPSILON = 0.001;
+                    const EPSILON = 0.05; // Widen epsilon to 50ms to handle boundary inaccuracies
 
                     for (const track of timeline.tracks) {
                       for (const clip of track.clips) {
-                        const matchesAsset = clip.assetId === activeTranscriptAsset?.id || clip.sourceFileName === activeTranscriptAsset?.name;
+                        // Better matching: Case-insensitive check and ID check
+                        const assetNameA = (clip.sourceFileName || clip.name || '').toLowerCase();
+                        const assetNameB = (activeTranscriptAsset?.name || '').toLowerCase();
+
+                        const matchesAsset = clip.assetId === activeTranscriptAsset?.id ||
+                          assetNameA === assetNameB ||
+                          (activeTranscriptAsset?.name && clip.sourceFileName?.includes(activeTranscriptAsset.name));
 
                         console.log(`  Checking clip: trimStart=${clip.trimStart.toFixed(2)}, trimEnd=${clip.trimEnd.toFixed(2)}, timelineStart=${clip.start.toFixed(2)}`);
 
@@ -354,7 +360,11 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                     // Find the nearest clip in the timeline that contains this source time range
                     const assetClips = timeline.tracks
                       .flatMap(t => t.clips)
-                      .filter(c => c.assetId === activeTranscriptAsset?.id || c.sourceFileName === activeTranscriptAsset?.name)
+                      .filter(c => {
+                        const assetNameA = (c.sourceFileName || c.name || '').toLowerCase();
+                        const assetNameB = (activeTranscriptAsset?.name || '').toLowerCase();
+                        return c.assetId === activeTranscriptAsset?.id || assetNameA === assetNameB;
+                      })
                       .sort((a, b) => a.start - b.start);
 
                     if (assetClips.length > 0) {

@@ -191,19 +191,22 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
 
     // OPTIMIZATION: Calculate originalTime ONCE per render
     const originalVideoTime = React.useMemo(() => {
-        const allClips = timeline.tracks.flatMap(t => t.clips);
-        if (allClips.length === 0) return playheadPosition;
+        if (!asset) return -1;
 
+        // Find the clip at the playhead
         for (const track of timeline.tracks) {
             for (const clip of track.clips) {
                 if (playheadPosition >= clip.start && playheadPosition <= clip.end) {
-                    const offsetInClip = playheadPosition - clip.start;
-                    return clip.trimStart + offsetInClip;
+                    // CRITICAL FIX: Only sync if this clip actually belongs to the current transcript asset
+                    if (clip.assetId === asset.id || clip.sourceFileName === asset.name) {
+                        const offsetInClip = playheadPosition - clip.start;
+                        return clip.trimStart + offsetInClip;
+                    }
                 }
             }
         }
         return -1;
-    }, [playheadPosition, timeline.tracks]);
+    }, [playheadPosition, timeline.tracks, asset]);
 
     // DYNAMIC VISIBILITY: Determine which parts of the asset are currently in the timeline
     const activeAssetRanges = React.useMemo(() => {

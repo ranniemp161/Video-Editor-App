@@ -5,6 +5,10 @@ import { TimelineState, Asset, TimelineClip } from '../types';
 const basename = (path: string) => path.split(/[\\/]/).pop() || '';
 const FRAME_DURATION = 0.04; // 25fps default
 
+// Deployment Support: Use provided VITE_API_URL or fallback to /api for proxy
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+console.log('[Config] Using API Base:', API_BASE);
+
 export const useTimeline = () => {
   const [timeline, setTimeline] = useState<TimelineState>({
     tracks: [
@@ -168,7 +172,7 @@ export const useTimeline = () => {
 
       try {
         console.log("Uploading to backend...");
-        const res = await fetch('/api/upload', {
+        const res = await fetch(`${API_BASE}/upload`, {
           method: 'POST',
           body: formData,
         });
@@ -191,7 +195,7 @@ export const useTimeline = () => {
   const transcribeProject = useCallback(async (pId: string) => {
     setIsTranscribing(pId);
     try {
-      const res = await fetch(`/api/project/${pId}/transcribe`, { method: 'POST' });
+      const res = await fetch(`${API_BASE}/project/${pId}/transcribe`, { method: 'POST' });
       const result = await res.json();
       if (result.success) {
         setSegments(result.segments);
@@ -230,7 +234,7 @@ export const useTimeline = () => {
       // Apply minimal padding? (Logic can go here later)
 
       newClips.push({
-        id: `seg-${idx}-${Date.now()}`,
+        id: `seg - ${idx} - ${Date.now()}`,
         assetId: assetId,
         trackId: 'v1',
         name: seg.text || 'Clip',
@@ -270,7 +274,7 @@ export const useTimeline = () => {
 
     // Sync to Backend
     try {
-      await fetch(`/api/project/${projectId}/segments`, {
+      await fetch(`${API_BASE}/project/${projectId}/segments`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newSegments)
@@ -291,7 +295,7 @@ export const useTimeline = () => {
     }
 
     try {
-      const res = await fetch(`/api/project/${projectId}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/project/${projectId}`, { method: 'DELETE' });
       if (res.ok) {
         // Reset Frontend State
         setProjectId(null);
@@ -334,7 +338,7 @@ export const useTimeline = () => {
 
     const fetchSegments = async () => {
       try {
-        const res = await fetch(`/api/project/${projectId}`);
+        const res = await fetch(`${API_BASE}/project/${projectId}`);
         if (!res.ok) {
           // If 404, maybe backend restarted? Clear storage
           if (res.status === 404) {
@@ -373,14 +377,14 @@ export const useTimeline = () => {
 
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/transcription-progress?videoPath=/${fileName}`);
+        const res = await fetch(`${API_BASE}/transcription-progress?videoPath=/${fileName}`);
         const data = await res.json();
         setTranscriptionProgress(data.progress || 0);
       } catch (e) { console.error(e); }
     }, 1000);
 
     try {
-      const response = await fetch('/api/transcribe', {
+      const response = await fetch(`${API_BASE}/transcribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoPath: `/${fileName}`, duration: asset.duration })
@@ -407,7 +411,7 @@ export const useTimeline = () => {
     if (!asset || !asset.transcription) return;
 
     try {
-      const response = await fetch('/api/auto-cut', {
+      const response = await fetch(`${API_BASE}/auto-cut`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -509,7 +513,7 @@ export const useTimeline = () => {
     };
 
     try {
-      const response = await fetch('/api/render', {
+      const response = await fetch(`${API_BASE}/render`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -519,7 +523,7 @@ export const useTimeline = () => {
         // Start polling progress
         const pollInterval = setInterval(async () => {
           try {
-            const progressRes = await fetch('/api/render-progress');
+            const progressRes = await fetch(`${API_BASE}/render-progress`);
             const progressData = await progressRes.json();
             setRenderProgress(progressData.progress);
 
@@ -557,7 +561,7 @@ export const useTimeline = () => {
     };
 
     try {
-      const response = await fetch('/api/export-xml', {
+      const response = await fetch(`${API_BASE}/export-xml`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -590,7 +594,7 @@ export const useTimeline = () => {
     };
 
     try {
-      const response = await fetch('/api/export-edl', {
+      const response = await fetch(`${API_BASE}/export-edl`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -1182,7 +1186,7 @@ export const useTimeline = () => {
 
   const exportTranscript = useCallback(async (transcription: any) => {
     try {
-      const response = await fetch('/api/export-transcript', {
+      const response = await fetch(`${API_BASE}/export-transcript`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1228,12 +1232,21 @@ export const useTimeline = () => {
   const uploadTranscript = useCallback(async (assetId: string, file: File) => {
     try {
       const content = await file.text();
-      const response = await fetch('/api/upload-transcript', {
+      console.log('📤 Uploading transcript:', file.name, 'size:', content.length, 'projectId:', projectId);
+      const response = await fetch(`${API_BASE}/upload-transcript`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, fileName: file.name, projectId })
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Transcript upload failed:', response.status, errorText);
+        throw new Error(`Upload failed with status ${response.status}: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('✅ Transcript upload response:', result);
       if (result.success) {
         const transcriptionWithSource = {
           ...result.transcription,

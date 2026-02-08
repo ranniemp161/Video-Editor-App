@@ -17,12 +17,31 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     server: {
-      port: 3000,
+      port: 5173,
+      strictPort: true,
       host: '0.0.0.0',
       allowedHosts: true,
+      hmr: {
+        overlay: false,
+        clientPort: 3000
+      },
+      watch: {
+        usePolling: true,
+        ignored: [
+          '**/public/renders/**',
+          '**/public/exports/**',
+          '**/backend/**',
+          '**/data/**',
+          '**/*.log',
+          '**/*.txt',
+          '**/*.py',
+          '**/*.pyc',
+          '**/.git/**'
+        ]
+      },
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: env.API_URL || 'http://localhost:8000',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         }
