@@ -10,10 +10,16 @@ if (!rootElement) {
 }
 
 
-const MAX_RELOADS = 5;
-const RELOAD_RESET_TIME = 5000; // 5 seconds
-
+// Reload loop detection - disabled in development to prevent false positives from HMR
 const checkReloadLoop = () => {
+  // Skip in development mode - HMR naturally causes rapid reloads
+  if (import.meta.env.DEV) {
+    return;
+  }
+
+  const MAX_RELOADS = 10;  // Increased threshold
+  const RELOAD_RESET_TIME = 3000; // Reduced window
+
   const lastReload = parseInt(sessionStorage.getItem('last_reload_time') || '0', 10);
   const reloadCount = parseInt(sessionStorage.getItem('reload_count') || '0', 10);
   const now = Date.now();
@@ -25,11 +31,11 @@ const checkReloadLoop = () => {
 
     if (newCount > MAX_RELOADS) {
       console.error("🚨 POTENTIAL INFINITE RELOAD LOOP DETECTED 🚨");
-      // Stop execution
+      sessionStorage.removeItem('reload_count');
+      sessionStorage.removeItem('last_reload_time');
       throw new Error(`Infinite Reload Loop Detected! App has reloaded ${newCount} times in under ${RELOAD_RESET_TIME / 1000}s.`);
     }
   } else {
-    // Reset if enough time has passed
     sessionStorage.setItem('reload_count', '1');
     sessionStorage.setItem('last_reload_time', now.toString());
   }

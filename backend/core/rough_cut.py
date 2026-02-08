@@ -825,7 +825,7 @@ class ProfessionalRoughCutV2:
                 all_words.append(self.words[idx])
 
         # 2. Run ThoughtGrouper
-        from thought_grouper import ThoughtGrouper
+        from .thought_grouper import ThoughtGrouper
         grouper = ThoughtGrouper(all_words)
         thoughts = grouper.group_into_thoughts()
 

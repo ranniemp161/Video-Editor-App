@@ -2,7 +2,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import { MediaPool } from '@/components/MediaPool';
 import { Preview } from '@/components/Preview';
-import { Timeline } from '@/components/Timeline';
+import { Timeline } from '@/components/timeline';
 import { PlaybackControls } from '@/components/PlaybackControls';
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';

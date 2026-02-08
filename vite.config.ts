@@ -22,8 +22,7 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       allowedHosts: true,
       hmr: {
-        overlay: false,
-        clientPort: 3000
+        overlay: false
       },
       watch: {
         usePolling: true,
