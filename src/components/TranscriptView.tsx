@@ -16,7 +16,9 @@ interface TranscriptViewProps {
     onToggleWord?: (start: number) => void;
     onDeleteRange?: (start: number, end: number) => void;
     onRestoreRange?: (start: number, end: number) => void;
-    timeline: TimelineState; // Use TimelineState type
+    timeline: TimelineState;
+    transcriptOffset?: number; // Time offset for SRT calibration (seconds)
+    onOffsetChange?: (offset: number) => void; // Callback to update offset
 }
 
 // Optimized Word Component to prevent 50,000 re-renders per frame
@@ -71,7 +73,9 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     onToggleWord,
     onDeleteRange,
     onRestoreRange,
-    timeline
+    timeline,
+    transcriptOffset = 0,
+    onOffsetChange
 }) => {
     // ALL HOOKS MUST BE AT THE TOP - React Rules of Hooks
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -406,6 +410,29 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                         >
                             TXT
                         </button>
+                    )}
+                    {/* Offset Calibration Control */}
+                    {onOffsetChange && (
+                        <>
+                            <div className="w-[1px] h-3 bg-white/5"></div>
+                            <div className="flex items-center gap-1" title="Adjust if SRT timing is off from video">
+                                <button
+                                    onClick={() => onOffsetChange(transcriptOffset - 0.1)}
+                                    className="text-[9px] text-gray-500 hover:text-white px-1 py-0.5 rounded hover:bg-white/5 transition-colors"
+                                >
+                                    −
+                                </button>
+                                <span className="text-[8px] text-gray-500 font-mono min-w-[40px] text-center">
+                                    {transcriptOffset === 0 ? 'SYNC' : `${transcriptOffset > 0 ? '+' : ''}${transcriptOffset.toFixed(1)}s`}
+                                </span>
+                                <button
+                                    onClick={() => onOffsetChange(transcriptOffset + 0.1)}
+                                    className="text-[9px] text-gray-500 hover:text-white px-1 py-0.5 rounded hover:bg-white/5 transition-colors"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
