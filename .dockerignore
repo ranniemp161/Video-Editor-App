@@ -7,7 +7,7 @@ build/
 public/uploads/
 public/exports/
 public/temp/
-
+public/temp_renders/
 # Environment files
 .env
 .env.local
