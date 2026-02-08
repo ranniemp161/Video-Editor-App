@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           projectId: 'default_project',
-          timeline: timelineState
+          finalTimeline: timelineState  // Fixed: was 'timeline', backend expects 'finalTimeline'
         })
       });
       const data = await res.json();
