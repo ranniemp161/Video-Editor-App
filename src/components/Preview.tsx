@@ -10,34 +10,49 @@ interface PreviewProps {
 
 export const Preview: React.FC<PreviewProps> = ({ clip, playheadPosition, isPlaying }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSeekTimeRef = useRef<number>(0);
+  const lastClipIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (clip && clip.asset && clip.asset.src) {
+      // Change video source only if clip changed
       if (video.src !== clip.asset.src) {
         video.src = clip.asset.src;
+        lastClipIdRef.current = clip.clip.id;
       }
 
       const clipTime = playheadPosition - clip.clip.start + clip.clip.trimStart;
-      const threshold = isPlaying ? 0.5 : 0.1;
 
-      if (Math.abs(video.currentTime - clipTime) > threshold) {
+      // Use different thresholds for playing vs scrubbing
+      // When playing: only seek if drift is > 0.5s (let video play naturally)
+      // When scrubbing/paused: seek more precisely (0.1s threshold)
+      const threshold = isPlaying ? 0.5 : 0.1;
+      const timeDrift = Math.abs(video.currentTime - clipTime);
+
+      // Prevent seek spam - minimum 50ms between seeks when scrubbing
+      const now = performance.now();
+      const canSeek = isPlaying || (now - lastSeekTimeRef.current > 50);
+
+      if (timeDrift > threshold && canSeek) {
         video.currentTime = clipTime;
+        lastSeekTimeRef.current = now;
       }
 
       video.volume = (clip.clip.volume ?? 100) / 100;
       video.style.opacity = ((clip.clip.opacity ?? 100) / 100).toString();
 
       if (isPlaying && video.paused) {
-        video.play().catch(e => console.error("Playback error:", e));
+        video.play().catch(() => { }); // Silently ignore play errors
       } else if (!isPlaying && !video.paused) {
         video.pause();
       }
     } else {
       video.pause();
       if (video.src) video.src = '';
+      lastClipIdRef.current = null;
     }
   }, [clip, playheadPosition, isPlaying]);
 

@@ -7,7 +7,6 @@ const FRAME_DURATION = 0.04; // 25fps default
 
 // Deployment Support: Use provided VITE_API_URL or fallback to /api for proxy
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
-console.log('[Config] Using API Base:', API_BASE);
 
 export const useTimeline = () => {
   const [timeline, setTimeline] = useState<TimelineState>({

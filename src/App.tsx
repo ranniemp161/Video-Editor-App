@@ -328,16 +328,21 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                     // Apply transcript offset if calibration is needed (uses state)
                     const adjustedSourceTime = sourceTime + transcriptOffset;
 
-                    console.log('🎯 SEEK DEBUG: Word clicked at source time:', adjustedSourceTime.toFixed(3), 'seconds');
+                    // Debug logging removed for performance
 
                     const EPSILON = 0.1; // 100ms tolerance for boundary matching
 
+                    // FIX: Use assets[0] directly instead of activeTranscriptAsset
+                    // activeTranscriptAsset depends on currentClip which depends on playheadPosition,
+                    // causing it to be stale on first click. assets[0] is stable.
+                    const targetAsset = assets[0] || activeTranscriptAsset;
+
                     // Helper to check if a clip matches the current transcript asset
                     const clipMatchesAsset = (clip: any) => {
-                      if (!activeTranscriptAsset) return false;
+                      if (!targetAsset) return false;
                       const clipName = (clip.sourceFileName || clip.name || '').toLowerCase();
-                      const assetName = (activeTranscriptAsset.name || '').toLowerCase();
-                      return clip.assetId === activeTranscriptAsset.id ||
+                      const assetName = (targetAsset.name || '').toLowerCase();
+                      return clip.assetId === targetAsset.id ||
                         clipName === assetName ||
                         clipName.includes(assetName) ||
                         assetName.includes(clipName);
@@ -350,7 +355,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                       .sort((a, b) => a.start - b.start);
 
                     if (assetClips.length === 0) {
-                      console.log('⚠️ No clips found for this asset');
+                      // No clips found for asset
                       return;
                     }
 
@@ -359,7 +364,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                       const isWithinTrimRange = adjustedSourceTime >= (clip.trimStart - EPSILON) &&
                         adjustedSourceTime <= (clip.trimEnd + EPSILON);
 
-                      console.log(`  Clip: timeline=${clip.start.toFixed(2)}-${clip.end.toFixed(2)}, source=${clip.trimStart.toFixed(2)}-${clip.trimEnd.toFixed(2)}, match=${isWithinTrimRange}`);
+
 
                       if (isWithinTrimRange) {
                         // Calculate timeline position from source time
@@ -369,7 +374,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                         // Clamp to clip boundaries
                         const finalPosition = Math.max(clip.start, Math.min(clip.end, timelinePosition));
 
-                        console.log('✅ FOUND! Seeking to timeline:', finalPosition.toFixed(3));
+
                         setPlayheadPosition(finalPosition);
                         return;
                       }
@@ -377,7 +382,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
                     // PASS 2: Source time is outside all visible clips (word was cut out)
                     // Find the nearest clip boundary
-                    console.log('⚠️ Source time not in any visible clip, finding nearest...');
+
 
                     let bestClip = null;
                     let bestDistance = Infinity;
@@ -402,7 +407,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                     if (bestClip) {
                       // Seek to the nearest edge of the nearest clip
                       const targetPosition = seekToStart ? bestClip.start : bestClip.end - 0.05;
-                      console.log(`📍 Seeking to ${seekToStart ? 'start' : 'end'} of nearest clip:`, targetPosition.toFixed(3));
+
                       setPlayheadPosition(Math.max(0, targetPosition));
                     }
                   }}
