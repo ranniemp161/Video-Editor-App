@@ -1,6 +1,9 @@
 import React from 'react';
 import { MenuIcon } from './icons';
 
+// Deployment Support: Use VITE_API_URL for cloud, fallback to /api for local proxy
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 interface HeaderProps {
   onImportClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   renderToMP4: () => void;
@@ -34,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
 
     setIsTraining(true);
     try {
-      const res = await fetch('/api/train-feedback', {
+      const res = await fetch(`${API_BASE}/train-feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

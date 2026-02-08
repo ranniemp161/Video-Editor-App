@@ -1270,7 +1270,7 @@ export const useTimeline = () => {
           // Don't regenerate timeline - user's existing cuts should be preserved!
 
           // Sync segments to backend (for transcript data only)
-          fetch(`/api/project/${projectId}/segments`, {
+          fetch(`${API_BASE}/project/${projectId}/segments`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newSegments)
