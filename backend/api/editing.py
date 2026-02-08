@@ -3,12 +3,14 @@ import os
 import time
 import logging
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 
-from db import SessionLocal, Project
+from db import SessionLocal, Project, RoughCutResult, get_db
 from schemas import AutoCutRequest, AnalyzeThoughtsRequest, TrainFeedbackRequest
 from core import ProfessionalRoughCutV2, ThoughtGrouper, find_zero_crossing
 from feedback_loop import FeedbackLoop
+from background_tasks import start_background_task, get_task_status
 
 logger = logging.getLogger(__name__)
 
@@ -105,11 +107,71 @@ async def auto_cut(request: AutoCutRequest):
     
     logger.info(f"Created {len(clips)} timeline clips")
     
+    # Save rough cut results to database for session recovery
+    db = SessionLocal()
+    try:
+        # Delete existing result if any
+        db.query(RoughCutResult).filter(RoughCutResult.projectId == request.asset.id).delete()
+        
+        # Create new result
+        rough_cut_result = RoughCutResult(
+            projectId=request.asset.id,
+            clips=clips,
+            statistics=stats,
+            status="completed",
+            createdAt=time.time(),
+            completedAt=time.time()
+        )
+        db.add(rough_cut_result)
+        db.commit()
+        logger.info(f"Saved rough cut results to database for project {request.asset.id}")
+    except Exception as e:
+        logger.error(f"Failed to save rough cut results: {e}")
+        db.rollback()
+    finally:
+        db.close()
+    
     return {
         "clips": clips,
         "words": request.words,
         "statistics": stats
     }
+
+
+@router.get("/rough-cut-status/{project_id}")
+async def get_rough_cut_status(project_id: str, db: Session = Depends(get_db)):
+    """Get saved rough cut results for a project (for session recovery)."""
+    result = db.query(RoughCutResult).filter(RoughCutResult.projectId == project_id).first()
+    
+    if not result:
+        return {"found": False}
+    
+    return {
+        "found": True,
+        "clips": result.clips,
+        "statistics": result.statistics,
+        "status": result.status,
+        "createdAt": result.createdAt,
+        "completedAt": result.completedAt
+    }
+
+
+@router.get("/processing-status/{task_id}")
+async def get_processing_status(task_id: str):
+    """Get the status of a background processing task."""
+    status = get_task_status(task_id)
+    
+    if not status:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return status
+
+
+@router.delete("/cleanup-project/{project_id}")
+async def cleanup_project(project_id: str, db: Session = Depends(get_db)):
+    """Delete project files and database records."""
+    from api.projects import delete_project
+    return delete_project(project_id, db)
 
 
 @router.post("/analyze-thoughts")
@@ -180,7 +242,7 @@ def seconds_to_timecode(seconds: float, fps: int = 30) -> str:
 
 
 @router.post("/export-edl")
-async def export_edl(request: ExportEDLRequest):
+async def export_edl(request: ExportEDLRequest, cleanup: bool = False, db: Session = Depends(get_db)):
     """
     Export timeline as CMX 3600 EDL format for DaVinci Resolve.
     Returns the EDL file content directly as a downloadable file.
@@ -251,6 +313,17 @@ async def export_edl(request: ExportEDLRequest):
     
     logger.info(f"EDL Export: Generated {len(video_clips)} events")
     
+    # Cleanup project files if requested
+    if cleanup and video_clips:
+        # Get project ID from first asset
+        first_asset_id = video_clips[0].assetId
+        try:
+            from api.projects import delete_project
+            delete_project(first_asset_id, db)
+            logger.info(f"Cleaned up project {first_asset_id} after EDL export")
+        except Exception as e:
+            logger.error(f"Failed to cleanup project after export: {e}")
+    
     return Response(
         content=edl_content,
         media_type="text/plain",
@@ -261,7 +334,7 @@ async def export_edl(request: ExportEDLRequest):
 
 
 @router.post("/export-xml")
-async def export_xml(request: ExportXMLRequest):
+async def export_xml(request: ExportXMLRequest, cleanup: bool = False, db: Session = Depends(get_db)):
     """
     Export timeline as FCP 7 XML format for DaVinci Resolve.
     Returns the XML file content directly as a downloadable file.
@@ -336,6 +409,17 @@ async def export_xml(request: ExportXMLRequest):
     xml_content = "\n".join(xml_lines)
     
     logger.info(f"XML Export: Generated {len(video_clips)} clips")
+    
+    # Cleanup project files if requested
+    if cleanup and video_clips:
+        # Get project ID from first asset
+        first_asset_id = video_clips[0].assetId
+        try:
+            from api.projects import delete_project
+            delete_project(first_asset_id, db)
+            logger.info(f"Cleaned up project {first_asset_id} after XML export")
+        except Exception as e:
+            logger.error(f"Failed to cleanup project after export: {e}")
     
     return Response(
         content=xml_content,

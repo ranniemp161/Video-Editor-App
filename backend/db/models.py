@@ -1,5 +1,5 @@
 # SQLAlchemy ORM models
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -15,6 +15,7 @@ class Project(Base):
     createdAt = Column(Float)  # Timestamp
 
     segments = relationship("Segment", back_populates="project", cascade="all, delete-orphan")
+    rough_cut_result = relationship("RoughCutResult", back_populates="project", cascade="all, delete-orphan", uselist=False)
 
 
 class Segment(Base):
@@ -30,3 +31,18 @@ class Segment(Base):
     isDeleted = Column(Boolean, default=False)
 
     project = relationship("Project", back_populates="segments")
+
+
+class RoughCutResult(Base):
+    """Store rough cut processing results for session recovery."""
+    __tablename__ = "rough_cut_results"
+
+    id = Column(Integer, primary_key=True, index=True)
+    projectId = Column(String, ForeignKey("projects.id"), unique=True)
+    clips = Column(JSON)  # Stores the array of timeline clips
+    statistics = Column(JSON)  # Stores rough cut statistics
+    status = Column(String, default="pending")  # pending, processing, completed, failed
+    createdAt = Column(Float)
+    completedAt = Column(Float, nullable=True)
+
+    project = relationship("Project", back_populates="rough_cut_result")

@@ -301,6 +301,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         deleteProject={deleteProject}
         timelineState={timeline}
         onLogout={onLogout}
+        hasActiveProject={assets.length > 0}
       />
 
       <div className="flex-grow flex overflow-hidden">
