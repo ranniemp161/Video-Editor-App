@@ -1,5 +1,10 @@
 # Node modules (will be installed in container)
 node_modules/
+.venv/
+venv/
+env/
+ENV/
+
 
 # Build output
 dist/
