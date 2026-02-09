@@ -46,7 +46,10 @@ class RoughCutModel:
             'sentiment_positive', 'sentiment_negative', 'sentiment_subjectivity',
             
             # New contextual features (2)
-            'position_in_video', 'time_since_last_cut'
+            'position_in_video', 'time_since_last_cut',
+            
+            # New audio features (4)
+            'avg_energy', 'energy_variance', 'avg_pitch', 'pitch_stability'
         ]
         
         self.load_model()
@@ -113,7 +116,7 @@ class RoughCutModel:
         # Save
         self.save_model()
 
-    def predict(self, segment: dict, prev_segment: dict = None, next_segment: dict = None) -> float:
+    def predict(self, segment: dict, prev_segment: dict = None, next_segment: dict = None, audio_features: dict = None) -> float:
         """
         Predict probability that a segment should be CUT.
         Returns: float (0.0 to 1.0)
@@ -121,7 +124,7 @@ class RoughCutModel:
         if not self.model:
             return 0.0 # Default to KEEP if no model
             
-        features = self.extractor.extract_features(segment, prev_segment, next_segment)
+        features = self.extractor.extract_features(segment, prev_segment, next_segment, audio_features)
         feature_vector = [features.get(name, 0.0) for name in self.feature_names]
         
         # Reshape for single prediction

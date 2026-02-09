@@ -12,6 +12,7 @@ interface TranscriptViewProps {
     onExport: (transcription: Transcription) => void;
     onUploadTranscript: (assetId: string, file: File) => void;
     isTranscribing: boolean;
+    isAutoCutting?: boolean;
     progress?: number;
     onToggleWord?: (start: number) => void;
     onDeleteRange?: (start: number, end: number) => void;
@@ -19,6 +20,8 @@ interface TranscriptViewProps {
     timeline: TimelineState;
     transcriptOffset?: number; // Time offset for SRT calibration (seconds)
     onOffsetChange?: (offset: number) => void; // Callback to update offset
+    activeAssetRanges?: Array<{ start: number; end: number }>;
+    wordInclusionStatus?: boolean[];
 }
 
 // Optimized Word Component to prevent 50,000 re-renders per frame
@@ -42,7 +45,7 @@ const TranscriptWord = React.memo(({
             className={`transcript-word cursor-pointer px-2 py-0.5 rounded-sm transition-all duration-75 text-sm border border-transparent
                   ${isSelected ? 'bg-[#26c6da] text-[#0f0f0f] font-bold' : ''}
                   ${!isIncluded && !isSelected
-                    ? 'text-red-500/40 opacity-40 line-through decoration-red-500/30'
+                    ? 'text-red-500/80 bg-red-500/10 line-through decoration-red-500/50'
                     : !isSelected ? 'text-[#fafafa] hover:bg-white/5 hover:text-white' : ''}
                 `}
             title={`${formatTime(word.start / 1000)}`}
@@ -55,7 +58,9 @@ const TranscriptWord = React.memo(({
     return (
         prev.isIncluded === next.isIncluded &&
         prev.isSelected === next.isSelected &&
-        prev.word === next.word // Word object reference usually stable
+        prev.word === next.word &&
+        prev.handleWordClick === next.handleWordClick &&
+        prev.handleContextMenu === next.handleContextMenu
     );
 });
 TranscriptWord.displayName = 'TranscriptWord';
@@ -69,13 +74,16 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     onExport,
     onUploadTranscript,
     isTranscribing,
+    isAutoCutting = false,
     progress = 0,
     onToggleWord,
     onDeleteRange,
     onRestoreRange,
     timeline,
     transcriptOffset = 0,
-    onOffsetChange
+    onOffsetChange,
+    activeAssetRanges = [],
+    wordInclusionStatus = []
 }) => {
     // ALL HOOKS MUST BE AT THE TOP - React Rules of Hooks
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -212,26 +220,8 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
         return -1;
     }, [playheadPosition, timeline.tracks, asset]);
 
-    // DYNAMIC VISIBILITY: Determine which parts of the asset are currently in the timeline
-    const activeAssetRanges = React.useMemo(() => {
-        if (!asset) return [];
-        return timeline.tracks.flatMap(t => t.clips)
-            .filter(c => c.assetId === asset.id || c.sourceFileName === asset.name)
-            .map(c => ({ start: c.trimStart, end: c.trimEnd }));
-    }, [asset, timeline.tracks]);
-
-    // OPTIMIZATION: Pre-calculate inclusion status for ALL words when timeline changes
-    // This prevents O(N*M) calculations on every frame inside the render loop
-    const wordInclusionStatus = React.useMemo(() => {
-        if (activeAssetRanges.length === 0) return new Array(words.length).fill(false);
-
-        return words.map(word => {
-            const wordStart = word.start / 1000;
-            const wordEnd = word.end / 1000;
-            const midPoint = (wordStart + wordEnd) / 2;
-            return activeAssetRanges.some(range => midPoint >= range.start - 0.05 && midPoint <= range.end + 0.05);
-        });
-    }, [words, activeAssetRanges]);
+    // Inclusion ranges and status now received as props from App.tsx 
+    // to centralize timeline-sync logic and allow actions to use the same logic.
 
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && asset) {
@@ -308,20 +298,63 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
         );
     }
 
-    if (isTranscribing) {
+    if (isTranscribing || isAutoCutting) {
         return (
-            <div className="flex-grow flex flex-col items-center justify-center gap-4 p-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#26c6da]"></div>
-                <div className="text-gray-400 text-xs font-medium animate-pulse text-center">
-                    Transcribing Video...
-                    <div className="text-[#26c6da] font-bold text-lg mt-1">{progress}%</div>
+            <div className="flex-grow flex flex-col p-6 overflow-hidden">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="h-4 w-24 bg-white/10 rounded animate-pulse"></div>
+                        <div className="h-4 w-16 bg-white/5 rounded-full animate-pulse"></div>
+                    </div>
+                    <div className="h-6 w-20 bg-white/5 rounded animate-pulse"></div>
                 </div>
-                {/* Progress Bar Track */}
-                <div className="w-48 h-1.5 bg-[#252525] rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-[#26c6da] transition-all duration-300 ease-out"
-                        style={{ width: `${progress}%` }}
-                    ></div>
+
+                <div className="flex flex-col gap-6">
+                    {/* Progress Info */}
+                    <div className="flex flex-col items-center justify-center gap-3 py-4">
+                        <div className="relative w-12 h-12 flex items-center justify-center">
+                            <div className="absolute inset-0 border-2 border-[#26c6da33] rounded-full"></div>
+                            <div className="absolute inset-0 border-2 border-[#26c6da] border-t-transparent rounded-full animate-spin"></div>
+                            {isTranscribing && <span className="text-[10px] font-bold text-[#26c6da]">{progress}%</span>}
+                        </div>
+                        <div className="text-center">
+                            <div className="text-xs font-bold text-[#fafafa] uppercase tracking-widest mb-1">
+                                {isTranscribing ? 'Transcribing Audio' : 'AI Auto-Cutting'}
+                            </div>
+                            <div className="text-[10px] text-gray-500 animate-pulse">
+                                {isTranscribing ? 'Converting speech to text...' : 'Analyzing repetitions and fluff...'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Skeleton Word Blocks */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-4">
+                        {[...Array(40)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-4 bg-white/5 rounded animate-pulse"
+                                style={{
+                                    width: `${Math.random() * 40 + 40}px`,
+                                    animationDelay: `${i * 0.05}s`,
+                                    opacity: Math.random() * 0.5 + 0.3
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-wrap gap-x-3 gap-y-4 opacity-60">
+                        {[...Array(30)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-4 bg-white/5 rounded animate-pulse"
+                                style={{
+                                    width: `${Math.random() * 50 + 30}px`,
+                                    animationDelay: `${(i + 40) * 0.05}s`,
+                                    opacity: Math.random() * 0.4 + 0.2
+                                }}
+                            ></div>
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -442,6 +475,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                     <ThoughtListView
                         thoughts={asset.transcription.thoughts.thoughts}
                         currentTime={playheadPosition}
+                        activeAssetRanges={activeAssetRanges}
                         onSeek={onSeek}
                     />
                 ) : (

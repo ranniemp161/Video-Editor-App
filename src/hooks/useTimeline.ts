@@ -55,6 +55,7 @@ export const useTimeline = () => {
   const [renderProgress, setRenderProgress] = useState(0);
   const [lastRenderPath, setLastRenderPath] = useState<string | null>(null);
   const [isTranscribing, setIsTranscribing] = useState<string | null>(null); // Asset ID being transcribed
+  const [isAutoCutting, setIsAutoCutting] = useState(false);
 
   // New Backend Integration State
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -453,6 +454,7 @@ export const useTimeline = () => {
     const asset = assets.find(a => a.id === assetId);
     if (!asset || !asset.transcription) return;
 
+    setIsAutoCutting(true);
     try {
       const response = await fetch(`${API_BASE}/auto-cut`, {
         method: 'POST',
@@ -498,6 +500,8 @@ export const useTimeline = () => {
       }
     } catch (err) {
       console.error('Auto-cut failed:', err);
+    } finally {
+      setIsAutoCutting(false);
     }
   }, [assets]);
 
@@ -1531,6 +1535,7 @@ export const useTimeline = () => {
     canUndo: past.length > 0,
     canRedo: future.length > 0,
     isTranscribing,
+    isAutoCutting,
     transcribeAsset,
     autoCutAsset,
     exportToXML,

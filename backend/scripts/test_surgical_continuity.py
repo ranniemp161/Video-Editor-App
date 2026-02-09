@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 # Add backend to path
 sys.path.append(os.path.join(os.getcwd(), 'backend'))
 
-from professional_rough_cut_v2 import ProfessionalRoughCutV2
+from core.rough_cut import ProfessionalRoughCutV2
 
 def test_surgical_continuity():
     # Case 1: Dangling Segment
@@ -55,10 +55,10 @@ def test_surgical_continuity():
     res1 = rc1.analyze()
     final_text = " ".join([s['text'] for s in res1])
     print(f"Result Text: \"{final_text}\"")
-    if "almost" not in final_text and "mistake." in final_text:
-        print("✅ SUCCESS: Surgically trimmed dangling 'you are almost'.")
+    if "you are almost" not in final_text and "a big mistake." in final_text:
+        print("[SUCCESS]: Surgically trimmed dangling 'you are almost'.")
     else:
-        print("❌ FAIL: Dangling thought still present.")
+        print(f"[FAIL]: Surgical trim failed. Got: '{final_text}'")
 
     print("\n--- Testing Incremental Take (False Start) ---")
     rc2 = ProfessionalRoughCutV2(case2_words)
@@ -68,9 +68,9 @@ def test_surgical_continuity():
         print(f"  {i}: {s['text']}")
     
     if len(res2) == 1 and "in one" in res2[0]['text']:
-        print("✅ SUCCESS: Discarded false start, kept complete take.")
+        print("[SUCCESS]: Discarded false start, kept complete take.")
     else:
-        print("❌ FAIL: False start was not discarded or both were kept.")
+        print("[FAIL]: False start was not discarded or both were kept.")
 
 if __name__ == "__main__":
     test_surgical_continuity()

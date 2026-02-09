@@ -41,7 +41,19 @@ async def auto_cut(request: AutoCutRequest):
         normalized_words.append(nw)
 
     # Run Professional Rough Cut Analysis
-    rough_cut = ProfessionalRoughCutV2(normalized_words)
+    video_path = None
+    db = SessionLocal()
+    try:
+        db_project = db.query(Project).filter(Project.id == request.asset.id).first()
+        if db_project:
+            video_path = db_project.mediaPath
+            logger.info(f"Auto-cut: Found video path for analysis: {video_path}")
+    except Exception as e:
+        logger.warning(f"Auto-cut: Could not find video path: {e}")
+    finally:
+        db.close()
+
+    rough_cut = ProfessionalRoughCutV2(normalized_words, video_path=video_path)
     segments = rough_cut.analyze()
     stats = rough_cut.get_statistics()
     

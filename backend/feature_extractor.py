@@ -45,10 +45,11 @@ class FeatureExtractor:
             'erm', 'ah', 'hmm', 'well'
         }
 
-    def extract_features(self, segment: Dict, prev_segment: Optional[Dict] = None, next_segment: Optional[Dict] = None) -> Dict[str, float]:
+    def extract_features(self, segment: Dict, prev_segment: Optional[Dict] = None, next_segment: Optional[Dict] = None, audio_features: Optional[Dict] = None) -> Dict[str, float]:
         """
         Extract numerical features for a single segment.
         Segment expected keys: 'text', 'start_time', 'end_time', 'word_count'
+        Optional audio_features dict provides pre-calculated energy/pitch.
         """
         features = {}
         
@@ -151,5 +152,17 @@ class FeatureExtractor:
             features['time_since_last_cut'] = round(time_since_last, 3)
         else:
             features['time_since_last_cut'] = 0.0
+
+        # --- AUDIO FEATURES ---
+        if audio_features:
+            features['avg_energy'] = audio_features.get('avg_energy', 0.0)
+            features['energy_variance'] = audio_features.get('energy_variance', 0.0)
+            features['avg_pitch'] = audio_features.get('avg_pitch', 0.0)
+            features['pitch_stability'] = audio_features.get('pitch_stability', 0.0)
+        else:
+            features['avg_energy'] = 0.0
+            features['energy_variance'] = 0.0
+            features['avg_pitch'] = 0.0
+            features['pitch_stability'] = 0.0
 
         return features

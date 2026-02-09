@@ -8,3 +8,4 @@ scipy
 fuzzywuzzy
 python-levenshtein
 sqlalchemy
+google-generativeai

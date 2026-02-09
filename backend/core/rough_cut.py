@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProfessionalRoughCutV2:
-    def __init__(self, words: List[Dict], ml_cut_threshold: float = 0.8):
+    def __init__(self, words: List[Dict], ml_cut_threshold: float = 0.8, video_path: Optional[str] = None):
         """
         Initialize with word-level transcript.
         Words expected format: [{'word': str, 'start': float, 'end': float}, ...]
@@ -29,15 +29,16 @@ class ProfessionalRoughCutV2:
                              0.8 = Conservative (fewer ML cuts, default)
                              0.6 = Moderate
                              0.4 = Aggressive (more ML cuts)
+            video_path: Optional path to video for multi-modal analysis
         """
         self.words = words
+        self.video_path = video_path
         self.segments = []
         
         # Thresholds
-        # Thresholds
         self.SILENCE_THRESHOLD = 2.0  # User Request: Remove silence > 2.0s
         self.SENTENCE_SPLIT_GAP = 0.4
-        self.REPETITION_SIMILARITY = 0.85 # Stricter
+        self.REPETITION_SIMILARITY = 0.92 # SAFETY FIRST: Increased from 0.85
         self.MIN_SEGMENT_LENGTH = 3
         self.ML_CUT_THRESHOLD = ml_cut_threshold  # Configurable ML threshold
         
@@ -48,10 +49,30 @@ class ProfessionalRoughCutV2:
             'repetitions_removed': 0,
             'cut_that_signals': 0,
             'incomplete_sentences': 0,
-            'phrase_stutters_removed': 0
+            'phrase_stutters_removed': 0,
+            'fluff_removed': 0
         }
         
-        # Initialize ML Components
+        # Phase 1: Multi-modal Audio Init
+        try:
+            if self.video_path:
+                from .audio_analyzer import AudioAnalyzer
+                self.audio_analyzer = AudioAnalyzer(self.video_path)
+            else:
+                self.audio_analyzer = None
+        except Exception as e:
+            logger.warning(f"AudioAnalyzer initialization failed: {e}")
+            self.audio_analyzer = None
+
+        # Phase 2: LLM Semantic Filtering
+        try:
+            from .llm_editor import LLMEditor
+            self.llm_editor = LLMEditor()
+        except Exception as e:
+            logger.warning(f"LLMEditor initialization failed: {e}")
+            self.llm_editor = None
+        
+        # Phase 3: ML Engine Components
         try:
             from ml_data_collector import MLDataCollector
             from feature_extractor import FeatureExtractor
@@ -111,6 +132,11 @@ class ProfessionalRoughCutV2:
         logger.info(f"{len(segments)} segments after semantic filtering")
         if segments is None: logger.error("Step 6 returned None")
         
+        # Step 6.2: LLM Semantic Pass (Phase 2)
+        # Identify and remove high-level "fluff" and off-topic segments
+        segments = self._llm_semantic_pass(segments)
+        logger.info(f"{len(segments)} segments after LLM semantic pass")
+        
         # Step 6.5: ML Overrides (Personalization Layer)
         # If the model has learned that specific patterns should be CUT, it overrides heuristics.
         if self.use_ml:
@@ -155,25 +181,38 @@ class ProfessionalRoughCutV2:
                 
                 # If gap exceeds threshold, end current segment
                 if gap > self.SILENCE_THRESHOLD:
-                    self.stats['silences_removed'] += 1
-                    self.stats['silence_duration_removed'] += gap
+                    # --- SMART SILENCE RECOVERY (New) ---
+                    is_true_silence = True
+                    if self.audio_analyzer:
+                        gap_start = self.words[i]['end']
+                        gap_end = self.words[i+1]['start']
+                        audio_feats = self.audio_analyzer.get_features(gap_start, gap_end)
+                        if audio_feats.get('avg_energy', 0) > 0.08: # Significant sound (laughter, etc)
+                            is_true_silence = False
+                            logger.info(f"Smart Silence: Preserving {gap:.1f}s gap at {gap_start:.1f}s due to detected energy ({audio_feats.get('avg_energy'):.3f})")
                     
-                    # Save current segment
-                    if current_segment_words:
-                        segments.append({
-                            'word_indices': current_segment_words.copy(),
-                            'start_idx': current_start_idx,
-                            'end_idx': i,
-                            'start_time': self.words[current_start_idx]['start'],
-                            'end_time': self.words[i]['end'],
-                            'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words if not self.words[idx].get('isDeleted', False)])
-                        })
-                    
-                    # Start new segment
-                    current_segment_words = []
-                    current_start_idx = i + 1
-                    
-                    logger.debug(f"Removed {gap:.1f}s silence at {self.words[i]['end']:.1f}s")
+                    if is_true_silence:
+                        self.stats['silences_removed'] += 1
+                        self.stats['silence_duration_removed'] += gap
+                        
+                        # Save current segment
+                        if current_segment_words:
+                            segments.append({
+                                'word_indices': current_segment_words.copy(),
+                                'start_idx': current_start_idx,
+                                'end_idx': i,
+                                'start_time': self.words[current_start_idx]['start'],
+                                'end_time': self.words[i]['end'],
+                                'text': ' '.join([self.words[idx]['word'] for idx in current_segment_words if not self.words[idx].get('isDeleted', False)])
+                            })
+                        
+                        # Start new segment
+                        current_segment_words = []
+                        current_start_idx = i + 1
+                        logger.debug(f"Removed {gap:.1f}s silence at {self.words[i]['end']:.1f}s")
+                    else:
+                        # Not a true silence, keep building the current segment
+                        pass
         
         # Add final segment
         if current_segment_words:
@@ -209,7 +248,18 @@ class ProfessionalRoughCutV2:
                     sub_splits.append(i + 1)
                 # Split on gap (> 0.4s)
                 elif w2['start'] - w1['end'] > self.SENTENCE_SPLIT_GAP:
-                    sub_splits.append(i + 1)
+                    # --- AUDIO VALIDATION (New) ---
+                    is_true_split = True
+                    if self.audio_analyzer:
+                        gap_start = w1['end']
+                        gap_end = w2['start']
+                        audio_feats = self.audio_analyzer.get_features(gap_start, gap_end)
+                        if audio_feats.get('avg_energy', 0) > 0.1: # Significant sound (laughter, etc)
+                             is_true_split = False
+                             logger.info(f"Refine: Preserving {w2['start']-w1['end']:.1f}s gap at {gap_start:.1f}s due to energy ({audio_feats.get('avg_energy'):.3f})")
+                    
+                    if is_true_split:
+                        sub_splits.append(i + 1)
             
             sub_splits.append(len(words_in_seg))
             
@@ -380,9 +430,13 @@ class ProfessionalRoughCutV2:
                             segment['end_time'] = self.words[word_indices[-1]]['end']
                         logger.info(f"Trimmed trailing connector '{last_word}' from unpunctuated segment")
 
-                # 2. If it's short and followed by a restart (or empty after trim), kill it.
+                # 2. If it's short, unpunctuated, and followed by a restart, kill it.
+                # But be careful: "I think so" is valid.
                 if len(segment['word_indices']) < 6 and i < len(segments) - 1:
-                     continue
+                    next_text = segments[i + 1]['text'].lower()
+                    restarts = ['so ', 'i mean', 'what i meant', 'let me', 'actually', 'the ', 'it ', 'i ']
+                    if any(next_text.startswith(r) for r in restarts):
+                        continue
                 
                 if segment['word_indices']:
                     cleaned.append(segment)
@@ -425,9 +479,20 @@ class ProfessionalRoughCutV2:
                     num_words_to_keep = len(text[:last_punct_idx+1].split())
                     segment['word_indices'] = segment['word_indices'][:num_words_to_keep]
                     segment['text'] = ' '.join([self.words[idx]['word'] for idx in segment['word_indices']])
-                    segment['end_time'] = self.words[segment['word_indices'][-1]]['end']
+                    if segment['word_indices']:
+                        segment['end_time'] = self.words[segment['word_indices'][-1]]['end']
                     self.stats['incomplete_sentences'] += 1
                     logger.info(f"Surgical Cut: Trimmed dangling thought: \"...{trailing_text}\"")
+                elif i == len(segments) - 1 and trailing_words:
+                    # Special Rule for last segment: If it ends with a connector, trim it too
+                    trailing_connectors = ['and', 'but', 'so', 'or', 'then', 'because', 'the', 'a', 'to', 'with']
+                    if trailing_words[-1].lower() in trailing_connectors:
+                         num_words_to_keep = len(text[:last_punct_idx+1].split())
+                         segment['word_indices'] = segment['word_indices'][:num_words_to_keep]
+                         segment['text'] = ' '.join([self.words[idx]['word'] for idx in segment['word_indices']])
+                         if segment['word_indices']:
+                             segment['end_time'] = self.words[segment['word_indices'][-1]]['end']
+                         logger.info(f"Final surgical trim on connector: '{trailing_words[-1]}'")
             
             if segment['word_indices']:
                 cleaned.append(segment)
@@ -553,7 +618,16 @@ class ProfessionalRoughCutV2:
                             score_a = len(seg_a['word_indices']) + (idx_a * 0.1)
                             score_b = len(seg_b['word_indices']) + (idx_b * 0.1)
                             
-                            if score_a > score_b:
+                            # --- AUDIO PREFERENCE (New) ---
+                            # If they are very similar, use energy as a tie-breaker before length
+                            if self.audio_analyzer and self._calculate_similarity(seg_a['text'], seg_b['text']) > 0.9:
+                                energy_a = self.audio_analyzer.get_features(seg_a['start_time'], seg_a['end_time']).get('avg_energy', 0)
+                                energy_b = self.audio_analyzer.get_features(seg_b['start_time'], seg_b['end_time']).get('avg_energy', 0)
+                                if energy_a > energy_b * 1.3:
+                                    should_delete_b = True
+                                    logger.info(f"Consolidate: Keeping earlier take at {seg_a['start_time']:.1f}s because it sounds better than later take at {seg_b['start_time']:.1f}s")
+                            
+                            if not should_delete_b and score_a > score_b:
                                 should_delete_b = True
                                 logger.info(f"Consolidate: '{seg_b['text'][:20]}...' similar to '{seg_a['text'][:20]}...' but worse score -> Delete B")
                                 
@@ -566,9 +640,52 @@ class ProfessionalRoughCutV2:
                                 should_delete_b = True
                                 logger.info(f"Consolidate: '{seg_b['text'][:20]}...' is prefix of '{seg_a['text'][:20]}...' -> Delete B")
 
+                        # Rule 4: Divergence Protection (SAFETY FIRST)
+                        # If they share a prefix but diverge with unique meaningful content at the end, KEEP BOTH.
+                        if not should_delete_b:
+                            # Extract words after the common prefix
+                            keywords_a = self._get_keywords(seg_a['text'])
+                            keywords_b = self._get_keywords(seg_b['text'])
+                            
+                            # Unique keywords (in one but not the other)
+                            unique_a = keywords_a - keywords_b
+                            unique_b = keywords_b - keywords_a
+                            
+                            # SAFETY FIRST: We protect if there is a significant divergence in content.
+                            # Just one unique keyword (e.g. "milk" vs "bread") is enough IF it's a strong word.
+                            # If it's a weak word like "almost", it's likely a false start.
+                            has_strong_a = any(len(w) > 4 for w in unique_a) or unique_a
+                            has_strong_b = any(len(w) > 4 for w in unique_b) or unique_b
+                            
+                            # If both have unique content, keep both. 
+                            # BUT if one is just a stuttered prefix of the other (identical keywords), delete it.
+                            if keywords_a == keywords_b and len(seg_a['text']) < len(seg_b['text']):
+                                logger.info(f"Consolidate: Identical keywords but shorter version - Delete A")
+                                cluster_discard.add(idx_a)
+                                indices_to_discard.add(idx_a)
+                                continue
+
+                            if (unique_a and unique_b):
+                                logger.info(f"Divergence Protection: Kept both due to unique keywords: {unique_a} vs {unique_b}")
+                                continue # Do not discard either
+
                         if should_delete_b:
                             cluster_discard.add(idx_b)
                             indices_to_discard.add(idx_b)
+                        elif not should_delete_b:
+                            # Rule 4: Quality Preference
+                            # If neither supersedes, but they are very similar, pick the one with better punctuation
+                            if self._calculate_similarity(seg_a['text'], seg_b['text']) > 0.7:
+                                ends_a = seg_a['text'].strip().endswith(('.', '!', '?'))
+                                ends_b = seg_b['text'].strip().endswith(('.', '!', '?'))
+                                if ends_a and not ends_b:
+                                    cluster_discard.add(idx_b)
+                                    indices_to_discard.add(idx_b)
+                                    logger.info(f"Consolidate: Kept punctuated '{seg_a['text'][:20]}...' over '{seg_b['text'][:20]}...'")
+                                elif ends_b and not ends_a:
+                                    cluster_discard.add(idx_a)
+                                    indices_to_discard.add(idx_a)
+                                    logger.info(f"Consolidate: Kept punctuated '{seg_b['text'][:20]}...' over '{seg_a['text'][:20]}...'")
 
                 self.stats['repetitions_removed'] += len(cluster_discard)
                 
@@ -624,14 +741,31 @@ class ProfessionalRoughCutV2:
                 # Length-weighted threshold (Smarter Sensitivity)
                 word_count = len(current['word_indices'])
                 if word_count <= 3:
-                     threshold = 0.95 # Higher bar for short phrases (stops "very, very")
+                    threshold = 0.95 # Higher bar for short phrases (stops "very, very")
                 elif word_count <= 6:
-                     threshold = 0.85
+                    threshold = 0.90 # SAFETY FIRST
                 else:
-                     threshold = 0.75 # More forgiving for long sentences
+                    threshold = 0.85 # SAFETY FIRST
                 
-                # If very similar, this current one is the EARLIER version
+                # If very similar, this current one is a version of the same thought
                 if similarity > threshold:
+                    # --- AUDIO-AWARE HEURISTIC (New) ---
+                    if self.audio_analyzer:
+                        feat_i = self.audio_analyzer.get_features(current['start_time'], current['end_time'])
+                        feat_j = self.audio_analyzer.get_features(later['start_time'], later['end_time'])
+                        
+                        energy_i = feat_i.get('avg_energy', 0)
+                        energy_j = feat_j.get('avg_energy', 0)
+                        
+                        # If the earlier take is significantly louder/more confident (>20% more energy), 
+                        # we keep it and discard the later, weaker take.
+                        if energy_i > energy_j * 1.2:
+                            removed_indices.add(j)
+                            logger.info(f"Heuristic Merge: Kept earlier take at {current['start_time']:.1f}s "
+                                      f"because it sounded more confident (Energy: {energy_i:.3f} > {energy_j:.3f})")
+                            continue # Keep looking for other versions of current
+                    
+                    # Default: Keep the LATER version (standard "Keep Final" logic)
                     found_later_version = True
                     removed_indices.add(i)
                     self.stats['repetitions_removed'] += 1
@@ -661,14 +795,8 @@ class ProfessionalRoughCutV2:
         # 2. Semantic Keyword Similarity (Bag of Words)
         # This catches "I want to go" vs "I need to leave" (different structure, similar keywords)
         
-        # Simple Jaccard implementation to avoid circular imports or heavy dependencies
-        def get_keywords(text):
-            stops = {'the','a','an','is','are','was','were','to','of','in','on','at','for','with','as','by','and','or','but','so','if','then','it','that','this','i','you','he','she','we','they'}
-            words = set(re.sub(r"[^\w\s']", '', text.lower()).split())
-            return {w for w in words if w not in stops and len(w) > 2}
-            
-        k1 = get_keywords(text1)
-        k2 = get_keywords(text2)
+        k1 = self._get_keywords(text1)
+        k2 = self._get_keywords(text2)
         
         sem_score = 0.0
         if k1 and k2:
@@ -676,9 +804,23 @@ class ProfessionalRoughCutV2:
             union = len(k1 | k2)
             sem_score = intersection / union
             
-        # Return the higher of the two scores
-        # We want to catch EITHER structural repetition OR semantic repetition
+        # Return weighted score
+        # SAFETY FIRST: We want high structural AND high semantic similarity to cut.
+        # If they are structurally similar but have different keywords, they are likely different.
+        if sem_score < 0.7: # Increased threshold for safety
+            return struct_score * 0.4 # More aggressive penalty
+            
         return max(struct_score, sem_score)
+        
+    def _get_keywords(self, text: str) -> set:
+        """Helper to extract strong keywords."""
+        # Expanded stops to exclude "weak" adjectives/adverbs that often end false starts
+        stops = {
+            'the','a','an','is','are','was','were','to','of','in','on','at','for','with','as','by','and','or','but','so','if','then','it','that','this','i','you','he','she','we','they',
+            'almost', 'maybe', 'perhaps', 'just', 'well', 'like', 'really', 'very', 'one', 'two', 'about', 'some', 'more', 'most', 'very'
+        }
+        words = set(re.sub(r"[^\w\s']", '', text.lower()).split())
+        return {w for w in words if w not in stops and len(w) > 2}
 
     def _log_decisions(self, kept_segments: List[Dict]):
         """
@@ -694,7 +836,9 @@ class ProfessionalRoughCutV2:
             next_seg = kept_segments[i+1] if i < len(kept_segments) - 1 else None
             
             try:
-                features = self.feature_extractor.extract_features(segment, prev, next_seg)
+                # Multi-modal features
+                audio_feats = self.audio_analyzer.get_features(segment['start_time'], segment['end_time']) if self.audio_analyzer else None
+                features = self.feature_extractor.extract_features(segment, prev, next_seg, audio_feats)
                 
                 # We log "KEEP" because the heuristic kept it
                 # We need exact start/end time from word indices
@@ -803,7 +947,8 @@ class ProfessionalRoughCutV2:
             # Predict CUT probability
             # 1.0 = Definite CUT
             # 0.0 = Definite KEEP
-            prob_cut = self.ml_model.predict(segment, prev_seg, next_seg)
+            audio_feats = self.audio_analyzer.get_features(segment['start_time'], segment['end_time']) if self.audio_analyzer else None
+            prob_cut = self.ml_model.predict(segment, prev_seg, next_seg, audio_feats)
             
             # Use configurable threshold
             if prob_cut > self.ML_CUT_THRESHOLD:
@@ -830,7 +975,10 @@ class ProfessionalRoughCutV2:
         all_words = []
         for seg in segments:
             for idx in seg['word_indices']:
-                all_words.append(self.words[idx])
+                # CRITICAL: Store original index to map back after grouping
+                word_copy = self.words[idx].copy()
+                word_copy['original_idx'] = idx
+                all_words.append(word_copy)
 
         # 2. Run ThoughtGrouper
         from .thought_grouper import ThoughtGrouper
@@ -857,13 +1005,17 @@ class ProfessionalRoughCutV2:
                  
                  if source_idx is not None:
                      # Remove the source
-                     # SAFEGUARD: Only remove if the repetition is substantial
+                     # SAFETY FIRST: Only remove if the repetition is substantial
                      # Determine if we are cutting a massive block for a small repetition
                      source_thought = thoughts[source_idx]
                      
+                     # Calculate similarity between source and current
+                     thought_sim = self._calculate_similarity(source_thought['text'], thought['text'])
+                     
                      # If source is huge (>50 words) and current is small (<10 words), likely a false positive match
-                     if source_thought['word_count'] > 50 and thought['word_count'] < 10:
-                         logger.info(f"Semantic Filter: ABORTED 'Keep Last'. Source {source_idx} is too big ({source_thought['word_count']} words) to be replaced by small repetition ({thought['word_count']} words).")
+                     # OR if they are not extremely similar semantically (>95%)
+                     if (source_thought['word_count'] > 50 and thought['word_count'] < 10) or thought_sim < 0.95:
+                         logger.info(f"Semantic Filter: ABORTED 'Keep Last'. Source {source_idx} is too different or too big to be replaced.")
                      else:
                          indices_to_remove.add(source_idx)
                          logger.info(f"Semantic Filter: 'Keep Last' triggered. Removing source thought {source_idx} in favor of later version {i}.")
@@ -877,9 +1029,18 @@ class ProfessionalRoughCutV2:
                         self.stats['repetitions_removed'] += 1
 
             elif thought['type'] == 'filler':
-                 # Only delete small fillers
-                 if thought['word_count'] <= 3 and thought['coherence_score'] < 0.6:
-                     indices_to_remove.add(i)
+             # Only delete small fillers
+             if thought['word_count'] <= 3 and thought['coherence_score'] < 0.6:
+                 # --- AUDIO VALIDATION (New) ---
+                 keep_anyway = False
+                 if self.audio_analyzer:
+                     audio_feats = self.audio_analyzer.get_features(thought['start_time'], thought['end_time'])
+                     if audio_feats.get('avg_energy', 0) > 0.12: # Intentional/Confident filler
+                         keep_anyway = True
+                         logger.info(f"Heuristic Keep: Preserving intentional filler \"{thought['text']}\" due to energy.")
+                 
+                 if not keep_anyway:
+                    indices_to_remove.add(i)
 
         for i, thought in enumerate(thoughts):
             if i in indices_to_remove:
@@ -887,17 +1048,45 @@ class ProfessionalRoughCutV2:
                 continue
             
             # Find which segments belong to this thought
-            # A thought can span multiple segments if they were split by punctuation/silence
-            for idx in thought['word_indices']:
-                if idx in segments_by_first_idx:
-                    filtered_segments.append(segments_by_first_idx[idx])
+            # FIX: We must map the thought's word indices back to the original indices used in segments
+            for thought_word_idx in thought['word_indices']:
+                # The word at thought_word_idx in all_words has the original index
+                orig_idx = all_words[thought_word_idx]['original_idx']
+                
+                if orig_idx in segments_by_first_idx:
+                    filtered_segments.append(segments_by_first_idx[orig_idx])
 
         # Note: This logic assumes segments are whole units within thoughts.
         # Since _refine_segmentation splits by punctuation and ThoughGrouper merges by sentences, 
         # mapping by the first index of a segment should be reliable.
         
         return filtered_segments
-    
+
+    def _llm_semantic_pass(self, segments: List[Dict]) -> List[Dict]:
+        """
+        Uses LLMEditor to identify and remove high-level fluff/tangents.
+        """
+        if not segments or not getattr(self, 'llm_editor', None) or not self.llm_editor.model:
+            return segments
+            
+        logger.info("Running LLM Semantic Pass for fluff detection...")
+        
+        # Identify fluff indices
+        discard_ids = self.llm_editor.identify_fluff(segments)
+        
+        if not discard_ids:
+            return segments
+            
+        final_segments = []
+        for i, seg in enumerate(segments):
+            if i in discard_ids:
+                logger.info(f"LLM CUT: Removed fluff/tangent: \"{seg['text'][:50]}...\"")
+                self.stats['fluff_removed'] += 1
+                continue
+            final_segments.append(seg)
+            
+        return final_segments
+
     def _finalize_segments(self, segments: List[Dict]) -> List[Dict]:
         """
         Convert processed segments to final timeline format.

@@ -16,13 +16,14 @@ export interface Thought {
 interface ThoughtBoundaryProps {
     thought: Thought;
     isActive: boolean;
+    isIncluded?: boolean;
     onClick?: () => void;
 }
 
 /**
  * Visual separator showing thought boundaries
  */
-export const ThoughtBoundary: React.FC<ThoughtBoundaryProps> = ({ thought, isActive, onClick }) => {
+export const ThoughtBoundary: React.FC<ThoughtBoundaryProps> = ({ thought, isActive, isIncluded = true, onClick }) => {
     const getTypeColor = (type: Thought['type']) => {
         switch (type) {
             case 'main_point':
@@ -57,7 +58,7 @@ export const ThoughtBoundary: React.FC<ThoughtBoundaryProps> = ({ thought, isAct
         <div
             className={`
                 w-full border-l-4 pl-3 py-2 mb-3
-                ${getTypeColor(thought.type)}
+                ${!isIncluded ? 'border-red-500 bg-red-500/10 opacity-60' : getTypeColor(thought.type)}
                 ${isActive ? 'opacity-100 scale-100' : 'opacity-70 hover:opacity-100'}
                 transition-all cursor-pointer
             `}
@@ -77,6 +78,11 @@ export const ThoughtBoundary: React.FC<ThoughtBoundaryProps> = ({ thought, isAct
                     `}>
                         {getTypeLabel(thought.type)}
                     </span>
+                    {!isIncluded && (
+                        <span className="text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase bg-red-900/40 text-red-500 border border-red-500/30">
+                            NOT IN TIMELINE
+                        </span>
+                    )}
                     {thought.is_kept !== undefined && (
                         <span className={`
                             text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase
@@ -107,6 +113,7 @@ export const ThoughtBoundary: React.FC<ThoughtBoundaryProps> = ({ thought, isAct
 interface ThoughtListViewProps {
     thoughts: Thought[];
     currentTime: number;
+    activeAssetRanges?: Array<{ start: number; end: number }>;
     onSeek: (time: number) => void;
 }
 
@@ -116,6 +123,7 @@ interface ThoughtListViewProps {
 export const ThoughtListView: React.FC<ThoughtListViewProps> = ({
     thoughts,
     currentTime,
+    activeAssetRanges = [],
     onSeek
 }) => {
     if (!thoughts || thoughts.length === 0) {
@@ -132,14 +140,22 @@ export const ThoughtListView: React.FC<ThoughtListViewProps> = ({
 
     return (
         <div className="flex flex-col gap-0">
-            {thoughts.map((thought) => (
-                <ThoughtBoundary
-                    key={thought.id}
-                    thought={thought}
-                    isActive={currentThought?.id === thought.id}
-                    onClick={() => onSeek(thought.start_time)}
-                />
-            ))}
+            {thoughts.map((thought) => {
+                // Determine if the thought is included in the timeline
+                const midPoint = (thought.start_time + thought.end_time) / 2;
+                const isIncluded = activeAssetRanges.length === 0 ||
+                    activeAssetRanges.some(r => midPoint >= r.start - 0.1 && midPoint <= r.end + 0.1);
+
+                return (
+                    <ThoughtBoundary
+                        key={thought.id}
+                        thought={thought}
+                        isActive={currentThought?.id === thought.id}
+                        isIncluded={isIncluded}
+                        onClick={() => onSeek(thought.start_time)}
+                    />
+                );
+            })}
         </div>
     );
 };

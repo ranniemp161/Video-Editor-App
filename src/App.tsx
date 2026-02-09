@@ -80,6 +80,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     exportTranscript,
     uploadTranscript,
     transcriptionProgress,
+    isAutoCutting,
     // New imports from hook
     toggleSegmentDelete,
     projectId,
@@ -136,6 +137,37 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     }
     return currentClip?.asset ?? assets[0] ?? null;
   }, [segments, assets, transcriptWords, currentClip?.asset.id]); // Optimization: depend on ID, not object
+
+  // DYNAMIC VISIBILITY: Determine which parts of the asset are currently in the timeline
+  const activeAssetRanges = React.useMemo(() => {
+    const asset = activeTranscriptAsset;
+    if (!asset) return [];
+
+    const clean = (s: string) => (s || '').toLowerCase().split('.')[0].trim();
+    const targetNameClean = clean(asset.name);
+
+    return timeline.tracks.flatMap(t => t.clips)
+      .filter(c => {
+        if (c.assetId === asset.id) return true;
+        if (clean(c.sourceFileName) === targetNameClean) return true;
+        if (clean(c.name) === targetNameClean) return true;
+        return false;
+      })
+      .map(c => ({ start: c.trimStart, end: c.trimEnd }));
+  }, [activeTranscriptAsset, timeline.tracks]);
+
+  // Pre-calculate inclusion status for ALL words in the current transcript
+  const wordInclusionStatus = React.useMemo(() => {
+    const words = activeTranscriptAsset?.transcription?.words || [];
+    if (activeAssetRanges.length === 0) return new Array(words.length).fill(false);
+
+    return words.map((word: any) => {
+      const wordStart = word.start / 1000;
+      const wordEnd = word.end / 1000;
+      const midPoint = (wordStart + wordEnd) / 2;
+      return activeAssetRanges.some(range => midPoint >= range.start - 0.05 && midPoint <= range.end + 0.05);
+    });
+  }, [activeTranscriptAsset?.transcription?.words, activeAssetRanges]);
 
 
   // --- Keyboard Shortcuts ---
@@ -417,8 +449,27 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                   onExport={exportTranscript}
                   onUploadTranscript={uploadTranscript}
                   isTranscribing={!!isTranscribing}
+                  isAutoCutting={isAutoCutting}
                   progress={transcriptionProgress}
-                  onToggleWord={(start) => toggleSegmentDelete(start)}
+                  onToggleWord={(start) => {
+                    const words = activeTranscriptAsset?.transcription?.words || [];
+                    const wordIdx = words.findIndex((w: any) => Math.abs(w.start / 1000 - start) < 0.01);
+                    if (wordIdx === -1) return;
+
+                    const word = words[wordIdx];
+                    const isIncluded = wordInclusionStatus[wordIdx];
+
+                    if (activeTranscriptAsset?.id) {
+                      if (isIncluded) {
+                        deleteClipRange(activeTranscriptAsset.id, word.start / 1000, word.end / 1000);
+                      } else {
+                        restoreClipRange(activeTranscriptAsset.id, word.start / 1000, word.end / 1000);
+                      }
+                    }
+
+                    // Also sync with backend segments
+                    toggleSegmentDelete(start);
+                  }}
                   onDeleteRange={(start, end) => {
                     if (activeTranscriptAsset?.id) {
                       deleteClipRange(activeTranscriptAsset.id, start, end);
@@ -431,6 +482,8 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                   }}
                   transcriptOffset={transcriptOffset}
                   onOffsetChange={setTranscriptOffset}
+                  activeAssetRanges={activeAssetRanges}
+                  wordInclusionStatus={wordInclusionStatus}
                 />
               )}
               {activeTab !== 'media' && activeTab !== 'transcript' && (
