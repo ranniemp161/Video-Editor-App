@@ -290,13 +290,17 @@ export const useTimeline = () => {
       return;
     }
 
-    if (!confirm("Are you sure you want to delete this project and all its video files? This cannot be undone.")) {
+    if (!confirm("Are you sure you want to delete this project and all its media files? This cannot be undone.")) {
       return;
     }
+
+    console.log(`Attempting to delete project: ${projectId}`);
 
     try {
       const res = await fetch(`${API_BASE}/project/${projectId}`, { method: 'DELETE' });
       if (res.ok) {
+        console.log("Delete request successful. Clearing local state...");
+
         // Reset Frontend State
         setProjectId(null);
         setSegments([]);
@@ -312,15 +316,22 @@ export const useTimeline = () => {
         setSelectedClipIds([]);
         setPast([]);
         setFuture([]);
+
+        // Clear storage
         localStorage.removeItem('currentProjectId');
-        alert("Project deleted successfully!");
-        console.log("Project and files deleted successfully.");
+
+        // Force reload to ensure clean state
+        console.log("Reloading page to reset application...");
+        window.location.reload();
+
       } else {
-        alert("Failed to delete project. Please try again.");
+        const errorText = await res.text();
+        console.error("Delete failed:", res.status, errorText);
+        alert(`Failed to delete project. Server responded with ${res.status}`);
       }
     } catch (e) {
       console.error("Failed to delete project", e);
-      alert("Error deleting project. Please try again.");
+      alert("Error deleting project. check console for details.");
     }
   }, [projectId]);
 
