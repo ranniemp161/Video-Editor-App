@@ -9,3 +9,7 @@ fuzzywuzzy
 python-levenshtein
 sqlalchemy
 google-generativeai
+pandas
+scikit-learn
+joblib
+textblob

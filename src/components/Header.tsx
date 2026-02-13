@@ -18,7 +18,7 @@ interface HeaderProps {
   hasActiveProject?: boolean; // Flag to show warning banner
 }
 
-export const Header: React.FC<HeaderProps> = ({
+export const HeaderComponent: React.FC<HeaderProps> = ({
   onImportClick,
   renderToMP4,
   renderStatus,
@@ -231,3 +231,5 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
+export const Header = React.memo(HeaderComponent);

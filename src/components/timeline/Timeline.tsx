@@ -151,7 +151,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         }
     };
 
-    const getSnappedTime = (time: number): number => {
+    const getSnappedTime = useCallback((time: number): number => {
         if (!isSnappingEnabled) return time;
         const threshold = 10 / pixelsPerSecond;
 
@@ -178,7 +178,7 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         else setSnapGuideTime(null);
 
         return snappedTime;
-    };
+    }, [isSnappingEnabled, pixelsPerSecond, timeline]);
 
     const rulerData = useMemo(() => {
         const minPixelsPerMajorTick = 100;
@@ -214,15 +214,15 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
     const [draggingClip, setDraggingClip] = useState<{ clipId: string; offsetX: number } | null>(null);
 
-    const handleDragStart = (e: React.DragEvent, clipId: string) => {
+    const handleDragStart = useCallback((e: React.DragEvent, clipId: string) => {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
         setDraggingClip({ clipId, offsetX });
         e.dataTransfer.setData('text/plain', clipId);
         e.dataTransfer.effectAllowed = 'move';
-    };
+    }, []);
 
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
 
@@ -238,9 +238,9 @@ const TimelineComponent: React.FC<TimelineProps> = ({
                 tracksScrollRef.current.scrollLeft -= scrollSpeed;
             }
         }
-    };
+    }, []);
 
-    const handleDrop = (e: React.DragEvent, trackId: string) => {
+    const handleDrop = useCallback((e: React.DragEvent, trackId: string) => {
         e.preventDefault();
         if (!draggingClip) return;
         const trackElement = e.currentTarget as HTMLElement;
@@ -249,21 +249,21 @@ const TimelineComponent: React.FC<TimelineProps> = ({
         let newStart = Math.max(0, (dropX - draggingClip.offsetX) / pixelsPerSecond);
         onClipMove(draggingClip.clipId, trackId, newStart);
         setDraggingClip(null);
-    };
+    }, [draggingClip, pixelsPerSecond, onClipMove]);
 
-    const handleRulerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleRulerClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
         if (!rulerRef.current) return;
         const rect = rulerRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left + scrollLeft;
         const time = x / pixelsPerSecond;
         onPlayheadUpdate(getSnappedTime(time));
         onSelectClip(null);
-    };
+    }, [scrollLeft, pixelsPerSecond, onPlayheadUpdate, onSelectClip, getSnappedTime]);
 
-    const handleScrubStart = (e: React.MouseEvent) => {
+    const handleScrubStart = useCallback((e: React.MouseEvent) => {
         setIsScrubbing(true);
         handleRulerClick(e as any);
-    };
+    }, [handleRulerClick]);
 
     useEffect(() => {
         if (!isScrubbing && !isPanning) return;
@@ -328,15 +328,15 @@ const TimelineComponent: React.FC<TimelineProps> = ({
 
     const [trimming, setTrimming] = React.useState<{ clipId: string; side: 'start' | 'end'; initialX: number; initialClipStart: number; initialClipEnd: number; initialTrimStart: number; initialTrimEnd: number } | null>(null);
 
-    const handleTrimStart = (e: React.MouseEvent, clip: TimelineClip) => {
+    const handleTrimStart = useCallback((e: React.MouseEvent, clip: TimelineClip) => {
         e.stopPropagation();
         setTrimming({ clipId: clip.id, side: 'start', initialX: e.clientX, initialClipStart: clip.start, initialClipEnd: clip.end, initialTrimStart: clip.trimStart, initialTrimEnd: clip.trimEnd });
-    };
+    }, []);
 
-    const handleTrimEnd = (e: React.MouseEvent, clip: TimelineClip) => {
+    const handleTrimEnd = useCallback((e: React.MouseEvent, clip: TimelineClip) => {
         e.stopPropagation();
         setTrimming({ clipId: clip.id, side: 'end', initialX: e.clientX, initialClipStart: clip.start, initialClipEnd: clip.end, initialTrimStart: clip.trimStart, initialTrimEnd: clip.trimEnd });
-    };
+    }, []);
 
     React.useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {

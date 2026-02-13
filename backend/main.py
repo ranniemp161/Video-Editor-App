@@ -33,21 +33,52 @@ app.include_router(projects_router)
 app.include_router(transcripts_router)
 app.include_router(editing_router)
 
+# ML Scheduler
+from ml_scheduler import MLScheduler
+scheduler = MLScheduler()
 
 @app.on_event("startup")
 def startup_event():
-    """Run cleanup on startup."""
+    """Run cleanup and start ML scheduler."""
     db = SessionLocal()
     try:
         cleanup_orphaned_files(db)
     finally:
         db.close()
+        
+    # Start ML Scheduler (checks every hour)
+    try:
+        scheduler.start(interval_seconds=3600)
+    except Exception as e:
+        logger.error(f"Failed to start ML scheduler: {e}")
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    """Stop ML scheduler."""
+    if scheduler:
+        scheduler.stop()
 
 
 @app.get("/")
 def read_root():
     """Health check endpoint."""
     return {"message": "Video Editor API"}
+
+
+@app.get("/ml-status")
+def get_ml_status():
+    """Get current ML training status and metrics."""
+    try:
+        state = scheduler._load_state()
+        return {
+            "status": "active" if scheduler.is_running else "stopped",
+            "last_training": state.get("last_trained_timestamp"),
+            "sample_count": state.get("last_trained_count"),
+            "metrics": state.get("latest_metrics", {})
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @app.get("/transcription-progress")
@@ -58,4 +89,5 @@ async def get_transcription_progress(videoPath: str):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
+    # use_reloader=False to prevent scheduler from running twice in dev
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

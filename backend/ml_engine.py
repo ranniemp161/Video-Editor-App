@@ -109,12 +109,23 @@ class RoughCutModel:
         
         # Evaluate with detailed metrics
         y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        report = classification_report(y_test, y_pred, target_names=['KEEP', 'CUT'], output_dict=True)
+        
         logger.info("Training complete.")
-        logger.info(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
-        logger.info(f"\n{classification_report(y_test, y_pred, target_names=['KEEP', 'CUT'])}")
+        logger.info(f"Accuracy: {accuracy:.3f}")
+        logger.info(f"Report:\n{classification_report(y_test, y_pred, target_names=['KEEP', 'CUT'])}")
         
         # Save
         self.save_model()
+        
+        return {
+            "accuracy": accuracy,
+            "precision": report['CUT']['precision'],
+            "recall": report['CUT']['recall'],
+            "f1": report['CUT']['f1-score'],
+            "support": report['CUT']['support']
+        }
 
     def predict(self, segment: dict, prev_segment: dict = None, next_segment: dict = None, audio_features: dict = None) -> float:
         """

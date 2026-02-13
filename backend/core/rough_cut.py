@@ -98,6 +98,11 @@ class ProfessionalRoughCutV2:
         logger.info(f"Split into {len(segments)} segments after initial silence removal")
         if segments is None: logger.error("Step 1 returned None")
         
+        # Step 1.1: Textual Scrub (Pre-Processing)
+        # User Request: Remove subset segments and stutter checks early
+        segments = self._textual_scrub(segments)
+        logger.info(f"{len(segments)} segments after textual scrub")
+        
         # Step 1.5: Refine segmentation (Internal restarts and punctuation)
         segments = self._refine_segmentation(segments)
         logger.info(f"Refined into {len(segments)} segments after punctuation/restart splits")
@@ -153,6 +158,75 @@ class ProfessionalRoughCutV2:
         logger.info(f"Final rough cut: {len(self.segments)} segments")
         return self.segments
     
+    def _textual_scrub(self, segments: List[Dict]) -> List[Dict]:
+        """
+        User Request Phase 2b: Textual Scrub Pre-Processing.
+        
+        1. Subset Matching: If Segment N is a subset (or fuzzy match) of Segment N+1, delete Segment N.
+           Example: "I am" vs "I am going" -> Delete "I am".
+           
+        2. Duration-to-Text Ratio: Flag stutters (too long) or false starts (too short).
+        """
+        if not segments:
+            return []
+            
+        scrubbed_indices = set()
+        
+        # Pass 1: Subset Matching
+        for i in range(len(segments) - 1):
+            if i in scrubbed_indices: continue
+            
+            curr = segments[i]
+            next_seg = segments[i+1]
+            
+            # Clean text for comparison
+            curr_text = re.sub(r'[^\w\s]', '', curr['text'].lower()).strip()
+            next_text = re.sub(r'[^\w\s]', '', next_seg['text'].lower()).strip()
+            
+            if not curr_text or not next_text: continue
+            
+            # Rule 1: Direct Subset
+            # "so right now" (curr) vs "so right now we are seeing" (next)
+            is_subset = curr_text in next_text and len(curr_text) < len(next_text)
+            
+            # Rule 2: Fuzzy Match (>85%)
+            # "so right now we are" vs "so right now we are seeing"
+            matcher = difflib.SequenceMatcher(None, curr_text, next_text)
+            is_fuzzy = matcher.ratio() > 0.85 and len(curr_text) < len(next_text)
+            
+            if is_subset or is_fuzzy:
+                scrubbed_indices.add(i)
+                self.stats['repetitions_removed'] += 1
+                logger.info(f"Textual Scrub: REMOVED '{curr['text']}' (subset of '{next_seg['text']}')")
+                continue
+
+        # Pass 2: Duration-to-Text Ratio
+        # TODO: Refine thresholds based on user feedback. 
+        # Current: Just logging for analysis, not deleting yet unless obviously bad.
+        # User Request: "Flag segments... for deletion"
+        # We will be conservative to avoid over-cutting.
+        
+        final_segments = []
+        for i, seg in enumerate(segments):
+            if i in scrubbed_indices: continue
+            
+            duration = seg['end_time'] - seg['start_time']
+            word_count = len(seg['word_indices'])
+            
+            if duration > 0.5:
+                wps = word_count / duration
+                
+                # Very slow (Drawl/Stutter) - < 0.8 wps (e.g., 1 word in 1.5s)
+                # "Uhhhh....."
+                if wps < 0.8 and word_count < 3:
+                     logger.info(f"Textual Scrub: REMOVED slow segment '{seg['text']}' ({wps:.2f} wps)")
+                     self.stats['fluff_removed'] += 1
+                     continue # Remove
+            
+            final_segments.append(seg)
+            
+        return final_segments
+
     def _split_by_silence(self) -> List[Dict]:
         """
         Split transcript into segments by removing silences > 1 second.
@@ -1094,11 +1168,10 @@ class ProfessionalRoughCutV2:
         """
         final = []
         
-        # Padding in seconds (User Request: 0.3-0.5s natural pause)
-        # We split it between start/end. 
-        # Start: 0.15s, End: 0.25s -> Total ~0.4s padding between cuts
+        # Padding in seconds (User Request: 0.15s Pre/Post)
+        # Anti-Aggression Smoothing
         PADDING_START = 0.15  
-        PADDING_END = 0.25    
+        PADDING_END = 0.15    
         
         for segment in segments:
             # Filter out words that are marked as deleted within the segment

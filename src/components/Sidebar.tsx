@@ -6,7 +6,7 @@ interface SidebarProps {
     setActiveTab: (tab: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const SidebarComponent: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
     const tabs = [
         { id: 'media', icon: MediaIcon, label: 'Media' },
         { id: 'transcript', icon: TextIcon, label: 'Transcript' },
@@ -41,3 +41,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </div>
     );
 };
+
+export const Sidebar = React.memo(SidebarComponent);

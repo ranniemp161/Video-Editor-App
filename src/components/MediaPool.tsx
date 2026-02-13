@@ -8,7 +8,7 @@ interface MediaPoolProps {
   onMediaUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, onMediaUpload }) => {
+export const MediaPoolComponent: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, onMediaUpload }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
@@ -95,3 +95,5 @@ export const MediaPool: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, o
     </div>
   );
 };
+
+export const MediaPool = React.memo(MediaPoolComponent);

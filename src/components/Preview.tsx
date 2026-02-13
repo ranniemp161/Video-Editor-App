@@ -8,7 +8,7 @@ interface PreviewProps {
   isPlaying: boolean;
 }
 
-export const Preview: React.FC<PreviewProps> = ({ clip, playheadPosition, isPlaying }) => {
+export const PreviewComponent: React.FC<PreviewProps> = ({ clip, playheadPosition, isPlaying }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastSeekTimeRef = useRef<number>(0);
   const lastClipIdRef = useRef<string | null>(null);
@@ -88,3 +88,5 @@ export const Preview: React.FC<PreviewProps> = ({ clip, playheadPosition, isPlay
     </div>
   );
 };
+
+export const Preview = React.memo(PreviewComponent);
