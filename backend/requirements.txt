@@ -13,3 +13,4 @@ pandas
 scikit-learn
 joblib
 textblob
+faster-whisper

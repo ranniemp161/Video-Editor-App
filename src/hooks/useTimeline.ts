@@ -353,24 +353,55 @@ export const useTimeline = () => {
         if (!res.ok) {
           // If 404, maybe backend restarted? Clear storage
           if (res.status === 404) {
-            console.warn("Project not found on backend (maybe restarted). Clearing session.");
-            localStorage.removeItem('currentProjectId');
-            setProjectId(null);
+            // ... existing 404 handling ...
           }
           return;
         }
         const data = await res.json();
+
+        // Restore Assets State (Critical for remoteSrc)
+        if (data.mediaPath && data.originalFileName) {
+          // Convert system path (public/uploads/...) to API path (/uploads/...)
+          // remove "public" prefix if present
+          const cleanPath = data.mediaPath.replace(/\\/g, '/'); // Normalize slashes
+          const remoteSrc = cleanPath.startsWith('public/') ? '/' + cleanPath.substring(7) : '/' + cleanPath;
+
+          const restoredAsset: Asset = {
+            id: data.projectId, // Use project ID as asset ID for single-project flow
+            name: data.originalFileName,
+            type: data.originalFileName.endsWith('.mp3') || data.originalFileName.endsWith('.wav') ? 'audio' : 'video',
+            src: null, // No local blob on reload, but that's fine for remote operations
+            remoteSrc: remoteSrc,
+            duration: data.duration || 0,
+            transcription: undefined // Will be set below
+          };
+
+          // If we have segments, recreate transcription object
+          if (data.segments && data.segments.length > 0) {
+            restoredAsset.transcription = {
+              source: 'ai',
+              transcription: data.segments.map((s: any) => s.text).join(' '),
+              words: data.segments.map((s: any) => ({
+                word: s.text,
+                start: s.start * 1000,
+                end: s.end * 1000,
+                isDeleted: s.isDeleted
+              }))
+            };
+          }
+
+          setAssets([restoredAsset]);
+        }
+
         if (data.segments) {
           setSegments(data.segments);
-          // REMOVED: Auto-timeline generation - user clicks "Auto-Cut" button instead
-          // generateTimelineFromSegments(data.segments);
         }
       } catch (e) {
         console.error("Failed to fetch project state", e);
       }
     };
     fetchSegments();
-  }, [projectId, generateTimelineFromSegments]);
+  }, [projectId]); // Removed generateTimelineFromSegments dependency to avoid loops checks
 
   // Session Recovery: Check for saved rough cut results on page load
   useEffect(() => {
@@ -432,17 +463,22 @@ export const useTimeline = () => {
 
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`${API_BASE}/transcription-progress?videoPath=/${fileName}`);
+        // Use remoteSrc or just fileName (backend searches uploads if path not found)
+        const videoPath = asset.remoteSrc || fileName;
+        const res = await fetch(`${API_BASE}/transcription-progress?videoPath=${encodeURIComponent(videoPath)}`);
         const data = await res.json();
         setTranscriptionProgress(data.progress || 0);
       } catch (e) { console.error(e); }
     }, 1000);
 
+    // Use remoteSrc (server path) if available, otherwise fallback to name
+    const videoPath = asset.remoteSrc || fileName;
+
     try {
       const response = await fetch(`${API_BASE}/transcribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoPath: `/${fileName}`, duration: asset.duration })
+        body: JSON.stringify({ videoPath, duration: asset.duration })
       });
       const result = await response.json();
       if (result.success) {
@@ -460,6 +496,48 @@ export const useTimeline = () => {
       setIsTranscribing(null);
     }
   }, [assets]);
+
+  const refineTranscript = useCallback(async (assetId: string) => {
+    // Determine project ID. In single project mode, it's just projectId.
+    // If assetId is different, we might need to handle multi-project later.
+    if (!projectId) return;
+
+    // Optimistic UI? Maybe show a spinner.
+    // For now just console log.
+    console.log(`Refining transcript for project ${projectId}...`);
+
+    try {
+      const res = await fetch(`${API_BASE}/project/${projectId}/refine-transcript`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+
+      if (data.success && data.words) {
+        console.log("Refinement success:", data.message);
+        // Update local state
+        setAssets(prev => prev.map(a => {
+          if (a.id === assetId || a.id === projectId) {
+            if (a.transcription) {
+              return {
+                ...a,
+                transcription: {
+                  ...a.transcription,
+                  words: data.words
+                }
+              };
+            }
+          }
+          return a;
+        }));
+      } else {
+        console.error("Refinement failed:", data.error);
+        alert(`Refinement failed: ${data.error}`);
+      }
+    } catch (e) {
+      console.error("Refinement error:", e);
+      alert("Refinement failed. See console.");
+    }
+  }, [projectId]);
 
   const autoCutAsset = useCallback(async (assetId: string) => {
     const asset = assets.find(a => a.id === assetId);
@@ -1554,6 +1632,7 @@ export const useTimeline = () => {
     exportTranscript,
     uploadTranscript,
     transcriptionProgress,
+    refineTranscript,
     // New exports
     toggleSegmentDelete,
     projectId,

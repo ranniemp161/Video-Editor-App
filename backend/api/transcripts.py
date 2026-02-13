@@ -7,15 +7,153 @@ import logging
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
+
 from db import SessionLocal, Project
-from schemas import UploadTranscriptRequest, ExportTranscriptRequest
+from schemas import UploadTranscriptRequest, ExportTranscriptRequest, TranscribeRequest
 from core import distribute_word_timestamps, refine_word_timestamps_with_audio
+from core.transcriber import WhisperTranscriber
+from background_tasks import start_background_task, update_task_progress
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["transcripts"])
 
 UPLOAD_DIR = "public/uploads"
+
+# Global transcriber instance (lazy loaded)
+transcriber = WhisperTranscriber()
+
+@router.post("/transcribe")
+def transcribe_media(request: TranscribeRequest):
+    """
+    Transcribe a video/audio file using Faster-Whisper.
+    """
+    logger.info(f"Received transcription request for: {request.videoPath}")
+    
+    # Check if file exists
+    # videoPath from frontend is relative to project root or public?
+    # Usually it's like "/uploads/uuid/file.mp4"
+    
+    # We need to resolve this to an absolute path
+    # Assuming public/uploads is where they are
+    
+    rel_path = request.videoPath.lstrip('/')
+    abs_path = os.path.join(os.getcwd(), "public", rel_path)
+    
+    if not os.path.exists(abs_path):
+        # Try without "public" if it's already included
+        abs_path = os.path.join(os.getcwd(), rel_path)
+        
+    if not os.path.exists(abs_path):
+        # Fallback: Search in public/uploads recursively
+        # This handles cases where frontend sends just the filename (e.g. "/MyVideo.mp4")
+        # but the file is stored in public/uploads/{uuid}/MyVideo.mp4
+        filename = os.path.basename(rel_path)
+        logger.info(f"File not found at {abs_path}. Searching for '{filename}' in uploads...")
+        
+        found_path = None
+        for root, dirs, files in os.walk(UPLOAD_DIR):
+            if filename in files:
+                found_path = os.path.join(root, filename)
+                break
+        
+        if found_path:
+            logger.info(f"Found file at: {found_path}")
+            abs_path = os.path.abspath(found_path)
+        else:
+            logger.error(f"File not found: {abs_path} (and not found in uploads search)")
+            return {"success": False, "error": "File not found"}
+        
+    try:
+        # Run transcription (Synchronous for now, but faster-whisper is fast)
+        # For very long videos, we should use background tasks, but user complained about 29m wait.
+        # Faster-whisper should take ~2-3 mins for 25 mins on CPU, seconds on GPU.
+        
+        # Determine model size based on duration? Or just use small/medium.
+        result = transcriber.transcribe(abs_path, model_size="medium")
+        
+        return {
+            "success": True,
+            "transcription": result
+        }
+    except Exception as e:
+        logger.error(f"Transcription failed: {e}")
+        return {"success": False, "error": str(e)}
+
+@router.post("/project/{project_id}/refine-transcript")
+async def refine_transcript(project_id: str):
+    """
+    Refine existing transcript timings using audio analysis.
+    """
+    db = SessionLocal()
+    try:
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return {"success": False, "error": "Project not found"}
+            
+        # Get existing words
+        # We need to fetch from DB segments? Or assume frontend sends them?
+        # The request doesn't include words, so we must load from DB or Project.segments
+        
+        # Start from project media path
+        if not os.path.exists(project.mediaPath):
+             return {"success": False, "error": "Media file not found"}
+             
+        # We need the current transcript. 
+        # API design issue: Project model stores segments, but not raw 'words' blob usually?
+        # Let's check Project schema...
+        # Project has 'segments' relationship.
+        
+        current_words = []
+        for s in project.segments:
+             current_words.append({
+                 "word": s.text,
+                 "start": s.start * 1000,
+                 "end": s.end * 1000,
+                 "type": s.type
+             })
+             
+        if not current_words:
+            return {"success": False, "error": "No transcript to refine"}
+            
+        # Refine
+        refined_words = refine_word_timestamps_with_audio(
+            words=current_words,
+            audio_path=project.mediaPath, # Audio lib handles video files too usually via ffmpeg
+            start_sec=0,
+            end_sec=project.duration
+        )
+        
+        # Save back to DB? 
+        # Or just return for frontend to preview?
+        # Let's save back to DB to make it permanent.
+        
+        # We need to map back to segments.
+        # This is tricky because existing segments might be "cut" or "deleted".
+        # Refinement should theoretically just shift timestamps.
+        
+        # Ideally, we update the segments in place.
+        for i, refined in enumerate(refined_words):
+            if i < len(project.segments):
+                seg = project.segments[i]
+                seg.start = refined['start'] / 1000.0
+                seg.end = refined['end'] / 1000.0
+                
+        db.commit()
+        
+        return {
+            "success": True, 
+            "words": refined_words,
+            "message": f"Refined {len(refined_words)} words"
+        }
+        
+    except Exception as e:
+        logger.error(f"Refinement failed: {e}")
+        return {"success": False, "error": str(e)}
+    finally:
+        db.close()
+
+
 
 
 @router.post("/upload-transcript")

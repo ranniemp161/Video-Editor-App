@@ -17,6 +17,7 @@ interface TranscriptViewProps {
     onToggleWord?: (start: number) => void;
     onDeleteRange?: (start: number, end: number) => void;
     onRestoreRange?: (start: number, end: number) => void;
+    onRefine?: (assetId: string) => void;
     timeline: TimelineState;
     transcriptOffset?: number; // Time offset for SRT calibration (seconds)
     onOffsetChange?: (offset: number) => void; // Callback to update offset
@@ -79,6 +80,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     onToggleWord,
     onDeleteRange,
     onRestoreRange,
+    onRefine,
     timeline,
     transcriptOffset = 0,
     onOffsetChange,
@@ -442,6 +444,16 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                             className="text-[9px] text-gray-400 hover:text-white font-bold uppercase tracking-wider transition-colors"
                         >
                             TXT
+                        </button>
+                    )}
+                    <div className="w-[1px] h-3 bg-white/5"></div>
+                    {onRefine && asset && (
+                        <button
+                            onClick={() => onRefine(asset.id)}
+                            className="text-[9px] text-blue-400 hover:text-blue-300 font-bold uppercase tracking-wider transition-colors"
+                            title="Refine timestamps using audio analysis"
+                        >
+                            Refine
                         </button>
                     )}
                     {/* Offset Calibration Control */}

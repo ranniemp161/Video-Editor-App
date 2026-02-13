@@ -155,6 +155,13 @@ def start_background_task(func: Callable, *args, **kwargs) -> str:
     return task_id
 
 
+def update_task_progress(task_id: str, progress: float):
+    """
+    Update the progress of a running task.
+    """
+    _registry.update_task(task_id, progress=progress)
+
+
 # Cleanup old tasks periodically
 def _cleanup_daemon():
     """Background daemon to cleanup old completed tasks."""

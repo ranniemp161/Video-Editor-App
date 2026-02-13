@@ -22,15 +22,21 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def cleanup_orphaned_files(db: Session):
     """Delete files in UPLOAD_DIR that are not referenced in the database."""
     try:
-        db_files = {os.path.basename(p.mediaPath) for p in db.query(Project).all()}
+        # Get all valid project IDs
+        valid_project_ids = {p.id for p in db.query(Project).all()}
+        
         now = time.time()
         
+        if not os.path.exists(UPLOAD_DIR):
+            return
+
         for item in os.listdir(UPLOAD_DIR):
             item_path = os.path.join(UPLOAD_DIR, item)
             
-            # Handle project directories
+            # Handle project directories (named by UUID)
             if os.path.isdir(item_path):
-                if item not in db_files and (now - os.path.getmtime(item_path)) > 600:
+                # Check if directory name (UUID) is a valid project ID
+                if item not in valid_project_ids and (now - os.path.getmtime(item_path)) > 600:
                     logger.info(f"Cleaning up orphaned project directory: {item}")
                     try:
                         shutil.rmtree(item_path)
@@ -38,18 +44,13 @@ def cleanup_orphaned_files(db: Session):
                         logger.error(f"Failed to delete directory {item}: {e}")
                 continue
             
-            # Handle legacy flat files
-            filename = item
-            if filename not in db_files and (now - os.path.getmtime(item_path)) > 600:
-                logger.info(f"Cleaning up orphaned file: {filename}")
-                try:
+            # Handle legacy flat files or other junk
+            if (now - os.path.getmtime(item_path)) > 3600: # 1 hour grace for root files
+                 logger.info(f"Cleaning up old root file: {item}")
+                 try:
                     os.remove(item_path)
-                    base = os.path.splitext(item_path)[0]
-                    for ext in ['.wav', '.json', '.txt']:
-                        if os.path.exists(base + ext):
-                            os.remove(base + ext)
-                except Exception as e:
-                    logger.error(f"Failed to delete {filename}: {e}")
+                 except Exception:
+                    pass
     except Exception as e:
         logger.error(f"Orphan cleanup failed: {e}")
 

@@ -74,6 +74,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     canRedo,
     isTranscribing,
     transcribeAsset,
+    refineTranscript,
     autoCutAsset,
     exportToXML,
     exportToEDL,
@@ -480,6 +481,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                       restoreClipRange(activeTranscriptAsset.id, start, end);
                     }
                   }}
+                  onRefine={refineTranscript}
                   transcriptOffset={transcriptOffset}
                   onOffsetChange={setTranscriptOffset}
                   activeAssetRanges={activeAssetRanges}
