@@ -14,8 +14,6 @@ services:
       - ./backend:/app
       # Persist uploads on host
       - ./backend/public:/app/public
-      # Persist database on host
-      - ./backend/videos.db:/app/videos.db
     environment:
       - PORT=8000
       - PYTHONUNBUFFERED=1

@@ -18,29 +18,60 @@ class AudioAnalyzer:
         self.is_ready = False
         self._load_audio()
 
+    def _extract_to_wav(self, path: str) -> str:
+        """Extract audio from a video file to a temp WAV so soundfile can load it."""
+        import subprocess, time
+        video_extensions = {'.mp4', '.mov', '.avi', '.mkv', '.webm', '.m4v'}
+        ext = os.path.splitext(path)[1].lower()
+        if ext not in video_extensions:
+            return path  # Already an audio file, no extraction needed
+
+        temp_dir = os.path.join(os.getcwd(), "temp_audio")
+        os.makedirs(temp_dir, exist_ok=True)
+        name = os.path.splitext(os.path.basename(path))[0]
+        wav_path = os.path.join(temp_dir, f"{name}_analyzer_{int(time.time())}.wav")
+
+        cmd = ["ffmpeg", "-y", "-i", path, "-ar", "22050", "-ac", "1", "-c:a", "pcm_s16le", wav_path]
+        try:
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            logger.info(f"AudioAnalyzer: extracted WAV to {wav_path}")
+            return wav_path
+        except subprocess.CalledProcessError as e:
+            logger.warning(f"AudioAnalyzer: ffmpeg extraction failed: {e.stderr.decode()[:200]}")
+            return path  # Fallback to original
+
     def _load_audio(self):
         """Load audio and pre-calculate base features."""
+        wav_path = None
         try:
             if not os.path.exists(self.video_path):
                 logger.error(f"Video file not found: {self.video_path}")
                 return
 
             logger.info(f"Loading audio from {self.video_path}...")
-            # Load audio using librosa (uses ffmpeg backend)
-            self.y, self.sr = librosa.load(self.video_path, sr=22050)
-            
+
+            # Extract to WAV first so soundfile (fast, no warnings) can handle it
+            wav_path = self._extract_to_wav(self.video_path)
+            self.y, self.sr = librosa.load(wav_path, sr=22050, mono=True)
+
             # Pre-calculate RMS Energy (Volume)
-            # frame_length and hop_length control the resolution
             self.rms = librosa.feature.rms(y=self.y)[0]
-            
+
             # Pre-calculate Pitch (f0) using PIPTRACK
-            # This is a bit heavy, but good for identifying tone
             self.pitches, self.magnitudes = librosa.piptrack(y=self.y, sr=self.sr)
-            
+
             self.is_ready = True
             logger.info("Audio features pre-calculated successfully.")
         except Exception as e:
             logger.error(f"Failed to load audio features: {e}")
+        finally:
+            # Clean up temp WAV if we created one
+            if wav_path and wav_path != self.video_path and os.path.exists(wav_path):
+                try:
+                    os.remove(wav_path)
+                except Exception:
+                    pass
+
 
     def get_features(self, start_time: float, end_time: float) -> dict:
         """

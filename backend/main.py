@@ -83,8 +83,10 @@ def get_ml_status():
 
 @app.get("/transcription-progress")
 async def get_transcription_progress(videoPath: str):
-    """Stub endpoint for compatibility."""
-    return {"progress": 0, "status": "processing"}
+    """Return real transcription progress if available."""
+    from api.transcripts import TRANSCRIPTION_PROGRESS
+    progress = TRANSCRIPTION_PROGRESS.get(videoPath, 0)
+    return {"progress": progress, "status": "processing" if progress < 100 else "completed"}
 
 
 if __name__ == "__main__":

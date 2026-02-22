@@ -117,17 +117,14 @@ def delete_project(project_id: str, db: Session = Depends(get_db)):
         logger.info(f"Delete requested for non-existent project {project_id}. Returning success.")
         return {"success": True, "message": "Project already deleted"}
     
-    # Delete associated files
-    media_path = db_project.mediaPath
+    # Delete associated files and directory
     try:
-        if os.path.exists(media_path):
-            os.remove(media_path)
-            base = os.path.splitext(media_path)[0]
-            for ext in ['.wav', '.json', '.txt', '.srt', '.vtt']:
-                sidecar = base + ext
-                if os.path.exists(sidecar):
-                    os.remove(sidecar)
+        project_dir = os.path.join(UPLOAD_DIR, project_id)
+        if os.path.exists(project_dir):
+            shutil.rmtree(project_dir)
+            logger.info(f"Deleted project directory: {project_dir}")
     except Exception as e:
+        logger.error(f"Error deleting files for project {project_id}: {e}")
         logger.error(f"Error deleting files for project {project_id}: {e}")
 
     # Delete from DB

@@ -25,6 +25,7 @@ class TranscribeRequest(BaseModel):
     """Request to transcribe video."""
     videoPath: str
     duration: float
+    projectId: Optional[str] = None
 
 
 class UploadTranscriptRequest(BaseModel):

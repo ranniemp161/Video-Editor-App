@@ -8,7 +8,7 @@ from .word_timing import refine_word_timestamps_with_audio
 logger = logging.getLogger(__name__)
 
 class WhisperTranscriber:
-    def __init__(self, model_size: str = "medium", device: str = "auto", compute_type: str = "default"):
+    def __init__(self, model_size: str = "small", device: str = "cpu", compute_type: str = "int8"):
         """
         Initialize the Faster-Whisper model.
         
@@ -101,9 +101,11 @@ class WhisperTranscriber:
         try:
             segments, info = self.model.transcribe(
                 clean_audio_path, 
-                beam_size=beam_size, 
+                beam_size=2,       # Reduced from 5 — faster with minimal quality loss
                 language=language,
-                word_timestamps=True
+                word_timestamps=True,
+                vad_filter=True,   # Skip silent regions automatically
+                vad_parameters=dict(min_silence_duration_ms=500)
             )
             
             full_text = []

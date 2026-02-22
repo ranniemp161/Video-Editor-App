@@ -23,6 +23,9 @@ UPLOAD_DIR = "public/uploads"
 # Global transcriber instance (lazy loaded)
 transcriber = WhisperTranscriber()
 
+# Global progress tracker (videoPath -> progress 0-100)
+TRANSCRIPTION_PROGRESS = {}
+
 @router.post("/transcribe")
 def transcribe_media(request: TranscribeRequest):
     """
@@ -38,43 +41,109 @@ def transcribe_media(request: TranscribeRequest):
     # Assuming public/uploads is where they are
     
     rel_path = request.videoPath.lstrip('/')
-    abs_path = os.path.join(os.getcwd(), "public", rel_path)
+    abs_path = None
+
+    # 1. Check if it's already an absolute path in the container (e.g. starting with /app/)
+    if request.videoPath.startswith('/app/') and os.path.exists(request.videoPath):
+        abs_path = request.videoPath
     
-    if not os.path.exists(abs_path):
-        # Try without "public" if it's already included
-        abs_path = os.path.join(os.getcwd(), rel_path)
-        
-    if not os.path.exists(abs_path):
-        # Fallback: Search in public/uploads recursively
-        # This handles cases where frontend sends just the filename (e.g. "/MyVideo.mp4")
-        # but the file is stored in public/uploads/{uuid}/MyVideo.mp4
+    # 2. Try to resolve via projectId and DB if provided
+    if not abs_path and request.projectId:
+        db = SessionLocal()
+        try:
+            db_project = db.query(Project).filter(Project.id == request.projectId).first()
+            if db_project and os.path.exists(db_project.mediaPath):
+                abs_path = db_project.mediaPath
+                logger.info(f"Resolved path from DB for project {request.projectId}: {abs_path}")
+        finally:
+            db.close()
+
+    # 3. Try primary relative path resolution
+    if not abs_path:
+        test_path = os.path.join(os.getcwd(), "public", rel_path)
+        if os.path.exists(test_path):
+            abs_path = test_path
+        else:
+            test_path = os.path.join(os.getcwd(), rel_path)
+            if os.path.exists(test_path):
+                abs_path = test_path
+
+    # 4. Final Fallback: Robust Search
+    if not abs_path:
         filename = os.path.basename(rel_path)
-        logger.info(f"File not found at {abs_path}. Searching for '{filename}' in uploads...")
+        logger.info(f"File not found at primary locations. Searching for '{filename}'...")
         
         found_path = None
-        for root, dirs, files in os.walk(UPLOAD_DIR):
-            if filename in files:
-                found_path = os.path.join(root, filename)
-                break
+        # Try finding in the project subfolder first if we have a projectId
+        search_root = UPLOAD_DIR
+        if request.projectId:
+            possible_project_dir = os.path.join(UPLOAD_DIR, request.projectId)
+            if os.path.exists(possible_project_dir):
+                search_root = possible_project_dir
+
+        for root, dirs, files in os.walk(search_root):
+            # Case-insensitive search
+            for f in files:
+                if f.lower() == filename.lower():
+                    found_path = os.path.join(root, f)
+                    break
+            if found_path: break
         
         if found_path:
-            logger.info(f"Found file at: {found_path}")
+            logger.info(f"Fallback found file at: {found_path}")
             abs_path = os.path.abspath(found_path)
         else:
-            logger.error(f"File not found: {abs_path} (and not found in uploads search)")
-            return {"success": False, "error": "File not found"}
+            logger.error(f"File not found after exhaustive search: {request.videoPath}")
+            return {"success": False, "error": f"File not found: {filename}"}
         
     try:
-        # Run transcription (Synchronous for now, but faster-whisper is fast)
-        # For very long videos, we should use background tasks, but user complained about 29m wait.
-        # Faster-whisper should take ~2-3 mins for 25 mins on CPU, seconds on GPU.
+        # Update progress to started
+        TRANSCRIPTION_PROGRESS[request.videoPath] = 10
         
-        # Determine model size based on duration? Or just use small/medium.
-        result = transcriber.transcribe(abs_path, model_size="medium")
+        # Run transcription
+        result = transcriber.transcribe(abs_path)
+        
+        # Update progress to finished
+        TRANSCRIPTION_PROGRESS[request.videoPath] = 100
+        
+        # Persist to DB if projectId is provided
+        if request.projectId:
+            db = SessionLocal()
+            try:
+                # Clear existing segments
+                from db import Segment as DBSegment
+                db.query(DBSegment).filter(DBSegment.projectId == request.projectId).delete()
+                
+                # Add new segments
+                for w in result.get('words', []):
+                    db_seg = DBSegment(
+                        projectId=request.projectId,
+                        start=w['start'] / 1000.0,
+                        end=w['end'] / 1000.0,
+                        text=w['word'],
+                        type="speech"
+                    )
+                    db.add(db_seg)
+                db.commit()
+                logger.info(f"Persisted {len(result.get('words', []))} segments for project {request.projectId}")
+            except Exception as e:
+                logger.error(f"Failed to persist segments: {e}")
+                db.rollback()
+            finally:
+                db.close()
         
         return {
             "success": True,
-            "transcription": result
+            "transcription": result,
+            "segments": [
+                {
+                    "start": w['start'] / 1000.0,
+                    "end": w['end'] / 1000.0,
+                    "text": w['word'],
+                    "type": "speech",
+                    "isDeleted": False
+                } for w in result.get('words', [])
+            ] if request.projectId else None
         }
     except Exception as e:
         logger.error(f"Transcription failed: {e}")
@@ -317,7 +386,10 @@ async def export_transcript(request: ExportTranscriptRequest):
     output_lines = []
     
     for w in words:
-        start_sec = w.get('start', 0)
+        # words in frontend/transcription blob are in milliseconds
+        start_ms = w.get('start', 0)
+        start_sec = start_ms / 1000.0
+        
         hours = int(start_sec // 3600)
         minutes = int((start_sec % 3600) // 60)
         seconds = int(start_sec % 60)

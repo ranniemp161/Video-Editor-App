@@ -220,7 +220,7 @@ export const useTimeline = () => {
     } finally {
       setIsTranscribing(null);
     }
-  }, []);
+  }, [assets]);
 
   const generateTimelineFromSegments = useCallback((curSegments: any[], assetId: string = 'video-1') => {
     // Filter out deleted segments
@@ -335,10 +335,16 @@ export const useTimeline = () => {
     }
   }, [projectId]);
 
-  // Fetch segments on load if projectId exists
+  // Track whether we've already restored assets from the backend on this session
+  const hasInitializedRef = useRef(false);
+  // Keep a ref to the latest timeline so effects see live state, not stale closure
+  const timelineRef = useRef(timeline);
+  useEffect(() => { timelineRef.current = timeline; }, [timeline]);
+
+  // Fetch project state on load (ONCE per session, not on every projectId change)
   useEffect(() => {
-    // Try to restore from local storage if not in state
     if (!projectId) {
+      // Try to restore from local storage if not in state
       const stored = localStorage.getItem('currentProjectId');
       if (stored) setProjectId(stored);
       return;
@@ -346,6 +352,11 @@ export const useTimeline = () => {
 
     // Save to local storage
     localStorage.setItem('currentProjectId', projectId);
+
+    // Only hydrate from backend ONCE per session to avoid overwriting transcription
+    // state that may be freshly set by the upload/transcription flow.
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
 
     const fetchSegments = async () => {
       try {
@@ -390,7 +401,14 @@ export const useTimeline = () => {
             };
           }
 
-          setAssets([restoredAsset]);
+          // Only set assets if we don't already have them from the upload flow
+          setAssets(prev => {
+            // If assets already populated (e.g. fresh upload), keep them and just patch remoteSrc
+            if (prev.length > 0) {
+              return prev.map(a => ({ ...a, remoteSrc: a.remoteSrc || remoteSrc }));
+            }
+            return [restoredAsset];
+          });
         }
 
         if (data.segments) {
@@ -403,9 +421,12 @@ export const useTimeline = () => {
     fetchSegments();
   }, [projectId]); // Removed generateTimelineFromSegments dependency to avoid loops checks
 
+  const hasRestoredRef = useRef(false);
+
   // Session Recovery: Check for saved rough cut results on page load
   useEffect(() => {
     if (!projectId) return;
+    if (hasRestoredRef.current) return; // Only restore once per session
 
     const checkForSavedRoughCut = async () => {
       try {
@@ -416,11 +437,12 @@ export const useTimeline = () => {
 
         // If we found saved rough cut results and timeline is empty, restore them
         if (data.found && data.clips && data.clips.length > 0) {
-          // Check if timeline already has clips (user might have manually added some)
-          const hasExistingClips = timeline.tracks.some(t => t.clips.length > 0);
+          // Use ref to get current timeline state (avoids stale closure)
+          const hasExistingClips = timelineRef.current.tracks.some(t => t.clips.length > 0);
 
           if (!hasExistingClips) {
             console.log(`🔄 Session Recovery: Restoring ${data.clips.length} clips from ${new Date(data.createdAt * 1000).toLocaleTimeString()}`);
+            hasRestoredRef.current = true;
 
             // Restore clips to timeline
             setTimeline(prev => ({
@@ -445,13 +467,16 @@ export const useTimeline = () => {
     };
 
     checkForSavedRoughCut();
-  }, [projectId, timeline.tracks]); // Depend on timeline.tracks to avoid race conditions
+  }, [projectId]); // Remove timeline.tracks to prevent infinite loop
 
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
 
   const transcribeAsset = useCallback(async (assetId: string, fileName: string) => {
     setIsTranscribing(assetId);
     setTranscriptionProgress(0);
+    // Preserve the current timeline clips during transcription — mark recovery as done
+    // to avoid session recovery overwriting whatever clips are on the timeline
+    hasRestoredRef.current = true;
 
     // Find asset to get duration
     const asset = assets.find(a => a.id === assetId);
@@ -478,15 +503,34 @@ export const useTimeline = () => {
       const response = await fetch(`${API_BASE}/transcribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoPath, duration: asset.duration })
+        body: JSON.stringify({
+          videoPath,
+          duration: asset.duration,
+          projectId: projectId || assetId // Match project flow
+        })
       });
       const result = await response.json();
       if (result.success) {
+        if (result.segments) {
+          setSegments(result.segments);
+        }
+        // Build a properly-typed transcription object from the raw Whisper response
+        const rawWords: any[] = result.transcription?.words || [];
         const transcriptionWithSource = {
-          ...result.transcription,
+          transcription: result.transcription?.text || '',
+          words: rawWords.map((w: any) => ({
+            word: w.word,
+            start: w.start,   // already in ms from transcriber.py
+            end: w.end,
+            score: w.score
+          })),
           source: 'ai' as const
         };
+        // Patch asset transcription without replacing the whole asset array identity
         setAssets(prev => prev.map(a => a.id === assetId ? { ...a, transcription: transcriptionWithSource } : a));
+      } else {
+        console.error('Transcription error from backend:', result.error);
+        alert(`Transcription failed: ${result.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Transcription failed:', err);
@@ -495,7 +539,7 @@ export const useTimeline = () => {
       setTranscriptionProgress(0);
       setIsTranscribing(null);
     }
-  }, [assets]);
+  }, [assets, projectId]);
 
   const refineTranscript = useCallback(async (assetId: string) => {
     // Determine project ID. In single project mode, it's just projectId.
@@ -543,7 +587,13 @@ export const useTimeline = () => {
     const asset = assets.find(a => a.id === assetId);
     if (!asset || !asset.transcription) return;
 
+    // Always use the real projectId for the backend request so DB lookups work correctly.
+    // Fall back to assetId only if projectId is not yet set (edge case).
+    const backendAssetId = projectId || assetId;
+
     setIsAutoCutting(true);
+    // Mark session recovery as done so it does not overwrite these fresh clips
+    hasRestoredRef.current = true;
     try {
       const response = await fetch(`${API_BASE}/auto-cut`, {
         method: 'POST',
@@ -551,11 +601,11 @@ export const useTimeline = () => {
         body: JSON.stringify({
           words: asset.transcription.words,
           asset: {
-            id: asset.id,
+            id: backendAssetId, // Use real projectId so backend DB lookup succeeds
             name: asset.name,
             duration: asset.duration
           },
-          trackId: 'video-1'
+          trackId: 'v1'
         })
       });
 
@@ -574,10 +624,13 @@ export const useTimeline = () => {
       }
 
       if (data.clips && data.clips.length > 0) {
+        // Re-map assetId in returned clips to the local asset id so Preview component
+        // can correctly look up the asset's src/remoteSrc
+        const remappedClips = data.clips.map((c: any) => ({ ...c, assetId }));
         setTimeline(prev => {
           const newTracks = prev.tracks.map(track => {
             if (track.id === 'v1') { // Target V1 only
-              return { ...track, clips: data.clips };
+              return { ...track, clips: remappedClips };
             }
             return track;
           });
@@ -586,13 +639,14 @@ export const useTimeline = () => {
         console.log(`✅ Added ${data.clips.length} clips to timeline`);
       } else {
         console.warn('⚠️ No clips returned from auto-cut');
+        alert('Auto-cut returned no clips. The transcript may be too short or contain no speech.');
       }
     } catch (err) {
       console.error('Auto-cut failed:', err);
     } finally {
       setIsAutoCutting(false);
     }
-  }, [assets]);
+  }, [assets, projectId]);
 
   const importXML = useCallback((xmlString: string) => {
     const parser = new DOMParser();
@@ -992,6 +1046,7 @@ export const useTimeline = () => {
         return { ...track, clips };
       });
 
+      if (!changed) return prev;
       setPast(p => [...p, prev].slice(-50));
       setFuture([]);
       return next;

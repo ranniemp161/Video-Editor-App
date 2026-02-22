@@ -1,4 +1,3 @@
-``
 import React, { useState, ChangeEvent } from 'react';
 import { MediaPool } from '@/components/MediaPool';
 import { Preview } from '@/components/Preview';

@@ -34,7 +34,7 @@ async def auto_cut(request: AutoCutRequest):
         if 'word' not in nw and 'text' in nw:
             nw['word'] = nw['text']
             
-        if nw.get('start', 0) > request.asset.duration * 1.1:
+        if nw.get('start', 0) > 1000: # Simple heuristic: > 1000 means ms
             nw['start'] /= 1000.0
             nw['end'] /= 1000.0
             
