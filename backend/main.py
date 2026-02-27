@@ -1,13 +1,15 @@
 # FastAPI Application Entry Point
 import os
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from db import SessionLocal, engine, Base, RoughCutResult
-from api import projects_router, transcripts_router, editing_router
+from api import projects_router, transcripts_router, editing_router, system_router
 from api.projects import cleanup_orphaned_files
+from ml_scheduler import MLScheduler
 
 # Create tables (RoughCutResult must be imported above for SQLAlchemy to see it)
 Base.metadata.create_all(bind=engine)
@@ -29,64 +31,41 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(system_router)
 app.include_router(projects_router)
 app.include_router(transcripts_router)
 app.include_router(editing_router)
 
-# ML Scheduler
-from ml_scheduler import MLScheduler
+# ML Scheduler instance
 scheduler = MLScheduler()
 
-@app.on_event("startup")
-def startup_event():
-    """Run cleanup and start ML scheduler."""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application startup and shutdown events."""
+    # Startup
     db = SessionLocal()
     try:
         cleanup_orphaned_files(db)
     finally:
         db.close()
         
-    # Start ML Scheduler (checks every hour)
     try:
+        # Start ML Scheduler (checks every hour)
         scheduler.start(interval_seconds=3600)
     except Exception as e:
         logger.error(f"Failed to start ML scheduler: {e}")
-
-
-@app.on_event("shutdown")
-def shutdown_event():
-    """Stop ML scheduler."""
+        
+    yield
+    
+    # Shutdown
     if scheduler:
         scheduler.stop()
 
-
-@app.get("/")
-def read_root():
-    """Health check endpoint."""
-    return {"message": "Video Editor API"}
+app = FastAPI(title="Video Editor API", lifespan=lifespan)
+app.state.scheduler = scheduler
 
 
-@app.get("/ml-status")
-def get_ml_status():
-    """Get current ML training status and metrics."""
-    try:
-        state = scheduler._load_state()
-        return {
-            "status": "active" if scheduler.is_running else "stopped",
-            "last_training": state.get("last_trained_timestamp"),
-            "sample_count": state.get("last_trained_count"),
-            "metrics": state.get("latest_metrics", {})
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-
-@app.get("/transcription-progress")
-async def get_transcription_progress(videoPath: str):
-    """Return real transcription progress if available."""
-    from api.transcripts import TRANSCRIPTION_PROGRESS
-    progress = TRANSCRIPTION_PROGRESS.get(videoPath, 0)
-    return {"progress": progress, "status": "processing" if progress < 100 else "completed"}
+# Note: Root, ml-status, and transcription-progress routes have been moved to api/system.py
 
 
 if __name__ == "__main__":

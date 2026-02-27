@@ -17,6 +17,7 @@ services:
     environment:
       - PORT=8000
       - PYTHONUNBUFFERED=1
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     restart: unless-stopped
     networks:
       - video-editor-network
