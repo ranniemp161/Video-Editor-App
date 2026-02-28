@@ -8,7 +8,8 @@ scipy
 fuzzywuzzy
 python-levenshtein
 sqlalchemy
-google-generativeai
+google-genai
+pydantic-settings
 pandas
 scikit-learn
 joblib

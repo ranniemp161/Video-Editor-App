@@ -56,7 +56,6 @@ async def auto_cut(request: AutoCutRequest):
     rough_cut = ProfessionalRoughCutV2(normalized_words, video_path=video_path)
     segments = rough_cut.analyze()
     stats = rough_cut.get_statistics()
-    
     logger.info(f"Professional rough cut: {len(segments)} segments, "
                 f"{stats['reduction_percentage']}% reduction, "
                 f"{stats['time_saved']:.1f}s saved")

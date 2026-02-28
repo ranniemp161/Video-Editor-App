@@ -8,7 +8,11 @@ Responsibilities:
 """
 
 import logging
+import warnings
 import os
+
+# Suppress repetitive scikit-learn parallel processing warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 import json
 import joblib
 import pandas as pd

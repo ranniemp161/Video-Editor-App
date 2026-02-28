@@ -56,12 +56,16 @@ class ProfessionalRoughCutV2:
         # Phase 1: Multi-modal Audio Init
         try:
             if self.video_path:
-                from .audio_analyzer import AudioAnalyzer
-                self.audio_analyzer = AudioAnalyzer(self.video_path)
+                try:
+                    from .audio_analyzer import AudioAnalyzer
+                    self.audio_analyzer = AudioAnalyzer(self.video_path)
+                except Exception as e:
+                    logger.warning(f"AudioAnalyzer failed to initialize: {e}")
+                    self.audio_analyzer = None
             else:
                 self.audio_analyzer = None
         except Exception as e:
-            logger.warning(f"AudioAnalyzer initialization failed: {e}")
+            logger.warning(f"Core rough cut audio setup failed: {e}")
             self.audio_analyzer = None
 
         # Phase 2: LLM Semantic Filtering
@@ -1140,7 +1144,7 @@ class ProfessionalRoughCutV2:
         """
         Uses LLMEditor to identify and remove high-level fluff/tangents.
         """
-        if not segments or not getattr(self, 'llm_editor', None) or not self.llm_editor.model:
+        if not segments or not getattr(self, 'llm_editor', None) or not self.llm_editor.client:
             return segments
             
         logger.info("Running LLM Semantic Pass for fluff detection...")
@@ -1203,19 +1207,23 @@ class ProfessionalRoughCutV2:
     
     def get_statistics(self) -> Dict:
         """Return editing statistics."""
-        if not self.words or not self.segments:
-            return self.stats
+        original_duration = 0.0
+        final_duration = 0.0
         
-        original_duration = self.words[-1]['end'] - self.words[0]['start']
-        final_duration = sum(s['end'] - s['start'] for s in self.segments)
+        if self.words:
+            original_duration = self.words[-1]['end'] - self.words[0]['start']
+        
+        if self.segments:
+            final_duration = sum(s['end'] - s['start'] for s in self.segments)
+            
+        time_saved = original_duration - final_duration
+        reduction = (1 - final_duration / original_duration) * 100 if original_duration > 0 else 0
         
         return {
             **self.stats,
             'segment_count': len(self.segments),
             'original_duration': round(original_duration, 2),
             'final_duration': round(final_duration, 2),
-            'time_saved': round(original_duration - final_duration, 2),
-            'reduction_percentage': round(
-                (1 - final_duration / original_duration) * 100, 1
-            ) if original_duration > 0 else 0
+            'time_saved': round(time_saved, 2),
+            'reduction_percentage': round(reduction, 1)
         }

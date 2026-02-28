@@ -63,8 +63,8 @@ interface EditorLayoutProps {
     uploadTranscript: (assetId: string, file: File) => Promise<void>;
     refineTranscript: (assetId: string) => Promise<void>;
     toggleSegmentDelete: (start: number) => void;
-    deleteClipRange: (id: string, start: number, end: number) => void;
-    restoreClipRange: (id: string, start: number, end: number) => void;
+    deleteClipRange: (assetId: string, start: number, end: number) => void;
+    restoreClipRange: (assetId: string, start: number, end: number, playheadPosition: number) => void;
     transcriptOffset: number;
     setTranscriptOffset: (o: number) => void;
     activeAssetRanges: any[];
@@ -155,7 +155,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                                             if (isIncluded) {
                                                 deleteClipRange(activeTranscriptAsset.id, word.start / 1000, word.end / 1000);
                                             } else {
-                                                restoreClipRange(activeTranscriptAsset.id, word.start / 1000, word.end / 1000);
+                                                restoreClipRange(activeTranscriptAsset.id, word.start / 1000, word.end / 1000, playheadPosition);
                                             }
                                         }
                                         toggleSegmentDelete(start);
@@ -167,7 +167,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                                     }}
                                     onRestoreRange={(start, end) => {
                                         if (activeTranscriptAsset?.id) {
-                                            restoreClipRange(activeTranscriptAsset.id, start, end);
+                                            restoreClipRange(activeTranscriptAsset.id, start, end, playheadPosition);
                                         }
                                     }}
                                     onRefine={refineTranscript}

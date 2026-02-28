@@ -78,7 +78,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       } as Asset;
     }
     return currentClip?.asset ?? assets[0] ?? null;
-  }, [segments, assets, transcriptWords, currentClip?.asset?.id]);
+  }, [segments, assets, transcriptWords, currentClip?.clip?.assetId]);
 
   const activeAssetRanges = useMemo(() => {
     const asset = activeTranscriptAsset;

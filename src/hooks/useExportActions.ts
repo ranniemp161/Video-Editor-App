@@ -1,14 +1,12 @@
-/**
- * useExport - Export and render functionality
- * Handles XML, EDL exports and MP4 rendering
- */
-import { useState, useCallback } from 'react';
-import { TimelineState, Asset } from '../types';
+
+import { useCallback, useState } from 'react';
+import { TimelineStateHook } from './useTimelineState';
 
 const basename = (path: string) => path.split(/[\\/]/).pop() || '';
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-export const useExport = (timeline: TimelineState, assets: Asset[]) => {
+export const useExportActions = (state: TimelineStateHook) => {
+    const { timeline, assets } = state;
     const [renderStatus, setRenderStatus] = useState<'idle' | 'rendering' | 'success' | 'error'>('idle');
     const [renderProgress, setRenderProgress] = useState(0);
     const [lastRenderPath, setLastRenderPath] = useState<string | null>(null);
@@ -73,17 +71,41 @@ export const useExport = (timeline: TimelineState, assets: Asset[]) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            const result = await response.json();
-            if (result.success) {
-                const link = document.createElement('a');
-                link.href = result.path;
-                link.download = basename(result.path);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+
+            if (!response.ok) {
+                throw new Error(`Export failed: ${response.status}`);
             }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const result = await response.json();
+                if (result.success === false) {
+                    alert(result.error || 'Export failed');
+                    return;
+                }
+                if (result.path) {
+                    const link = document.createElement('a');
+                    link.href = result.path;
+                    link.download = basename(result.path);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    return;
+                }
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `rough_cut_${Date.now()}.xml`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error('XML Export failed:', err);
+            alert('XML Export failed. Please try again.');
         }
     }, [timeline, assets]);
 
@@ -104,17 +126,41 @@ export const useExport = (timeline: TimelineState, assets: Asset[]) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            const result = await response.json();
-            if (result.success) {
-                const link = document.createElement('a');
-                link.href = result.path;
-                link.download = basename(result.path);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+
+            if (!response.ok) {
+                throw new Error(`Export failed: ${response.status}`);
             }
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const result = await response.json();
+                if (result.success === false) {
+                    alert(result.error || 'Export failed');
+                    return;
+                }
+                if (result.path) {
+                    const link = document.createElement('a');
+                    link.href = result.path;
+                    link.download = basename(result.path);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    return;
+                }
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `rough_cut_${Date.now()}.edl`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error('EDL Export failed:', err);
+            alert('EDL Export failed. Please try again.');
         }
     }, [timeline, assets]);
 
@@ -122,34 +168,32 @@ export const useExport = (timeline: TimelineState, assets: Asset[]) => {
         try {
             const response = await fetch(`${API_BASE}/export-transcript`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    transcription,
-                    format: 'txt'
-                })
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ transcription, format: 'txt' }),
             });
 
             if (response.ok) {
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'transcript.txt';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transcript_${Date.now()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            } else {
+                console.error('Failed to export transcript');
             }
-        } catch (err) {
-            console.error('Transcript export failed:', err);
+        } catch (error) {
+            console.error('Error exporting transcript:', error);
         }
     }, []);
 
-    const importXML = useCallback((
-        xmlString: string,
-        setTimeline: (updater: (prev: TimelineState) => TimelineState) => void,
-        pushHistory: (prev: TimelineState) => void
-    ) => {
+    const importXML = useCallback((xmlString: string) => {
+        const { setTimeline, setPast, setFuture } = state;
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlString, "text/xml");
         const clipTags = xmlDoc.getElementsByTagName('clipitem');
@@ -183,19 +227,20 @@ export const useExport = (timeline: TimelineState, assets: Asset[]) => {
         });
 
         setTimeline(prev => {
-            pushHistory(prev);
+            setPast(p => [...p, prev].slice(-50));
+            setFuture([]);
             return {
                 ...prev,
                 tracks: prev.tracks.map((t, i) => i === 0 ? { ...t, clips: newClips } : t)
             };
         });
-    }, []);
+    }, [state]);
 
     return {
-        renderToMP4,
         renderStatus,
         renderProgress,
         lastRenderPath,
+        renderToMP4,
         exportToXML,
         exportToEDL,
         exportTranscript,

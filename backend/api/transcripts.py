@@ -4,7 +4,7 @@ import re
 import json
 import uuid
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse
 
 
@@ -23,11 +23,10 @@ UPLOAD_DIR = "public/uploads"
 # Global transcriber instance (lazy loaded)
 transcriber = WhisperTranscriber()
 
-# Global progress tracker (videoPath -> progress 0-100)
-TRANSCRIPTION_PROGRESS = {}
+# Progress tracking moved to app.state
 
 @router.post("/transcribe")
-def transcribe_media(request: TranscribeRequest):
+def transcribe_media(request: TranscribeRequest, raw_request: Request):
     """
     Transcribe a video/audio file using Faster-Whisper.
     """
@@ -98,13 +97,13 @@ def transcribe_media(request: TranscribeRequest):
         
     try:
         # Update progress to started
-        TRANSCRIPTION_PROGRESS[request.videoPath] = 10
+        raw_request.app.state.transcription_progress[request.videoPath] = 10
         
         # Run transcription
         result = transcriber.transcribe(abs_path)
         
         # Update progress to finished
-        TRANSCRIPTION_PROGRESS[request.videoPath] = 100
+        raw_request.app.state.transcription_progress[request.videoPath] = 100
         
         # Persist to DB if projectId is provided
         if request.projectId:

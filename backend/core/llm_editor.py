@@ -1,33 +1,39 @@
-
-import os
 import json
 import logging
+import re
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
 from typing import List, Dict
-import google.generativeai as genai
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 
 class LLMEditor:
     def __init__(self):
-        self.api_key = os.environ.get("GEMINI_API_KEY")
-        self.model = None
+        self.api_key = settings.gemini_api_key
+        self.client = None
         
-        if self.api_key:
+        if self.api_key and genai:
             try:
-                genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-2.0-flash')
-                logger.info("LLMEditor initialized with Gemini 2.0 Flash.")
+                self.client = genai.Client(api_key=self.api_key)
+                logger.info("LLMEditor initialized with Gemini 2.0 Flash (via google-genai).")
             except Exception as e:
                 logger.error(f"Failed to initialize Gemini API: {e}")
         else:
-            logger.warning("GEMINI_API_KEY not found in environment. LLM filtering will be skipped.")
+            if not genai:
+                logger.warning("google-genai package not found. LLM filtering will be skipped.")
+            else:
+                logger.warning("GEMINI_API_KEY not found in settings. LLM filtering will be skipped.")
 
     def identify_fluff(self, segments: List[Dict]) -> List[int]:
         """
         Send a batch of segments to Gemini to identify which ones should be CUT.
         Returns a list of segment indices to discard.
         """
-        if not self.model or not segments:
+        if not self.client or not segments:
             return []
 
         # 1. Format segments for prompt
@@ -64,8 +70,11 @@ OUTPUT FORMAT:
 """
 
         try:
-            response = self.model.generate_content(prompt)
-            # Parse response (cleaning up markdown if necessary)
+            response = self.client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
+            # Parse response
             text_response = response.text.strip()
             # Remove markdown backticks if present
             if text_response.startswith("```"):
