@@ -28,16 +28,22 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
             return;
         }
 
+        // Build the most reliable video path:
+        // 1. Use remoteSrc (set after upload completes, e.g. "/uploads/uuid/file.mp4")
+        // 2. Fall back to constructing from projectId
+        // 3. Last resort: bare fileName
+        const videoPath = asset.remoteSrc ||
+            (projectId ? `/uploads/${projectId}/${fileName}` : fileName);
+
+        console.log('Transcribe: sending videoPath =', videoPath, '| projectId =', projectId || assetId);
+
         const pollInterval = setInterval(async () => {
             try {
-                const videoPath = asset.remoteSrc || fileName;
                 const res = await fetch(`${API_BASE}/transcription-progress?videoPath=${encodeURIComponent(videoPath)}`);
                 const data = await res.json();
                 setTranscriptionProgress(data.progress || 0);
             } catch (e) { console.error(e); }
         }, 1000);
-
-        const videoPath = asset.remoteSrc || fileName;
 
         try {
             const response = await fetch(`${API_BASE}/transcribe`, {

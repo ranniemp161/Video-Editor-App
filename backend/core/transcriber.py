@@ -8,12 +8,14 @@ from .word_timing import refine_word_timestamps_with_audio
 logger = logging.getLogger(__name__)
 
 class WhisperTranscriber:
-    def __init__(self, model_size: str = "small", device: str = "cpu", compute_type: str = "int8"):
+    def __init__(self, model_size: str = "base", device: str = "cpu", compute_type: str = "int8"):
         """
         Initialize the Faster-Whisper model.
         
         Args:
             model_size: Size of the model (tiny, base, small, medium, large-v2, large-v3)
+                        'base' is recommended for CPU — good balance of speed and accuracy.
+                        'tiny' is fastest but lower accuracy.
             device: "cuda" for NVIDIA GPU, "cpu" for CPU, or "auto"
             compute_type: "float16" for GPU, "int8" for CPU quantization
         """
@@ -21,6 +23,7 @@ class WhisperTranscriber:
         self.device = device
         self.compute_type = compute_type
         self.model = None
+        self._progress_callback = None  # Optional callback for progress updates
 
     def _load_model(self):
         """Lazy load the model only when needed."""
@@ -69,7 +72,7 @@ class WhisperTranscriber:
             logger.error(f"FFmpeg failed: {error_msg}")
             raise RuntimeError(f"Failed to extract audio: {error_msg}")
 
-    def transcribe(self, audio_path: str, language: str = None, beam_size: int = 5, model_size: str = None) -> Dict:
+    def transcribe(self, audio_path: str, language: str = None, beam_size: int = 5, model_size: str = None, progress_callback=None) -> Dict:
         """
         Transcribe audio file to word-level segments.
         
@@ -108,12 +111,23 @@ class WhisperTranscriber:
                 vad_parameters=dict(min_silence_duration_ms=500)
             )
             
+            total_duration = info.duration or 1.0
             full_text = []
             words_list = []
+            segment_count = 0
             
             # Generator to list (this runs the inference)
             for segment in segments:
                 full_text.append(segment.text)
+                segment_count += 1
+                
+                # Report progress based on how far through the audio we are
+                if progress_callback and segment.end > 0:
+                    pct = min(95, int((segment.end / total_duration) * 100))
+                    progress_callback(pct)
+                
+                if segment_count % 10 == 0:
+                    logger.info(f"Transcribing... {segment.end:.1f}s / {total_duration:.1f}s ({int(segment.end/total_duration*100)}%)")
                 
                 # segment.words contains the word-level timestamps
                 if segment.words:

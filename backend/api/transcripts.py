@@ -42,20 +42,20 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
     rel_path = request.videoPath.lstrip('/')
     abs_path = None
 
-    # 1. Check if it's already an absolute path in the container (e.g. starting with /app/)
-    if request.videoPath.startswith('/app/') and os.path.exists(request.videoPath):
-        abs_path = request.videoPath
-    
-    # 2. Try to resolve via projectId and DB if provided
-    if not abs_path and request.projectId:
+    # 1. PRIORITY: Resolve via projectId and DB (most reliable — works even with bare filenames)
+    if request.projectId:
         db = SessionLocal()
         try:
             db_project = db.query(Project).filter(Project.id == request.projectId).first()
-            if db_project and os.path.exists(db_project.mediaPath):
+            if db_project and db_project.mediaPath and os.path.exists(db_project.mediaPath):
                 abs_path = db_project.mediaPath
                 logger.info(f"Resolved path from DB for project {request.projectId}: {abs_path}")
         finally:
             db.close()
+
+    # 2. Check if it's already an absolute path in the container (e.g. starting with /app/)
+    if not abs_path and request.videoPath.startswith('/app/') and os.path.exists(request.videoPath):
+        abs_path = request.videoPath
 
     # 3. Try primary relative path resolution
     if not abs_path:
@@ -67,7 +67,7 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
             if os.path.exists(test_path):
                 abs_path = test_path
 
-    # 4. Final Fallback: Robust Search
+    # 4. Final Fallback: Recursive file search in upload directory
     if not abs_path:
         filename = os.path.basename(rel_path)
         logger.info(f"File not found at primary locations. Searching for '{filename}'...")
@@ -81,26 +81,38 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
                 search_root = possible_project_dir
 
         for root, dirs, files in os.walk(search_root):
-            # Case-insensitive search
             for f in files:
                 if f.lower() == filename.lower():
                     found_path = os.path.join(root, f)
                     break
             if found_path: break
         
+        # If not found in project dir, try the full uploads directory
+        if not found_path and search_root != UPLOAD_DIR:
+            for root, dirs, files in os.walk(UPLOAD_DIR):
+                for f in files:
+                    if f.lower() == filename.lower():
+                        found_path = os.path.join(root, f)
+                        break
+                if found_path: break
+
         if found_path:
             logger.info(f"Fallback found file at: {found_path}")
             abs_path = os.path.abspath(found_path)
         else:
-            logger.error(f"File not found after exhaustive search: {request.videoPath}")
-            return {"success": False, "error": f"File not found: {filename}"}
+            logger.error(f"File not found after exhaustive search: {request.videoPath} (projectId: {request.projectId})")
+            return {"success": False, "error": f"File not found: {filename}. Make sure you upload the video first."}
         
     try:
         # Update progress to started
         raw_request.app.state.transcription_progress[request.videoPath] = 10
         
+        # Progress callback to feed real-time updates to the frontend
+        def on_progress(pct: int):
+            raw_request.app.state.transcription_progress[request.videoPath] = pct
+        
         # Run transcription
-        result = transcriber.transcribe(abs_path)
+        result = transcriber.transcribe(abs_path, progress_callback=on_progress)
         
         # Update progress to finished
         raw_request.app.state.transcription_progress[request.videoPath] = 100
