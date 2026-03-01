@@ -28,14 +28,21 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
             return;
         }
 
+        // Guard: projectId must be the real backend UUID (set after upload completes).
+        // Without it, the backend cannot locate the file.
+        if (!projectId) {
+            alert('Upload is still in progress. Please wait for the upload to finish before transcribing.');
+            setIsTranscribing(null);
+            return;
+        }
+
         // Build the most reliable video path:
         // 1. Use remoteSrc (set after upload completes, e.g. "/uploads/uuid/file.mp4")
-        // 2. Fall back to constructing from projectId
-        // 3. Last resort: bare fileName
+        // 2. Fall back to constructing from projectId (always the backend UUID)
         const videoPath = asset.remoteSrc ||
-            (projectId ? `/uploads/${projectId}/${fileName}` : fileName);
+            `/uploads/${projectId}/${fileName}`;
 
-        console.log('Transcribe: sending videoPath =', videoPath, '| projectId =', projectId || assetId);
+        console.log('Transcribe: sending videoPath =', videoPath, '| projectId =', projectId);
 
         const pollInterval = setInterval(async () => {
             try {
@@ -52,7 +59,7 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
                 body: JSON.stringify({
                     videoPath,
                     duration: asset.duration,
-                    projectId: projectId || assetId
+                    projectId: projectId
                 })
             });
             const result = await response.json();

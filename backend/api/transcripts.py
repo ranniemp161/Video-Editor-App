@@ -100,6 +100,16 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
             logger.info(f"Fallback found file at: {found_path}")
             abs_path = os.path.abspath(found_path)
         else:
+            # Detect if the projectId is a frontend-generated asset ID (not a real backend UUID)
+            is_frontend_id = request.projectId and request.projectId.startswith("asset-")
+            if is_frontend_id:
+                logger.error(
+                    f"File not found: {request.videoPath} — projectId '{request.projectId}' "
+                    f"is a frontend asset ID, not a backend UUID. "
+                    f"The upload may not have completed before transcription was triggered."
+                )
+                return {"success": False, "error": "Upload not complete yet. Please wait for the upload to finish and try again."}
+            
             logger.error(f"File not found after exhaustive search: {request.videoPath} (projectId: {request.projectId})")
             return {"success": False, "error": f"File not found: {filename}. Make sure you upload the video first."}
         
