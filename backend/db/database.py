@@ -7,9 +7,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Constants for testability and configuration
-# Default path: ProjectRoot/data (used locally)
-default_data_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data"))
+# Default path: backend/data (used locally and in Docker)
+default_data_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data"))
 
 # Fallback path: Current working directory/data (guaranteed writable in many environments)
 fallback_data_dir = os.path.abspath(os.path.join(os.getcwd(), "data"))

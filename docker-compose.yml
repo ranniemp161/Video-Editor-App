@@ -6,14 +6,16 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: video-editor-backend:latest
     container_name: video-editor-backend
     ports:
       - "8000:8000"
     volumes:
       # Mount source code for hot-reloading
       - ./backend:/app
-      # Persist uploads on host
-      - ./backend/public:/app/public
+      # Persist data and uploads on host
+      - ./backend/data:/app/data
+      - ./backend/public/uploads:/app/public/uploads
     environment:
       - PORT=8000
       - PYTHONUNBUFFERED=1
@@ -30,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: video-editor-frontend:latest
     container_name: video-editor-frontend
     ports:
       - "3000:5173"

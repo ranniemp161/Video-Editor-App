@@ -1,8 +1,10 @@
 # FastAPI Application Entry Point
+import os
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -18,8 +20,10 @@ from api.projects import cleanup_orphaned_files
 from ml_scheduler import MLScheduler
 from core.config import settings
 
-# Create tables (RoughCutResult must be imported above for SQLAlchemy to see it)
+# Create tables and directories
 Base.metadata.create_all(bind=engine)
+os.makedirs(settings.data_dir, exist_ok=True)
+os.makedirs(settings.upload_dir, exist_ok=True)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -91,6 +95,9 @@ app.include_router(auth_router)    # Auth routes (login) are public
 app.include_router(projects_router, dependencies=[Depends(verify_jwt_token)])
 app.include_router(transcripts_router, dependencies=[Depends(verify_jwt_token)])
 app.include_router(editing_router, dependencies=[Depends(verify_jwt_token)])
+
+# Serve static files from the uploads directory
+app.mount("/uploads", StaticFiles(directory=str(settings.upload_dir)), name="uploads")
 
 # Note: Root, ml-status, and transcription-progress routes have been moved to api/system.py
 
