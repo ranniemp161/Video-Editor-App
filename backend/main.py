@@ -24,6 +24,19 @@ Base.metadata.create_all(bind=engine)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Security configuration check
+if settings.app_password == "MISSING_IN_ENV" or settings.jwt_secret == "MISSING_IN_ENV":
+    logger.critical("MISSING SECURITY CONFIGURATION!")
+    logger.critical("APP_PASSWORD or JWT_SECRET is not set in environment variables.")
+    logger.critical("Please set these variables in your .env file or deployment dashboard (e.g., Render).")
+    # In production, we should exit if these are missing, but for dev we might want to continue
+    # with a warning. Given the user's focus on production deployment, let's be strict.
+    if not settings.debug:
+        import sys
+        logger.critical("Exiting due to missing security configuration.")
+        sys.exit(1)
+
+
 # ML Scheduler instance
 scheduler = MLScheduler()
 

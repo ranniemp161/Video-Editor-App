@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     # Security: Maximum file upload size to prevent DoS attacks
     max_upload_size_mb: int = 500
     
-    # Global Authentication Password (REQUIRED — no default for security)
-    app_password: str
+    # Global Authentication Password (REQUIRED)
+    app_password: str = "MISSING_IN_ENV"
     
-    # JWT signing secret (REQUIRED — generate with: python -c "import secrets; print(secrets.token_hex(32))")
-    jwt_secret: str
+    # JWT signing secret (REQUIRED)
+    jwt_secret: str = "MISSING_IN_ENV"
     
     model_config = SettingsConfigDict(
         env_file=".env",
