@@ -1,34 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..'); // Video-Editor-App root
 
 export const searchDirs = [
-    // Current Project Priorities
+    // Application-managed directories only
     path.join(projectRoot, 'public'),
     path.join(projectRoot, 'public', 'uploads'),
     path.join(projectRoot, 'dist', 'uploads'),
     path.join(projectRoot, 'videos'),
-
-    // User's Active Folders
-    path.resolve(projectRoot, '..', '..', '..', 'cluade-rannie', 'Videos'),
-    path.resolve(projectRoot, '..', '..', '..', 'Video Editing', 'Assets'),
-    path.resolve(projectRoot, '..', '..', '..', 'Desktop'),
-    path.resolve(projectRoot, '..', '..', '..', 'Downloads'),
-    path.resolve(projectRoot, '..', '..', '..', 'Videos'),
-
-    // Google Drive
-    'H:\\',
-    'H:\\.shortcut-targets-by-id\\1mYQl7irQDT7J6BJKWxGyRIBSmk0aPIbH\\Rannie and Tj\'s Projects\\Exported sections',
-
-    // Other Projects (As fallback only)
-    path.resolve(projectRoot, '..', '..', 'claude project rannie', 'my-video'),
-    path.resolve(projectRoot, '..', '..', 'claude project rannie', 'my-video', 'public'),
-    path.resolve(projectRoot, '..', '..', 'claude project rannie', 'my-video', 'public', 'v2'), // User mentioned this is different
 ];
 
 export function findFile(filename) {
@@ -95,8 +79,8 @@ export function getMediaMetadata(filePath) {
     if (!filePath || !fs.existsSync(filePath)) return null;
 
     try {
-        const cmd = `ffprobe -v error -select_streams v:0 -show_entries stream=width,height,avg_frame_rate -of json "${filePath}"`;
-        const output = execSync(cmd).toString();
+        const args = ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height,avg_frame_rate', '-of', 'json', filePath];
+        const output = execFileSync('ffprobe', args).toString();
         const data = JSON.parse(output);
         const stream = data.streams[0];
 

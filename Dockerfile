@@ -13,6 +13,11 @@ RUN npm install
 # Copy application code
 COPY . .
 
+# Create non-root user for security
+RUN adduser --disabled-password --gecos "" appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
 # Expose Vite dev server port
 EXPOSE 5173
 

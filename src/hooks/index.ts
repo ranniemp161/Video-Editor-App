@@ -12,4 +12,3 @@ export { useExportActions } from './useExportActions';
 export { useTranscriptSync } from './useTranscriptSync';
 export { useAutoCut } from './useAutoCut';
 export { useProjectManagement } from './useProjectManagement';
-export { useVideoPlayer } from './useVideoPlayer';

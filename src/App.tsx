@@ -8,7 +8,7 @@ import { Asset } from '@/types';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return !!localStorage.getItem('auth_token');
   });
 
   const handleLogin = () => {
@@ -16,7 +16,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('auth_token');
     setIsAuthenticated(false);
   };
 

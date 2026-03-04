@@ -6,6 +6,8 @@ import uuid
 import logging
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import FileResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from db import Project, get_db
@@ -18,6 +20,7 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["transcripts"])
+limiter = Limiter(key_func=get_remote_address)
 
 UPLOAD_DIR = str(settings.upload_dir)
 
@@ -27,32 +30,27 @@ transcriber = WhisperTranscriber()
 # Progress tracking moved to app.state
 
 @router.post("/transcribe")
-def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Session = Depends(get_db)):
+@limiter.limit("2/minute")
+def transcribe_media(request: Request, transcribe_data: TranscribeRequest, db: Session = Depends(get_db)):
     """
     Transcribe a video/audio file using Faster-Whisper.
     """
-    logger.info(f"Received transcription request for: {request.videoPath}")
-    
-    # Check if file exists
-    # videoPath from frontend is relative to project root or public?
-    # Usually it's like "/uploads/uuid/file.mp4"
+    logger.info(f"Received transcription request for: {transcribe_data.videoPath}")
     
     # We need to resolve this to an absolute path
-    # Assuming public/uploads is where they are
-    
-    rel_path = request.videoPath.lstrip('/')
+    rel_path = transcribe_data.videoPath.lstrip('/')
     abs_path = None
 
-    # 1. PRIORITY: Resolve via projectId and DB (most reliable — works even with bare filenames)
-    if request.projectId:
-        db_project = db.query(Project).filter(Project.id == request.projectId).first()
+    # 1. PRIORITY: Resolve via projectId and DB
+    if transcribe_data.projectId:
+        db_project = db.query(Project).filter(Project.id == transcribe_data.projectId).first()
         if db_project and db_project.mediaPath and os.path.exists(db_project.mediaPath):
             abs_path = db_project.mediaPath
-            logger.info(f"Resolved path from DB for project {request.projectId}: {abs_path}")
+            logger.info(f"Resolved path from DB for project {transcribe_data.projectId}: {abs_path}")
 
-    # 2. Check if it's already an absolute path in the container (e.g. starting with /app/)
-    if not abs_path and request.videoPath.startswith('/app/') and os.path.exists(request.videoPath):
-        abs_path = request.videoPath
+    # 2. Check if it's already an absolute path in the container
+    if not abs_path and transcribe_data.videoPath.startswith('/app/') and os.path.exists(transcribe_data.videoPath):
+        abs_path = transcribe_data.videoPath
 
     # 3. Try primary relative path resolution
     if not abs_path:
@@ -70,10 +68,9 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Sessi
         logger.info(f"File not found at primary locations. Searching for '{filename}'...")
         
         found_path = None
-        # Try finding in the project subfolder first if we have a projectId
         search_root = UPLOAD_DIR
-        if request.projectId:
-            possible_project_dir = os.path.join(UPLOAD_DIR, request.projectId)
+        if transcribe_data.projectId:
+            possible_project_dir = os.path.join(UPLOAD_DIR, transcribe_data.projectId)
             if os.path.exists(possible_project_dir):
                 search_root = possible_project_dir
 
@@ -84,7 +81,6 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Sessi
                     break
             if found_path: break
         
-        # If not found in project dir, try the full uploads directory
         if not found_path and search_root != UPLOAD_DIR:
             for root, dirs, files in os.walk(UPLOAD_DIR):
                 for f in files:
@@ -97,44 +93,36 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Sessi
             logger.info(f"Fallback found file at: {found_path}")
             abs_path = os.path.abspath(found_path)
         else:
-            # Detect if the projectId is a frontend-generated asset ID (not a real backend UUID)
-            is_frontend_id = request.projectId and request.projectId.startswith("asset-")
+            is_frontend_id = transcribe_data.projectId and transcribe_data.projectId.startswith("asset-")
             if is_frontend_id:
-                logger.error(
-                    f"File not found: {request.videoPath} — projectId '{request.projectId}' "
-                    f"is a frontend asset ID, not a backend UUID. "
-                    f"The upload may not have completed before transcription was triggered."
-                )
-                return {"success": False, "error": "Upload not complete yet. Please wait for the upload to finish and try again."}
+                logger.error(f"File not found: {transcribe_data.videoPath} — projectId '{transcribe_data.projectId}' is a frontend asset ID.")
+                return {"success": False, "error": "Upload not complete yet."}
             
-            logger.error(f"File not found after exhaustive search: {request.videoPath} (projectId: {request.projectId})")
-            return {"success": False, "error": f"File not found: {filename}. Make sure you upload the video first."}
+            logger.error(f"File not found: {transcribe_data.videoPath} (projectId: {transcribe_data.projectId})")
+            return {"success": False, "error": f"File not found: {filename}."}
         
     try:
         # Update progress to started
-        raw_request.app.state.transcription_progress[request.videoPath] = 10
+        request.app.state.transcription_progress[transcribe_data.videoPath] = 10
         
-        # Progress callback to feed real-time updates to the frontend
         def on_progress(pct: int):
-            raw_request.app.state.transcription_progress[request.videoPath] = pct
+            request.app.state.transcription_progress[transcribe_data.videoPath] = pct
         
         # Run transcription
         result = transcriber.transcribe(abs_path, progress_callback=on_progress)
         
         # Update progress to finished
-        raw_request.app.state.transcription_progress[request.videoPath] = 100
+        request.app.state.transcription_progress[transcribe_data.videoPath] = 100
         
         # Persist to DB if projectId is provided
-        if request.projectId:
+        if transcribe_data.projectId:
             try:
-                # Clear existing segments
                 from db import Segment as DBSegment
-                db.query(DBSegment).filter(DBSegment.projectId == request.projectId).delete()
+                db.query(DBSegment).filter(DBSegment.projectId == transcribe_data.projectId).delete()
                 
-                # Add new segments
                 for w in result.get('words', []):
                     db_seg = DBSegment(
-                        projectId=request.projectId,
+                        projectId=transcribe_data.projectId,
                         start=w['start'] / 1000.0,
                         end=w['end'] / 1000.0,
                         text=w['word'],
@@ -142,7 +130,7 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Sessi
                     )
                     db.add(db_seg)
                 db.commit()
-                logger.info(f"Persisted {len(result.get('words', []))} segments for project {request.projectId}")
+                logger.info(f"Persisted {len(result.get('words', []))} segments for project {transcribe_data.projectId}")
             except Exception as e:
                 logger.error(f"Failed to persist segments: {e}")
                 db.rollback()
@@ -158,7 +146,7 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Sessi
                     "type": "speech",
                     "isDeleted": False
                 } for w in result.get('words', [])
-            ] if request.projectId else None
+            ] if transcribe_data.projectId else None
         }
     except Exception as e:
         logger.error(f"Transcription failed: {e}")

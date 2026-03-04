@@ -56,8 +56,10 @@ export default defineConfig(({ mode }) => {
             const url = req.url || '';
 
             if (url.startsWith('/renders/') && req.method === 'GET') {
-              const fileName = url.replace('/renders/', '');
+              const fileName = path.basename(url.replace('/renders/', ''));
               const filePath = path.join(__dirname, 'public', 'renders', fileName);
+              const rendersDir = path.resolve(__dirname, 'public', 'renders');
+              if (!path.resolve(filePath).startsWith(rendersDir)) return next();
               if (fs.existsSync(filePath)) {
                 res.writeHead(200, { 'Content-Type': 'video/mp4' });
                 fs.createReadStream(filePath).pipe(res);
@@ -66,8 +68,10 @@ export default defineConfig(({ mode }) => {
             }
 
             if (url.startsWith('/exports/') && req.method === 'GET') {
-              const fileName = url.replace('/exports/', '');
+              const fileName = path.basename(url.replace('/exports/', ''));
               const filePath = path.join(__dirname, 'public', 'exports', fileName);
+              const exportsDir = path.resolve(__dirname, 'public', 'exports');
+              if (!path.resolve(filePath).startsWith(exportsDir)) return next();
               if (fs.existsSync(filePath)) {
                 res.writeHead(200, { 'Content-Type': 'application/xml' });
                 fs.createReadStream(filePath).pipe(res);

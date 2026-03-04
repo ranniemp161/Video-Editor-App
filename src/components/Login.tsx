@@ -7,18 +7,32 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
 
-        const correctPassword = import.meta.env.VITE_APP_PASSWORD;
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
 
-        if (password === correctPassword) {
-            localStorage.setItem('isAuthenticated', 'true');
-            onLogin();
-        } else {
-            setError('Incorrect password. Please try again.');
-            setPassword('');
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('auth_token', data.token);
+                onLogin();
+            } else {
+                setError('Incorrect password. Please try again.');
+                setPassword('');
+            }
+        } catch {
+            setError('Connection error. Is the server running?');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -47,6 +61,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                 className="w-full px-4 py-3 bg-[#1a1a1a] border border-white/[0.1] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#26c6da] focus:ring-1 focus:ring-[#26c6da] transition-colors"
                                 placeholder="Enter password"
                                 autoFocus
+                                disabled={isLoading}
                             />
                             {error && (
                                 <p className="mt-2 text-sm text-red-400">{error}</p>
@@ -55,9 +70,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                         <button
                             type="submit"
-                            className="w-full py-3 px-4 bg-[#26c6da] hover:bg-[#1fb5c7] text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#26c6da] focus:ring-offset-2 focus:ring-offset-[#0a0a0a]"
+                            disabled={isLoading}
+                            className="w-full py-3 px-4 bg-[#26c6da] hover:bg-[#1fb5c7] text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#26c6da] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] disabled:opacity-50"
                         >
-                            Access Editor
+                            {isLoading ? 'Authenticating...' : 'Access Editor'}
                         </button>
                     </form>
                 </div>

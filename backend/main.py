@@ -1,8 +1,11 @@
 # FastAPI Application Entry Point
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, Header, HTTPException
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import uvicorn
 
 from db import SessionLocal, engine, Base, RoughCutResult
@@ -10,14 +13,10 @@ from api.projects import router as projects_router
 from api.transcripts import router as transcripts_router
 from api.editing import router as editing_router
 from api.system import router as system_router
+from api.auth import router as auth_router, verify_jwt_token
 from api.projects import cleanup_orphaned_files
 from ml_scheduler import MLScheduler
 from core.config import settings
-
-def verify_app_password(x_app_password: str = Header(None)):
-    """Global dependency to protect API routes with the configured app password."""
-    if not x_app_password or x_app_password != settings.app_password:
-        raise HTTPException(status_code=401, detail="Invalid or missing X-App-Password header")
 
 # Create tables (RoughCutResult must be imported above for SQLAlchemy to see it)
 Base.metadata.create_all(bind=engine)
@@ -54,26 +53,31 @@ app = FastAPI(title=settings.app_title, lifespan=lifespan)
 app.state.scheduler = scheduler
 app.state.transcription_progress = {}
 
-# CORS configuration - securely restricted to the frontend origin
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS configuration - restricted to frontend origins with specific methods/headers
 app.add_middleware(
     CORSMiddleware,
-    # In production, this should be set via environment variables.
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000"
     ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
+    expose_headers=["Content-Disposition"],
 )
 
 # Include routers with authentication protection where needed
-app.include_router(system_router) # System routes like health checks are public
-app.include_router(projects_router, dependencies=[Depends(verify_app_password)])
-app.include_router(transcripts_router, dependencies=[Depends(verify_app_password)])
-app.include_router(editing_router, dependencies=[Depends(verify_app_password)])
+app.include_router(system_router)  # System routes like health checks are public
+app.include_router(auth_router)    # Auth routes (login) are public
+app.include_router(projects_router, dependencies=[Depends(verify_jwt_token)])
+app.include_router(transcripts_router, dependencies=[Depends(verify_jwt_token)])
+app.include_router(editing_router, dependencies=[Depends(verify_jwt_token)])
 
 # Note: Root, ml-status, and transcription-progress routes have been moved to api/system.py
 

@@ -6,6 +6,8 @@ import time
 import logging
 from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from db import get_db, Project, Segment as DBSegment
@@ -15,6 +17,7 @@ from core.config import settings
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["projects"])
+limiter = Limiter(key_func=get_remote_address)
 
 UPLOAD_DIR = str(settings.upload_dir)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -68,6 +71,7 @@ def secure_filename(filename: str) -> str:
     return safe_name
 
 @router.post("/upload")
+@limiter.limit("5/minute")
 async def upload_video(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
     """Upload a video file and create a new project."""
     try:
