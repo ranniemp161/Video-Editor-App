@@ -18,6 +18,8 @@ services:
       - PORT=8000
       - PYTHONUNBUFFERED=1
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - APP_PASSWORD=${VITE_APP_PASSWORD}
+      - MAX_UPLOAD_SIZE_MB=${MAX_UPLOAD_SIZE_MB:-500}
     restart: unless-stopped
     networks:
       - video-editor-network

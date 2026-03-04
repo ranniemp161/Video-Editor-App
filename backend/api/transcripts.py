@@ -4,21 +4,22 @@ import re
 import json
 import uuid
 import logging
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
-
-from db import SessionLocal, Project
+from db import Project, get_db
 from schemas import UploadTranscriptRequest, ExportTranscriptRequest, TranscribeRequest
 from core import distribute_word_timestamps, refine_word_timestamps_with_audio
 from core.transcriber import WhisperTranscriber
 from background_tasks import start_background_task, update_task_progress
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["transcripts"])
 
-UPLOAD_DIR = "public/uploads"
+UPLOAD_DIR = str(settings.upload_dir)
 
 # Global transcriber instance (lazy loaded)
 transcriber = WhisperTranscriber()
@@ -26,7 +27,7 @@ transcriber = WhisperTranscriber()
 # Progress tracking moved to app.state
 
 @router.post("/transcribe")
-def transcribe_media(request: TranscribeRequest, raw_request: Request):
+def transcribe_media(request: TranscribeRequest, raw_request: Request, db: Session = Depends(get_db)):
     """
     Transcribe a video/audio file using Faster-Whisper.
     """
@@ -44,14 +45,10 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
 
     # 1. PRIORITY: Resolve via projectId and DB (most reliable — works even with bare filenames)
     if request.projectId:
-        db = SessionLocal()
-        try:
-            db_project = db.query(Project).filter(Project.id == request.projectId).first()
-            if db_project and db_project.mediaPath and os.path.exists(db_project.mediaPath):
-                abs_path = db_project.mediaPath
-                logger.info(f"Resolved path from DB for project {request.projectId}: {abs_path}")
-        finally:
-            db.close()
+        db_project = db.query(Project).filter(Project.id == request.projectId).first()
+        if db_project and db_project.mediaPath and os.path.exists(db_project.mediaPath):
+            abs_path = db_project.mediaPath
+            logger.info(f"Resolved path from DB for project {request.projectId}: {abs_path}")
 
     # 2. Check if it's already an absolute path in the container (e.g. starting with /app/)
     if not abs_path and request.videoPath.startswith('/app/') and os.path.exists(request.videoPath):
@@ -129,7 +126,6 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
         
         # Persist to DB if projectId is provided
         if request.projectId:
-            db = SessionLocal()
             try:
                 # Clear existing segments
                 from db import Segment as DBSegment
@@ -150,8 +146,6 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
             except Exception as e:
                 logger.error(f"Failed to persist segments: {e}")
                 db.rollback()
-            finally:
-                db.close()
         
         return {
             "success": True,
@@ -171,11 +165,10 @@ def transcribe_media(request: TranscribeRequest, raw_request: Request):
         return {"success": False, "error": str(e)}
 
 @router.post("/project/{project_id}/refine-transcript")
-async def refine_transcript(project_id: str):
+async def refine_transcript(project_id: str, db: Session = Depends(get_db)):
     """
     Refine existing transcript timings using audio analysis.
     """
-    db = SessionLocal()
     try:
         project = db.query(Project).filter(Project.id == project_id).first()
         if not project:
@@ -239,15 +232,14 @@ async def refine_transcript(project_id: str):
         
     except Exception as e:
         logger.error(f"Refinement failed: {e}")
+        db.rollback()
         return {"success": False, "error": str(e)}
-    finally:
-        db.close()
 
 
 
 
 @router.post("/upload-transcript")
-async def upload_transcript_manual(request: UploadTranscriptRequest):
+async def upload_transcript_manual(request: UploadTranscriptRequest, db: Session = Depends(get_db)):
     """Upload and parse a transcript file (SRT, VTT, JSON, or plain text)."""
     logger.info(f"Received manual transcript upload: {request.fileName} (size: {len(request.content)})")
     if request.projectId:
@@ -366,20 +358,16 @@ async def upload_transcript_manual(request: UploadTranscriptRequest):
 
         # Refine with audio if projectId is known
         if words and request.projectId:
-            db = SessionLocal()
-            try:
-                db_project = db.query(Project).filter(Project.id == request.projectId).first()
-                if db_project:
-                    wav_path = db_project.mediaPath + ".wav"
-                    if os.path.exists(wav_path):
-                        words = refine_word_timestamps_with_audio(
-                            words=words,
-                            audio_path=wav_path,
-                            start_sec=words[0]['start']/1000,
-                            end_sec=words[-1]['end']/1000
-                        )
-            finally:
-                db.close()
+            db_project = db.query(Project).filter(Project.id == request.projectId).first()
+            if db_project:
+                wav_path = db_project.mediaPath + ".wav"
+                if os.path.exists(wav_path):
+                    words = refine_word_timestamps_with_audio(
+                        words=words,
+                        audio_path=wav_path,
+                        start_sec=words[0]['start']/1000,
+                        end_sec=words[-1]['end']/1000
+                    )
     else:
         # Fallback to crude splitting
         raw_words = text.split()

@@ -151,14 +151,59 @@ class RoughCutModel:
         return float(prob_cut)
 
     def save_model(self):
+        import hashlib
         joblib.dump(self.model, self.model_path)
         logger.info(f"Model saved to {self.model_path}")
+        
+        # Security: Create a hash of the newly saved model
+        model_hash = self._calculate_file_hash(self.model_path)
+        if model_hash:
+            hash_path = f"{self.model_path}.sha256"
+            with open(hash_path, "w") as f:
+                f.write(model_hash)
+            logger.info(f"Model hash saved to {hash_path}")
+
+    def _calculate_file_hash(self, filepath: str) -> str:
+        """Calculate SHA-256 hash of a file."""
+        import hashlib
+        sha256_hash = hashlib.sha256()
+        try:
+            with open(filepath, "rb") as f:
+                # Read and update hash string value in blocks of 4K
+                for byte_block in iter(lambda: f.read(4096), b""):
+                    sha256_hash.update(byte_block)
+            return sha256_hash.hexdigest()
+        except Exception as e:
+            logger.error(f"Failed to calculate hash for {filepath}: {e}")
+            return ""
 
     def load_model(self):
         if os.path.exists(self.model_path):
+            hash_path = f"{self.model_path}.sha256"
+            
+            # Security: Verify the model hash before deserializing
+            if not os.path.exists(hash_path):
+                logger.error("Model hash file missing. Refusing to load potentially unsafe model.")
+                logger.info("Running in heuristic-only mode.")
+                return
+                
+            current_hash = self._calculate_file_hash(self.model_path)
+            try:
+                with open(hash_path, "r") as f:
+                    expected_hash = f.read().strip()
+            except Exception as e:
+                logger.error(f"Failed to read model hash file: {e}")
+                return
+                
+            if current_hash != expected_hash:
+                logger.error(f"CRITICAL: Model hash mismatch! Expected {expected_hash}, got {current_hash}.")
+                logger.error("Refusing to load corrupted or tampered model.")
+                logger.info("Running in heuristic-only mode.")
+                return
+                
             try:
                 self.model = joblib.load(self.model_path)
-                logger.info("Loaded specialized rough cut model.")
+                logger.info("Loaded and verified specialized rough cut model.")
             except Exception as e:
                 logger.error(f"Failed to load model: {e}")
         else:

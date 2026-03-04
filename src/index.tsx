@@ -9,6 +9,28 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
+// Global Fetch Interceptor to inject App Password Authentication
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+  const password = import.meta.env.VITE_APP_PASSWORD;
+  if (!password) {
+    console.warn("VITE_APP_PASSWORD is not set in environment.");
+  }
+
+  const [resource, config] = args;
+
+  // Only inject into API requests, not local assets or external domains
+  if (typeof resource === 'string' && resource.includes('/api/')) {
+    const customConfig = config || {};
+    customConfig.headers = {
+      ...customConfig.headers,
+      'X-App-Password': password || ''
+    };
+    return originalFetch(resource, customConfig);
+  }
+
+  return originalFetch(...args);
+};
 
 // Reload loop detection - disabled in development to prevent false positives from HMR
 const checkReloadLoop = () => {

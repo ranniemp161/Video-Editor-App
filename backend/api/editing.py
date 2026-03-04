@@ -6,7 +6,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from db import SessionLocal, Project, RoughCutResult, get_db
+from db import Project, RoughCutResult, get_db
 from schemas import AutoCutRequest, AnalyzeThoughtsRequest, TrainFeedbackRequest
 from core import ProfessionalRoughCutV2, ThoughtGrouper, find_zero_crossing
 from feedback_loop import FeedbackLoop
@@ -18,7 +18,7 @@ router = APIRouter(tags=["editing"])
 
 
 @router.post("/auto-cut")
-async def auto_cut(request: AutoCutRequest):
+async def auto_cut(request: AutoCutRequest, db: Session = Depends(get_db)):
     """
     Professional rough cut following industry-standard editing principles:
     1. Silence & Pause Management (>2s removed)
@@ -42,7 +42,6 @@ async def auto_cut(request: AutoCutRequest):
 
     # Run Professional Rough Cut Analysis
     video_path = None
-    db = SessionLocal()
     try:
         db_project = db.query(Project).filter(Project.id == request.asset.id).first()
         if db_project:
@@ -50,8 +49,6 @@ async def auto_cut(request: AutoCutRequest):
             logger.info(f"Auto-cut: Found video path for analysis: {video_path}")
     except Exception as e:
         logger.warning(f"Auto-cut: Could not find video path: {e}")
-    finally:
-        db.close()
 
     rough_cut = ProfessionalRoughCutV2(normalized_words, video_path=video_path)
     segments = rough_cut.analyze()
@@ -67,7 +64,6 @@ async def auto_cut(request: AutoCutRequest):
     # Load audio for zero-crossing snapping if possible
     audio_buffer = None
     sr = 16000
-    db = SessionLocal()
     try:
         db_project = db.query(Project).filter(Project.id == request.asset.id).first()
         if db_project and os.path.exists(db_project.mediaPath):
@@ -77,8 +73,6 @@ async def auto_cut(request: AutoCutRequest):
                 audio_buffer, _ = librosa.load(wav_path, sr=sr)
     except Exception as e:
         logger.warning(f"Auto-cut: Could not load audio for snapping: {e}")
-    finally:
-        db.close()
 
     # Convert segments to Timeline Clips
     clips = []
@@ -119,7 +113,6 @@ async def auto_cut(request: AutoCutRequest):
     logger.info(f"Created {len(clips)} timeline clips")
     
     # Save rough cut results to database for session recovery
-    db = SessionLocal()
     try:
         # Delete existing result if any
         db.query(RoughCutResult).filter(RoughCutResult.projectId == request.asset.id).delete()
@@ -139,8 +132,6 @@ async def auto_cut(request: AutoCutRequest):
     except Exception as e:
         logger.error(f"Failed to save rough cut results: {e}")
         db.rollback()
-    finally:
-        db.close()
     
     return {
         "clips": clips,
@@ -383,12 +374,16 @@ async def export_xml(request: ExportXMLRequest, cleanup: bool = False, db: Sessi
         '        <track>',
     ]
     
+    from html import escape
+    
     for idx, clip in enumerate(video_clips):
         asset = next((a for a in assets if a.id == clip.assetId), None)
         if not asset:
             continue
         
-        clip_name = clip.sourceFileName or clip.name or asset.name or "Clip"
+        # Sanitize variables that could contain user input to prevent XML/HTML injection (XSS)
+        clip_name = escape(clip.sourceFileName or clip.name or asset.name or "Clip")
+        asset_name = escape(asset.name)
         
         xml_lines.extend([
             '          <clipitem>',
@@ -403,7 +398,7 @@ async def export_xml(request: ExportXMLRequest, cleanup: bool = False, db: Sessi
             f'            <in>{int(clip.trimStart * FPS)}</in>',
             f'            <out>{int(clip.trimEnd * FPS)}</out>',
             '            <file>',
-            f'              <name>{asset.name}</name>',
+            f'              <name>{asset_name}</name>',
             f'              <duration>{int(asset.duration * FPS)}</duration>',
             '            </file>',
             '          </clipitem>',

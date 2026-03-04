@@ -4,6 +4,7 @@ import { useTimelineState } from './useTimelineState';
 import { useClipManagement } from './useClipManagement';
 import { useExportActions } from './useExportActions';
 import { useTranscriptSync } from './useTranscriptSync';
+import { useAutoCut } from './useAutoCut';
 import { useProjectManagement } from './useProjectManagement';
 
 export const useTimeline = () => {
@@ -16,6 +17,7 @@ export const useTimeline = () => {
   const clipManagement = useClipManagement(state);
   const exportActions = useExportActions(state);
   const transcriptSync = useTranscriptSync(state);
+  const autoCutState = useAutoCut(state);
   const projectManagement = useProjectManagement(state);
 
   // Derived State & Utilities that are easier to keep in the orchestrator
@@ -81,6 +83,7 @@ export const useTimeline = () => {
     ...clipManagement,
     ...exportActions,
     ...transcriptSync,
+    ...autoCutState,
     ...projectManagement,
     currentClip,
     findMatchingAsset,

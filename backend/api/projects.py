@@ -5,17 +5,18 @@ import shutil
 import time
 import logging
 from typing import List
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
 from sqlalchemy.orm import Session
 
 from db import get_db, Project, Segment as DBSegment
 from schemas import Segment
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["projects"])
 
-UPLOAD_DIR = "public/uploads"
+UPLOAD_DIR = str(settings.upload_dir)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -55,18 +56,51 @@ def cleanup_orphaned_files(db: Session):
         logger.error(f"Orphan cleanup failed: {e}")
 
 
+import re
+
+def secure_filename(filename: str) -> str:
+    """Return a secure version of a filename for file system storage."""
+    # Keep only alphanumeric, dot, dash, and underscore. Strip path dividers.
+    safe_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', os.path.basename(filename))
+    # Prevent empty or hidden-only names
+    if not safe_name or safe_name.startswith('.'):
+        safe_name = "upload_" + str(uuid.uuid4())[:8] + ".tmp"
+    return safe_name
+
 @router.post("/upload")
-async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_video(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
     """Upload a video file and create a new project."""
     try:
+        # Pre-emptive check using Content-Length header (if provided by client)
+        content_length = request.headers.get("content-length")
+        max_bytes = settings.max_upload_size_mb * 1024 * 1024
+        if content_length and int(content_length) > max_bytes:
+            raise HTTPException(status_code=413, detail=f"File too large. Maximum size is {settings.max_upload_size_mb}MB.")
+
         file_id = str(uuid.uuid4())
         project_dir = os.path.join(UPLOAD_DIR, file_id)
         os.makedirs(project_dir, exist_ok=True)
         
-        file_path = os.path.join(project_dir, file.filename)
+        # Prevent Path Traversal by securing the uploaded filename
+        safe_name = secure_filename(file.filename)
+        file_path = os.path.join(project_dir, safe_name)
+        
+        # Stream file in chunks to prevent memory RAM exhaustion and enforce true size limits
+        bytes_written = 0
+        chunk_size = 1024 * 1024  # 1MB chunks
         
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            while True:
+                chunk = file.file.read(chunk_size)
+                if not chunk:
+                    break
+                bytes_written += len(chunk)
+                if bytes_written > max_bytes:
+                    buffer.close()
+                    os.remove(file_path)
+                    shutil.rmtree(project_dir, ignore_errors=True)
+                    raise HTTPException(status_code=413, detail=f"File too large. Maximum size is {settings.max_upload_size_mb}MB.")
+                buffer.write(chunk)
             
         db_project = Project(
             id=file_id,
@@ -78,7 +112,10 @@ async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_d
         db.add(db_project)
         db.commit()
         
-        return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}/{file.filename}"}
+        return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}/{safe_name}"}
+    except HTTPException:
+        # Re-raise HTTP exceptions (like our 413) so they aren't caught by the generic handler
+        raise
     except Exception as e:
         logger.error(f"Upload failed: {e}")
         db.rollback()
@@ -112,6 +149,10 @@ def get_project(project_id: str, db: Session = Depends(get_db)):
 @router.delete("/project/{project_id}")
 def delete_project(project_id: str, db: Session = Depends(get_db)):
     """Delete a project and its associated files."""
+    # Prevent directory climbing / path traversal
+    if ".." in project_id or "/" in project_id or "\\" in project_id:
+        raise HTTPException(status_code=400, detail="Invalid project ID format")
+        
     db_project = db.query(Project).filter(Project.id == project_id).first()
     if not db_project:
         logger.info(f"Delete requested for non-existent project {project_id}. Returning success.")

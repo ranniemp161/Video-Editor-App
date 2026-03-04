@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     # Path Configuration
     base_dir: Path = Path(__file__).resolve().parent.parent
     data_dir: Path = base_dir / "data"
+    model_dir: Path = base_dir / "models"
+    
+    # Store uploads one directory up from backend to match frontend's "public/uploads" expectations
+    upload_dir: Path = base_dir.parent / "public" / "uploads"
+    
+    # Security: Maximum file upload size to prevent DoS attacks
+    max_upload_size_mb: int = 500
+    
+    # Global Authentication Password
+    app_password: str = "dev_password"
     
     model_config = SettingsConfigDict(
         env_file=".env",
