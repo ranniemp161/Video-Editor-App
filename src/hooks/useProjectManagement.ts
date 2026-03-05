@@ -66,17 +66,32 @@ export const useProjectManagement = (state: TimelineStateHook) => {
 
             xhr.onload = () => {
                 if (xhr.status >= 200 && xhr.status < 300) {
-                    const data = JSON.parse(xhr.responseText);
-                    if (data.success) {
-                        setProjectId(data.projectId);
-                        setAssets(prev => prev.map(a =>
-                            a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
-                        ));
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.success) {
+                            setProjectId(data.projectId);
+                            setAssets(prev => prev.map(a =>
+                                a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
+                            ));
+                        } else {
+                            console.error("Upload failed (server logic):", data.error);
+                            setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
+                            alert(`Upload failed: ${data.error || 'Unknown error'}`);
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse upload response:", e);
+                        setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
+                        alert("Upload failed: Invalid server response.");
                     }
                 } else {
                     console.error("Upload failed with status:", xhr.status);
                     setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                    alert(`Upload failed: ${xhr.statusText}`);
+                    let errorDetail = "";
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        errorDetail = data.detail || data.error || "";
+                    } catch (e) { }
+                    alert(`Upload failed (${xhr.status}): ${errorDetail || xhr.statusText}`);
                 }
             };
 

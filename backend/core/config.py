@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Any
+from pydantic import field_validator
 
 class Settings(BaseSettings):
     # App Settings
@@ -13,7 +14,20 @@ class Settings(BaseSettings):
     gemini_api_key: Optional[str] = None
     
     # CORS Configuration
-    cors_allowed_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
+    cors_allowed_origins: Any = []
+    
+    @field_validator("cors_allowed_origins", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> list[str]:
+        if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return v
     
     # Path Configuration
     base_dir: Path = Path(__file__).resolve().parent.parent
