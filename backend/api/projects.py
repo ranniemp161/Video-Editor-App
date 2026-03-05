@@ -6,6 +6,7 @@ import time
 import logging
 from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
+from sqlalchemy.orm import Session
 from core.limiter import limiter
 from db import Project, Segment as DBSegment, RoughCutResult, get_db
 from schemas import Segment

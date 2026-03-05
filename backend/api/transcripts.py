@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 from core.limiter import limiter
 
+router = APIRouter(tags=["transcripts"])
+
 UPLOAD_DIR = str(settings.upload_dir)
 
 # Global transcriber instance (lazy loaded)
