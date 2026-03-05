@@ -62,9 +62,13 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
 
     setIsTraining(true);
     try {
+      const token = localStorage.getItem('auth_token');
       const res = await fetch(`${API_BASE}/train-feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           projectId: 'default_project',
           finalTimeline: timelineState  // Fixed: was 'timeline', backend expects 'finalTimeline'

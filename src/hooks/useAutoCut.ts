@@ -19,9 +19,13 @@ export const useAutoCut = (state: TimelineStateHook) => {
         const backendAssetId = projectId || assetId;
         setIsAutoCutting(true);
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/auto-cut`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     words: asset.transcription.words,
                     asset: {

@@ -19,9 +19,13 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/render`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify(data)
             });
             const result = await response.json();
@@ -66,9 +70,13 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-xml`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify(data)
             });
 
@@ -121,9 +129,13 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-edl`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify(data)
             });
 
@@ -166,10 +178,12 @@ export const useExportActions = (state: TimelineStateHook) => {
 
     const exportTranscript = useCallback(async (transcription: any) => {
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-transcript`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
                 body: JSON.stringify({ transcription, format: 'txt' }),
             });

@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # AI Configuration
     gemini_api_key: Optional[str] = None
     
+    # CORS Configuration
+    cors_allowed_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
+    
     # Path Configuration
     base_dir: Path = Path(__file__).resolve().parent.parent
     data_dir: Path = base_dir / "data"

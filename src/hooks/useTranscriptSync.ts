@@ -52,9 +52,13 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         }, 1000);
 
         try {
+            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/transcribe`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({
                     videoPath,
                     duration: asset.duration,
@@ -93,8 +97,10 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         if (!projectId) return;
 
         try {
+            const token = localStorage.getItem('auth_token');
             const res = await fetch(`${API_BASE}/project/${projectId}/refine-transcript`, {
-                method: 'POST'
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
             const data = await res.json();
 
@@ -131,9 +137,13 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         setSegments(newSegments);
 
         try {
+            const token = localStorage.getItem('auth_token');
             await fetch(`${API_BASE}/project/${projectId}/segments`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify(newSegments)
             });
         } catch (e) {
@@ -143,10 +153,14 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
 
     const uploadTranscript = useCallback(async (assetId: string, file: File) => {
         try {
+            const token = localStorage.getItem('auth_token');
             const content = await file.text();
             const response = await fetch(`${API_BASE}/upload-transcript`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({ content, fileName: file.name, projectId })
             });
 
@@ -170,9 +184,13 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
                     }));
                     setSegments(newSegments);
 
+                    const token = localStorage.getItem('auth_token');
                     fetch(`${API_BASE}/project/${projectId}/segments`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                        },
                         body: JSON.stringify(newSegments)
                     }).catch(e => console.error("Sync failed", e));
                 }

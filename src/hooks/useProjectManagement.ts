@@ -49,6 +49,12 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', `${API_BASE}/upload`, true);
 
+            // Add Authorization header
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            }
+
             xhr.upload.onprogress = (event) => {
                 if (event.lengthComputable) {
                     const percentComplete = Math.round((event.loaded / event.total) * 100);
