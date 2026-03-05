@@ -4,10 +4,9 @@ import re
 import json
 import uuid
 import logging
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import FileResponse
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from core.limiter import limiter
 from sqlalchemy.orm import Session
 
 from db import Project, get_db

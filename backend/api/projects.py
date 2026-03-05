@@ -7,14 +7,14 @@ import logging
 from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
 from core.limiter import limiter
-from db import Project, Segment, TimelineDraft, get_db
+from db import Project, Segment as DBSegment, RoughCutResult, get_db
 from schemas import Segment
 from core.config import settings
 
 logger = logging.getLogger(__name__)
 
+
 router = APIRouter(tags=["projects"])
-limiter = Limiter(key_func=get_remote_address)
 
 UPLOAD_DIR = str(settings.upload_dir)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
