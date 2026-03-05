@@ -38,26 +38,49 @@ export const useProjectManagement = (state: TimelineStateHook) => {
         dummyVideo.src = asset.src!;
         dummyVideo.onloadedmetadata = async () => {
             asset.duration = dummyVideo.duration;
+            asset.isUploading = true;
+            asset.uploadProgress = 0;
             setAssets([asset]);
 
             const formData = new FormData();
             formData.append('file', file);
 
-            try {
-                const res = await fetch(`${API_BASE}/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setProjectId(data.projectId);
+            // Use XMLHttpRequest for progress tracking
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${API_BASE}/upload`, true);
+
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
                     setAssets(prev => prev.map(a =>
-                        a.name === file.name ? { ...a, remoteSrc: data.filePath } : a
+                        a.id === asset.id ? { ...a, uploadProgress: percentComplete } : a
                     ));
                 }
-            } catch (e) {
-                console.error("Upload failed", e);
-            }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        setProjectId(data.projectId);
+                        setAssets(prev => prev.map(a =>
+                            a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
+                        ));
+                    }
+                } else {
+                    console.error("Upload failed with status:", xhr.status);
+                    setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
+                    alert(`Upload failed: ${xhr.statusText}`);
+                }
+            };
+
+            xhr.onerror = () => {
+                console.error("Upload failed (network error)");
+                setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
+                alert("Upload failed due to a network error.");
+            };
+
+            xhr.send(formData);
         };
     }, [setAssets, setProjectId]);
 

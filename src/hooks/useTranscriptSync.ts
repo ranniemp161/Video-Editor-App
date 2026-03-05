@@ -30,7 +30,7 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         // Guard: projectId must be the real backend UUID (set after upload completes).
         // Without it, the backend cannot locate the file.
         if (!projectId) {
-            alert('Upload is still in progress. Please wait for the upload to finish before transcribing.');
+            alert('The video is still uploading to the server. Please wait for the upload to complete (see progress in Media tab) before transcribing.');
             setIsTranscribing(null);
             return;
         }

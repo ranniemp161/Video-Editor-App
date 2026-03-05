@@ -63,11 +63,25 @@ export const MediaPoolComponent: React.FC<MediaPoolProps> = ({ assets, onAddToTi
                     <div className="w-full h-full relative">
                       <video
                         src={asset.src}
-                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                        className={`w-full h-full object-cover transition-opacity ${asset.isUploading ? 'opacity-40' : 'opacity-80 group-hover:opacity-100'}`}
                       />
-                      <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-md px-1 rounded text-[9px] text-gray-300 font-mono">
-                        {Math.floor(asset.duration)}s
-                      </div>
+                      {asset.isUploading ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-3 bg-black/40 backdrop-blur-[2px]">
+                          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div
+                              className="bg-[#26c6da] h-full transition-all duration-300 shadow-[0_0_10px_rgba(38,198,218,0.5)]"
+                              style={{ width: `${asset.uploadProgress || 0}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-[10px] font-bold text-[#fafafa] uppercase tracking-wider animate-pulse">
+                            Uploading {asset.uploadProgress || 0}%
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-md px-1 rounded text-[9px] text-gray-300 font-mono">
+                          {Math.floor(asset.duration)}s
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-red-900/10">

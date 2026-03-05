@@ -51,6 +51,8 @@ export interface Asset {
   duration: number; // in seconds
   transcription?: Transcription;
   waveformPeaks?: number[]; // Cached waveform data for performance
+  isUploading?: boolean;
+  uploadProgress?: number;
 }
 
 export interface TimelineClip {
