@@ -19,8 +19,7 @@ from core.config import settings
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["transcripts"])
-limiter = Limiter(key_func=get_remote_address)
+from core.limiter import limiter
 
 UPLOAD_DIR = str(settings.upload_dir)
 

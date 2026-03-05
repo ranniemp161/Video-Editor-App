@@ -6,16 +6,12 @@ from typing import Optional
 import jwt
 from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-
+from core.limiter import limiter
 from core.config import settings
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["auth"])
-
-limiter = Limiter(key_func=get_remote_address)
 
 ALGORITHM = "HS256"
 TOKEN_EXPIRY_HOURS = 24

@@ -70,8 +70,9 @@ app = FastAPI(title=settings.app_title, lifespan=lifespan)
 app.state.scheduler = scheduler
 app.state.transcription_progress = {}
 
+from core.limiter import limiter
+
 # Rate limiter
-limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
