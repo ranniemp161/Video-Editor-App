@@ -14,7 +14,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  const env = loadEnv(mode, process.cwd(), '');
+  const targetUrl = env.VITE_API_URL || env.API_URL || process.env.API_URL;
+
+  // Use a safer default for local dev, but require it for production/cloud
+  const finalTarget = targetUrl || 'http://localhost:8000';
+
+  console.log('*****************************************');
+  console.log(`[Vite] LOADING MODE: ${mode}`);
+  console.log(`[Vite] PROXY TARGET: ${finalTarget}`);
+  if (!targetUrl) {
+    console.log('[Vite] WARNING: No API_URL found! Falling back to localhost:8000');
+  }
+  console.log('*****************************************');
+
   return {
     server: {
       port: 5173,
@@ -40,7 +53,7 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         '/api': {
-          target: env.API_URL || 'http://localhost:8000',
+          target: finalTarget,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         }
