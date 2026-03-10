@@ -62,7 +62,7 @@ def verify_jwt_token(authorization: str = Header(None)) -> None:
 
 
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit("10/minute")
+@limiter.limit("30/minute")
 def login(request: Request, login_data: LoginRequest) -> TokenResponse:
     """Authenticate with app password and receive a JWT token."""
     if login_data.password != settings.app_password:

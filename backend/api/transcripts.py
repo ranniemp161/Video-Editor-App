@@ -30,7 +30,7 @@ transcriber = WhisperTranscriber()
 # Progress tracking moved to app.state
 
 @router.post("/transcribe")
-@limiter.limit("2/minute")
+@limiter.limit("10/minute")
 def transcribe_media(request: Request, transcribe_data: TranscribeRequest, db: Session = Depends(get_db)):
     """
     Transcribe a video/audio file using Faster-Whisper.

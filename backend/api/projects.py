@@ -69,7 +69,7 @@ def secure_filename(filename: str) -> str:
     return safe_name
 
 @router.post("/upload")
-@limiter.limit("5/minute")
+@limiter.limit("20/minute")
 async def upload_video(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
     """Upload a video file and create a new project."""
     try:
