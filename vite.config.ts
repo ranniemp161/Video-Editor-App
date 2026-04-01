@@ -21,6 +21,11 @@ export default defineConfig(({ mode }) => {
   console.log(`[Vite] VITE_API_URL: ${env.VITE_API_URL || '(not set)'}`);
   console.log('*****************************************');
 
+  // Determine backend target:
+  // - In Docker: container name 'backend' is resolvable via Docker internal network
+  // - Locally without Docker: falls back to localhost:8000
+  const backendTarget = env.BACKEND_URL || 'http://backend:8000';
+
   return {
     server: {
       port: 5173,
@@ -44,8 +49,27 @@ export default defineConfig(({ mode }) => {
           '**/.git/**'
         ]
       },
-      // No proxy needed — frontend talks directly to backend via VITE_API_URL
-      // CORS on the backend handles cross-origin requests
+      // All /api/* and /uploads/* requests are proxied to the FastAPI backend.
+      // This eliminates CORS issues in local dev and ensures consistent routing
+      // regardless of whether VITE_API_URL is set or not.
+      proxy: {
+        '/api': {
+          target: backendTarget,
+          changeOrigin: true,
+          secure: false,
+          // Stream large chunked uploads without buffering in memory
+          configure: (proxy) => {
+            proxy.on('error', (err) => {
+              console.error('[Vite Proxy Error]', err.message);
+            });
+          }
+        },
+        '/uploads': {
+          target: backendTarget,
+          changeOrigin: true,
+          secure: false,
+        }
+      }
     },
     plugins: [
       tailwindcss(),

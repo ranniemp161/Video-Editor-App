@@ -86,11 +86,11 @@ app.add_middleware(
 )
 
 # Include routers with authentication protection where needed
-app.include_router(system_router)  # System routes like health checks are public
-app.include_router(auth_router)    # Auth routes (login) are public
-app.include_router(projects_router, dependencies=[Depends(verify_jwt_token)])
-app.include_router(transcripts_router, dependencies=[Depends(verify_jwt_token)])
-app.include_router(editing_router, dependencies=[Depends(verify_jwt_token)])
+app.include_router(system_router, prefix="/api")  # System routes like health checks
+app.include_router(auth_router, prefix="/api")    # Auth routes (login)
+app.include_router(projects_router, prefix="/api", dependencies=[Depends(verify_jwt_token)])
+app.include_router(transcripts_router, prefix="/api", dependencies=[Depends(verify_jwt_token)])
+app.include_router(editing_router, prefix="/api", dependencies=[Depends(verify_jwt_token)])
 
 # Serve static files from the uploads directory
 app.mount("/uploads", StaticFiles(directory=str(settings.upload_dir)), name="uploads")

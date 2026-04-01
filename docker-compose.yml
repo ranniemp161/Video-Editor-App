@@ -49,9 +49,12 @@ services:
       - ./tailwind.config.js:/app/tailwind.config.js
       - ./tsconfig.json:/app/tsconfig.json
     environment:
-      # Browser talks directly to backend — no proxy needed
-      # localhost:8000 is accessible because docker-compose maps ports 8000:8000
-      - VITE_API_URL=http://localhost:8000
+      # BACKEND_URL is used by the Vite dev-server proxy (server-side).
+      # The browser itself uses relative /api paths, which Vite forwards here.
+      # This uses Docker's internal network to resolve the backend service by name.
+      - BACKEND_URL=http://backend:8000
+      # DO NOT set VITE_API_URL here — if set, it overrides the proxy and the
+      # browser tries to hit the backend directly, causing CORS issues in Docker.
     depends_on:
       - backend
     restart: unless-stopped
