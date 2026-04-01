@@ -25,19 +25,15 @@ interface TranscriptViewProps {
     wordInclusionStatus?: boolean[];
 }
 
-// Optimized Word Component to prevent 50,000 re-renders per frame
-// Optimized Word Component to prevent 50,000 re-renders per frame
+// Optimized Word Component to prevent excessive re-renders per frame
 const TranscriptWord = React.memo(({
     word,
     index,
-    // isCurrent, // REMOVED: Managed via Direct DOM
     isIncluded,
     isSelected,
     handleWordClick,
     handleContextMenu
 }: any) => {
-    // const wordRef = useRef<HTMLSpanElement>(null); // REMOVED: Using ID for selection
-
     return (
         <span
             id={`word-${index}`} // Added ID for O(1) DOM access
@@ -276,21 +272,12 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
                 if (newEl) {
                     newEl.classList.remove('text-[#fafafa]');
                     newEl.classList.add('bg-[#26c6da22]', 'text-[#26c6da]', 'font-bold', 'shadow-[0_0_10px_rgba(38,198,218,0.2)]');
-
-                    // Scroll into view DISABLED as per user request to avoid annoyance
-                    // if (scrollContainerRef.current) {
-                    //     const container = scrollContainerRef.current;
-                    //     const offset = newEl.offsetTop - container.offsetTop - (container.clientHeight / 2) + (newEl.clientHeight / 2);
-                    //     container.scrollTo({ top: offset, behavior: 'smooth' });
-                    // }
                 }
             }
             activeWordIndexRef.current = foundIndex;
         }
 
     }, [originalVideoTime, words]);
-
-    // Auto-scroll logic is now integrated into the Direct DOM effect above for synchronization
 
     if (!asset) {
         return (

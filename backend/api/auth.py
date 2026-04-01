@@ -46,18 +46,22 @@ def verify_jwt_token(authorization: str = Header(None)) -> None:
     Expects header: Authorization: Bearer <token>
     """
     if not authorization:
+        logger.warning("JWT verification failed: No Authorization header present in request")
         raise HTTPException(status_code=401, detail="Missing Authorization header")
 
     parts = authorization.split(" ", 1)
     if len(parts) != 2 or parts[0].lower() != "bearer":
+        logger.warning("JWT verification failed: malformed Authorization header (expected 'Bearer <token>')")
         raise HTTPException(status_code=401, detail="Invalid Authorization header format")
 
     token = parts[1]
     try:
         jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
+        logger.warning("JWT verification failed: token has expired")
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
+        logger.warning("JWT verification failed: invalid token — %s", e)
         raise HTTPException(status_code=401, detail="Invalid token")
 
 

@@ -56,8 +56,8 @@ export interface Asset {
 }
 
 export interface TimelineClip {
-  sourceFileName: any;
   id: string; // Unique instance ID
+  sourceFileName?: string; // Original source file name for relinking
   assetId: string;
   trackId: string;
   name: string; // Store name for relinking

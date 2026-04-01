@@ -9,20 +9,32 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-// Global Fetch Interceptor to inject JWT Authorization header
+// Global Fetch Interceptor to inject JWT Authorization header and handle 401s
+const API_BASE = import.meta.env.VITE_API_URL || '';
 const originalFetch = window.fetch;
 window.fetch = async (...args) => {
   const [resource, config] = args;
 
-  // Only inject into API requests, not local assets or external domains
-  if (typeof resource === 'string' && resource.includes('/api/')) {
+  // Inject auth into API requests (matches both "/api/..." and "http://host:port/..." backend URLs)
+  const isApiRequest = typeof resource === 'string' &&
+    (resource.startsWith(API_BASE) || resource.includes('/api/'));
+
+  if (isApiRequest && typeof resource === 'string') {
     const token = localStorage.getItem('auth_token');
     const customConfig = config || {};
     customConfig.headers = {
       ...customConfig.headers,
       ...(token ? { 'Authorization': `Bearer ${token}` } : {})
     };
-    return originalFetch(resource, customConfig);
+    const response = await originalFetch(resource, customConfig);
+
+    // Handle 401: clear stale token and reload to show login screen
+    if (response.status === 401 && !resource.includes('/login')) {
+      localStorage.removeItem('auth_token');
+      window.location.reload();
+    }
+
+    return response;
   }
 
   return originalFetch(...args);
@@ -91,7 +103,6 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 
-console.log("Mounting React App...");
 console.log("Mounting React App...");
 
 const root = ReactDOM.createRoot(rootElement);

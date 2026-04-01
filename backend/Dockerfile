@@ -21,13 +21,8 @@ RUN pip install --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Create uploads directory
-RUN mkdir -p public/uploads
-
-# Create non-root user for security
-RUN adduser --disabled-password --gecos "" appuser && \
-    chown -R appuser:appuser /app
-USER appuser
+# Create data and uploads directories
+RUN mkdir -p public/uploads data
 
 # Expose port 8000
 EXPOSE 8000

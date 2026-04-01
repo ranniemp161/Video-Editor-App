@@ -37,7 +37,7 @@ export const useClipManagement = (state: TimelineStateHook) => {
             const end = start + asset.duration;
 
             const newClip: TimelineClip = {
-                id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `clip-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
                 assetId: asset.id,
                 trackId: track.id,
                 name: asset.name,

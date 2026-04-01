@@ -27,7 +27,7 @@ export const useMarkers = () => {
     // Add a new marker
     const addMarker = useCallback((time: number, color: TimelineMarker['color'] = 'blue', label?: string) => {
         const newMarker: TimelineMarker = {
-            id: `marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `marker-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
             time,
             label,
             color,

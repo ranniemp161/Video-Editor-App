@@ -42,66 +42,75 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             asset.uploadProgress = 0;
             setAssets([asset]);
 
-            const formData = new FormData();
-            formData.append('file', file);
-
-            // Use XMLHttpRequest for progress tracking
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${API_BASE}/upload`, true);
-
-            // Add Authorization header
+            const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            const fileId = `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const token = localStorage.getItem('auth_token');
-            if (token) {
-                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-            }
+            const headers: Record<string, string> = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
 
-            xhr.upload.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+            try {
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * CHUNK_SIZE;
+                    const end = Math.min(start + CHUNK_SIZE, file.size);
+                    const chunk = file.slice(start, end);
+
+                    const formData = new FormData();
+                    formData.append('fileId', fileId);
+                    formData.append('chunkIndex', i.toString());
+                    formData.append('file', chunk, file.name); // explicitly pass name for File backend
+
+                    const res = await fetch(`${API_BASE}/upload-chunk`, {
+                        method: 'POST',
+                        headers,
+                        body: formData
+                    });
+
+                    if (!res.ok) {
+                        if (res.status === 401) {
+                            localStorage.removeItem('auth_token');
+                            window.location.reload();
+                            return;
+                        }
+                        let errText = await res.text();
+                        try { errText = JSON.parse(errText).detail || errText; } catch(e){}
+                        throw new Error(`Failed to upload chunk ${i}: ${res.status} ${errText}`);
+                    }
+
+                    const percentComplete = Math.round(((i + 1) / totalChunks) * 100);
                     setAssets(prev => prev.map(a =>
                         a.id === asset.id ? { ...a, uploadProgress: percentComplete } : a
                     ));
                 }
-            };
 
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    try {
-                        const data = JSON.parse(xhr.responseText);
-                        if (data.success) {
-                            setProjectId(data.projectId);
-                            setAssets(prev => prev.map(a =>
-                                a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
-                            ));
-                        } else {
-                            console.error("Upload failed (server logic):", data.error);
-                            setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                            alert(`Upload failed: ${data.error || 'Unknown error'}`);
-                        }
-                    } catch (e) {
-                        console.error("Failed to parse upload response:", e);
-                        setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                        alert("Upload failed: Invalid server response.");
-                    }
-                } else {
-                    console.error("Upload failed with status:", xhr.status);
-                    setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                    let errorDetail = "";
-                    try {
-                        const data = JSON.parse(xhr.responseText);
-                        errorDetail = data.detail || data.error || "";
-                    } catch (e) { }
-                    alert(`Upload failed (${xhr.status}): ${errorDetail || xhr.statusText}`);
+                // Finalize
+                const completeRes = await fetch(`${API_BASE}/upload-complete`, {
+                    method: 'POST',
+                    headers: { ...headers, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fileId, fileName: file.name })
+                });
+
+                if (!completeRes.ok) {
+                    let errText = await completeRes.text();
+                    try { errText = JSON.parse(errText).detail || errText; } catch(e){}
+                    throw new Error(`Finalization failed: ${completeRes.status} ${errText}`);
                 }
-            };
 
-            xhr.onerror = () => {
-                console.error("Upload failed (network error)");
+                const data = await completeRes.json();
+                if (data.success) {
+                    setProjectId(data.projectId);
+                    setAssets(prev => prev.map(a =>
+                        a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
+                    ));
+                } else {
+                    throw new Error(data.error || 'Server logic failed on finalize');
+                }
+
+            } catch (err: any) {
+                console.error("Chunked upload failed:", err);
                 setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                alert("Upload failed due to a network error.");
-            };
-
-            xhr.send(formData);
+                alert(`Upload failed: ${err.message || 'Network/Server Error'}`);
+            }
         };
     }, [setAssets, setProjectId]);
 

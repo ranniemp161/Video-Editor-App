@@ -55,7 +55,7 @@ export const useTimeline = () => {
         return Math.max(max, lastClip ? lastClip.end : 0);
       }, 0);
       return next > total ? 0 : next;
-    },);
+    });
 
     animationFrameRef.current = requestAnimationFrame(animatePlayback);
   }, [timeline, setPlayheadPosition]);

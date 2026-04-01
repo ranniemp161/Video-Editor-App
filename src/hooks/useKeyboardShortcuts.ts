@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 
 interface KeyboardShortcutHandlers {
     togglePlayback: () => void;
@@ -39,7 +39,7 @@ export const useKeyboardShortcuts = (handlers: KeyboardShortcutHandlers) => {
         updateClip
     } = handlers;
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             // Ignore if user is typing in an input
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;

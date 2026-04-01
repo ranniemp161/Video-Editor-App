@@ -5,7 +5,8 @@ import shutil
 import time
 import logging
 from typing import List
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request, Form
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from core.limiter import limiter
 from db import Project, Segment as DBSegment, RoughCutResult, get_db
@@ -68,10 +69,103 @@ def secure_filename(filename: str) -> str:
         safe_name = "upload_" + str(uuid.uuid4())[:8] + ".tmp"
     return safe_name
 
+class UploadCompleteRequest(BaseModel):
+    fileId: str
+    fileName: str
+
+@router.post("/upload-chunk")
+@limiter.limit("200/minute")
+async def upload_chunk(
+    request: Request,
+    fileId: str = Form(...),
+    chunkIndex: int = Form(...),
+    file: UploadFile = File(...)
+):
+    """Receive and store a single chunk of a large file."""
+    try:
+        if not re.match(r'^[a-zA-Z0-9-]+$', fileId):
+            raise HTTPException(status_code=400, detail="Invalid fileId formatted.")
+
+        project_dir = os.path.join(UPLOAD_DIR, fileId)
+        os.makedirs(project_dir, exist_ok=True)
+        
+        chunk_path = os.path.join(project_dir, f"chunk_{chunkIndex}.part")
+        
+        # Write the 5MB chunk to disk asynchronously
+        chunk_data = await file.read()
+        with open(chunk_path, "wb") as f:
+            f.write(chunk_data)
+            
+        return {"success": True, "chunkIndex": chunkIndex}
+    except Exception as e:
+        logger.error(f"Chunk upload failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/upload-complete")
+@limiter.limit("20/minute")
+async def upload_complete(data: UploadCompleteRequest, db: Session = Depends(get_db)):
+    """Merge all stored chunks and finalize the project."""
+    try:
+        fileId = data.fileId
+        if not re.match(r'^[a-zA-Z0-9-]+$', fileId):
+            raise HTTPException(status_code=400, detail="Invalid fileId formed.")
+
+        project_dir = os.path.join(UPLOAD_DIR, fileId)
+        if not os.path.exists(project_dir):
+            raise HTTPException(status_code=404, detail="Upload directory missing or no chunks sent.")
+
+        safe_name = secure_filename(data.fileName)
+        final_path = os.path.join(project_dir, safe_name)
+        
+        # Discover and sort chunks
+        chunks = []
+        for filename in os.listdir(project_dir):
+            if filename.startswith("chunk_") and filename.endswith(".part"):
+                idx_str = filename.replace("chunk_", "").replace(".part", "")
+                if idx_str.isdigit():
+                    chunks.append((int(idx_str), os.path.join(project_dir, filename)))
+        
+        if not chunks:
+            raise HTTPException(status_code=400, detail="No chunks found to merge.")
+            
+        chunks.sort(key=lambda x: x[0])
+        
+        # Merge exactly in order
+        with open(final_path, "wb") as outfile:
+            for idx, chunk_file in chunks:
+                with open(chunk_file, "rb") as infile:
+                    shutil.copyfileobj(infile, outfile)
+                os.remove(chunk_file)
+                
+        # Validate final composed size
+        max_bytes = settings.max_upload_size_mb * 1024 * 1024
+        if os.path.getsize(final_path) > max_bytes:
+            os.remove(final_path)
+            shutil.rmtree(project_dir, ignore_errors=True)
+            raise HTTPException(status_code=413, detail=f"Merged file too large. Maximum size is {settings.max_upload_size_mb}MB.")
+            
+        db_project = Project(
+            id=fileId,
+            mediaPath=final_path,
+            duration=0.0,
+            originalFileName=data.fileName,
+            createdAt=time.time()
+        )
+        db.add(db_project)
+        db.commit()
+        
+        return {"success": True, "projectId": fileId, "filePath": f"/uploads/{fileId}/{safe_name}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Upload complete failed: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/upload")
 @limiter.limit("20/minute")
 async def upload_video(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    """Upload a video file and create a new project."""
+    """Legacy endpoint for single-request uploads. Replaced by chunked uploads for large files."""
     try:
         # Pre-emptive check using Content-Length header (if provided by client)
         content_length = request.headers.get("content-length")

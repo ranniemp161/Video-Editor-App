@@ -42,12 +42,16 @@ services:
       # Mount source code for hot-reloading
       - ./src:/app/src
       - ./public:/app/public
+      - ./server:/app/server
       - ./index.html:/app/index.html
+      - ./.env:/app/.env
       - ./vite.config.ts:/app/vite.config.ts
       - ./tailwind.config.js:/app/tailwind.config.js
       - ./tsconfig.json:/app/tsconfig.json
     environment:
-      - API_URL=http://backend:8000
+      # Browser talks directly to backend — no proxy needed
+      # localhost:8000 is accessible because docker-compose maps ports 8000:8000
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
     restart: unless-stopped

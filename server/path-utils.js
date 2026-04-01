@@ -7,6 +7,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..'); // Video-Editor-App root
 
+// Helper to safely append to log file (ensures directory exists)
+const logFilePath = path.join(projectRoot, 'data', 'transcribe_log.txt');
+function safeAppendLog(message) {
+    try {
+        const logDir = path.dirname(logFilePath);
+        if (!fs.existsSync(logDir)) {
+            fs.mkdirSync(logDir, { recursive: true });
+        }
+        fs.appendFileSync(logFilePath, `${message}\n`);
+    } catch (e) {
+        // Silently fail if logging fails - don't break the main functionality
+    }
+}
+
 export const searchDirs = [
     // Application-managed directories only
     path.join(projectRoot, 'public'),
@@ -37,38 +51,10 @@ export function findFile(filename) {
         if (fs.existsSync(fullPath)) {
             const msg = `[Path Utils] Found file (exact): ${fullPath}`;
             console.log(msg);
-            fs.appendFileSync('data/transcribe_log.txt', `${msg}\n`);
+            safeAppendLog(msg);
             return fullPath;
         }
     }
-
-    // DISABLED: Smart Fallback (causes incorrect filename mapping during XML export)
-    // console.log(`[Path Utils] Exact match failed for ${filename}. Attempting smart fallback...`);
-    /*
-    const extensions = ['.mp4', '.mov', '.mkv', '.webm'];
-
-    // Check main priority folders first
-    const priorityDirs = searchDirs.slice(0, 5);
-    for (const dir of priorityDirs) {
-        if (!fs.existsSync(dir)) continue;
-
-        try {
-            const files = fs.readdirSync(dir);
-            const videos = files.filter(f => extensions.includes(path.extname(f).toLowerCase()));
-
-            if (videos.length > 0) {
-                // If there's only one video, use it!
-                const fallbackFile = path.join(dir, videos[0]);
-                const msg = `[Path Utils] SMART FALLBACK: Using ${videos[0]} instead of ${filename}`;
-                console.log(msg);
-                fs.appendFileSync('data/transcribe_log.txt', `${msg}\n`);
-                return fallbackFile;
-            }
-        } catch (e) {
-            // Ignore readdir errors
-        }
-    }
-    */
 
     const warnMsg = `[Path Utils] File NOT FOUND: ${filename}`;
     console.warn(warnMsg);
