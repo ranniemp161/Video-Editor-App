@@ -24,7 +24,8 @@ export default defineConfig(({ mode }) => {
   // Determine backend target:
   // - In Docker: container name 'backend' is resolvable via Docker internal network
   // - Locally without Docker: falls back to localhost:8000
-  const backendTarget = env.BACKEND_URL || 'http://backend:8000';
+  const backendTarget = process.env.BACKEND_URL || env.BACKEND_URL || 'http://backend:8000';
+  console.log(`[Vite Proxy] Configured to target backend at: ${backendTarget}`);
 
   return {
     server: {

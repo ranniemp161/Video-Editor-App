@@ -42,12 +42,15 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             asset.uploadProgress = 0;
             setAssets([asset]);
 
-            const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+            const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
             const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
             const fileId = `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const token = localStorage.getItem('auth_token');
             const headers: Record<string, string> = {};
             if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const uploadUrl = `${API_BASE}/upload-chunk`;
+            console.log(`[Upload] Starting massive chunked upload to: ${uploadUrl} (ID: ${fileId})`);
 
             try {
                 for (let i = 0; i < totalChunks; i++) {
@@ -58,29 +61,48 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                     const formData = new FormData();
                     formData.append('fileId', fileId);
                     formData.append('chunkIndex', i.toString());
-                    formData.append('file', chunk, file.name); // explicitly pass name for File backend
+                    formData.append('file', chunk, file.name);
 
-                    const res = await fetch(`${API_BASE}/upload-chunk`, {
-                        method: 'POST',
-                        headers,
-                        body: formData
-                    });
+                    // Robust retry logic for each chunk
+                    let success = false;
+                    let attempts = 0;
+                    const maxAttempts = 3;
 
-                    if (!res.ok) {
-                        if (res.status === 401) {
-                            localStorage.removeItem('auth_token');
-                            window.location.reload();
-                            return;
+                    while (!success && attempts < maxAttempts) {
+                        try {
+                            const res = await fetch(uploadUrl, {
+                                method: 'POST',
+                                headers,
+                                body: formData
+                            });
+
+                            if (!res.ok) {
+                                if (res.status === 401) {
+                                    localStorage.removeItem('auth_token');
+                                    window.location.reload();
+                                    return;
+                                }
+                                let errText = await res.text();
+                                try { errText = JSON.parse(errText).detail || errText; } catch(e){}
+                                throw new Error(`${res.status} ${errText}`);
+                            }
+                            success = true;
+                        } catch (err) {
+                            attempts++;
+                            console.warn(`[Upload] Chunk ${i} failed (attempt ${attempts}/${maxAttempts}):`, err);
+                            if (attempts >= maxAttempts) throw err;
+                            // Wait 500ms before retrying
+                            await new Promise(r => setTimeout(r, 500));
                         }
-                        let errText = await res.text();
-                        try { errText = JSON.parse(errText).detail || errText; } catch(e){}
-                        throw new Error(`Failed to upload chunk ${i}: ${res.status} ${errText}`);
                     }
 
                     const percentComplete = Math.round(((i + 1) / totalChunks) * 100);
                     setAssets(prev => prev.map(a =>
                         a.id === asset.id ? { ...a, uploadProgress: percentComplete } : a
                     ));
+
+                    // Small 50ms pause to let the proxy breathe
+                    await new Promise(r => setTimeout(r, 50));
                 }
 
                 // Finalize

@@ -8,7 +8,6 @@ from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request, Form
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from core.limiter import limiter
 from db import Project, Segment as DBSegment, RoughCutResult, get_db
 from schemas import Segment
 from core.config import settings
@@ -74,7 +73,7 @@ class UploadCompleteRequest(BaseModel):
     fileName: str
 
 @router.post("/upload-chunk")
-@limiter.limit("200/minute")
+@limiter.limit("5000/minute")
 async def upload_chunk(
     request: Request,
     fileId: str = Form(...),
@@ -128,14 +127,17 @@ async def upload_complete(data: UploadCompleteRequest, db: Session = Depends(get
         if not chunks:
             raise HTTPException(status_code=400, detail="No chunks found to merge.")
             
-        chunks.sort(key=lambda x: x[0])
-        
-        # Merge exactly in order
+        # Merge exactly in order - Optimized for 5GB+ files
+        # We use a 1MB buffer for the copy operation to ensure smooth I/O
         with open(final_path, "wb") as outfile:
             for idx, chunk_file in chunks:
-                with open(chunk_file, "rb") as infile:
-                    shutil.copyfileobj(infile, outfile)
-                os.remove(chunk_file)
+                try:
+                    with open(chunk_file, "rb") as infile:
+                        shutil.copyfileobj(infile, outfile, length=1024*1024)
+                    os.remove(chunk_file)
+                except Exception as chunk_err:
+                    logger.error(f"Failed to process chunk {idx}: {chunk_err}")
+                    raise HTTPException(status_code=500, detail=f"Failed during merge at chunk {idx}")
                 
         # Validate final composed size
         max_bytes = settings.max_upload_size_mb * 1024 * 1024
