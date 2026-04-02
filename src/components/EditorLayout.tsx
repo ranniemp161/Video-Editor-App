@@ -39,6 +39,7 @@ interface EditorLayoutProps {
     exportToXML: () => void;
     exportToEDL: () => void;
     deleteProject: () => void;
+    resetAll: () => Promise<void>;
     addClipToTimeline: (asset: Asset) => void;
     splitClip: (id: string, pos: number) => void;
     deleteClip: () => void;
@@ -88,7 +89,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
     const {
         activeTab, setActiveTab, playheadPosition, setPlayheadPosition, totalDuration, isPlaying, togglePlayback, undo, redo, onLogout,
         timeline, assets, currentClip, selectedClipIds, isMagnetic, setIsMagnetic,
-        renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML, exportToEDL, deleteProject,
+        renderToMP4, renderStatus, renderProgress, lastRenderPath, exportToXML, exportToEDL, deleteProject, resetAll,
         addClipToTimeline, splitClip, deleteClip, updateClip, moveClip, moveClips, toggleTrackMute, toggleTrackLock,
         splitClipAtPlayhead, selectClipsInRange, setTrackHeight, selectAllClips, onSelectClip,
         activeTranscriptAsset, isTranscribing, isAutoCutting, transcriptionProgress, transcribeAsset, autoCutAsset,
@@ -109,6 +110,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                 exportToXML={exportToXML}
                 exportToEDL={exportToEDL}
                 deleteProject={deleteProject}
+                resetAll={resetAll}
                 timelineState={timeline}
                 onLogout={onLogout}
                 hasActiveProject={assets.length > 0}

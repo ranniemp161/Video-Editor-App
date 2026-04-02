@@ -105,11 +105,11 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                     await new Promise(r => setTimeout(r, 50));
                 }
 
-                // Finalize
+                // Finalize with total chunk count for verification
                 const completeRes = await fetch(`${API_BASE}/upload-complete`, {
                     method: 'POST',
                     headers: { ...headers, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId, fileName: file.name })
+                    body: JSON.stringify({ fileId, fileName: file.name, totalChunks })
                 });
 
                 if (!completeRes.ok) {
@@ -260,8 +260,39 @@ export const useProjectManagement = (state: TimelineStateHook) => {
         checkForSavedRoughCut();
     }, [projectId, setTimeline]);
 
+    const resetAll = useCallback(async () => {
+        if (!confirm("⚠️ DANGER: This will delete ALL projects and ALL uploaded videos from the server. This cannot be undone. Continue?")) return;
+        if (!confirm("FINAL CONFIRMATION: Are you absolutely sure?")) return;
+
+        try {
+            const token = localStorage.getItem('auth_token');
+            const res = await fetch(`${API_BASE}/system/reset`, {
+                method: 'POST',
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            
+            if (res.ok) {
+                // Clear everything locally
+                setProjectId(null);
+                setAssets([]);
+                setSegments([]);
+                setTimeline({ tracks: [{ id: 'track-1', clips: [] }] });
+                
+                alert("System Reset Complete. All storage cleared.");
+                window.location.reload(); 
+            } else {
+                const err = await res.text();
+                alert(`Reset failed: ${err}`);
+            }
+        } catch (e) {
+            console.error("Failed to reset system:", e);
+            alert("Network error during reset.");
+        }
+    }, [setProjectId, setAssets, setSegments, setTimeline]);
+
     return {
         addMediaFiles,
         deleteProject,
+        resetAll
     };
 };

@@ -13,6 +13,7 @@ interface HeaderProps {
   exportToXML: () => void;
   exportToEDL: () => void;
   deleteProject: () => void;
+  resetAll: () => Promise<void>;
   timelineState?: any; // Pass timeline for training
   onLogout: () => void;
   hasActiveProject?: boolean; // Flag to show warning banner
@@ -27,6 +28,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
   exportToXML,
   exportToEDL,
   deleteProject,
+  resetAll,
   timelineState,
   onLogout,
   hasActiveProject = false
@@ -224,10 +226,18 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             <div className="h-4 w-[1px] bg-white/10 mx-1"></div>
             <button
               onClick={deleteProject}
-              className="px-3 py-1.5 text-[9px] uppercase tracking-wider font-bold bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all rounded-full active:scale-95"
-              title="Delete current project and all its media files"
+              className="px-3 py-1.5 text-[9px] uppercase tracking-wider font-bold bg-white/[0.03] hover:bg-white/[0.08] text-gray-400 border border-white/[0.05] transition-all rounded-full active:scale-95"
+              title="Delete current project only"
             >
-              RESET
+              CLEAN TIMELINE
+            </button>
+            <button
+              onClick={resetAll}
+              className="px-3 py-1.5 text-[9px] uppercase tracking-wider font-bold bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30 transition-all rounded-full shadow-lg shadow-red-500/10 active:scale-95 flex items-center gap-1"
+              title="NUCLEAR OPTION: Delete ALL projects and ALL media files from server"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              WIPE STORAGE
             </button>
           </div>
         </div>

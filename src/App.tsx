@@ -38,7 +38,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     undo, redo, isTranscribing, transcribeAsset, refineTranscript, autoCutAsset,
     exportToXML, exportToEDL, exportTranscript, uploadTranscript, transcriptionProgress,
     isAutoCutting, toggleSegmentDelete, segments, splitClipAtPlayhead,
-    selectClipsInRange, setTrackHeight, deleteProject, deleteClipRange, restoreClipRange
+    selectClipsInRange, setTrackHeight, deleteProject, resetAll, deleteClipRange, restoreClipRange
   } = timelineProps;
 
   const [activeTab, setActiveTab] = useState('media');
@@ -169,6 +169,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       removeMarker={markerProps.removeMarker}
       updateMarker={markerProps.updateMarker}
       markers={markerProps.markers}
+      resetAll={resetAll}
     />
   );
 };

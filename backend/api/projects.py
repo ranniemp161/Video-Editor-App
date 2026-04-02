@@ -72,6 +72,7 @@ def secure_filename(filename: str) -> str:
 class UploadCompleteRequest(BaseModel):
     fileId: str
     fileName: str
+    totalChunks: int
 
 @router.post("/upload-chunk")
 @limiter.limit("5000/minute")
@@ -125,8 +126,17 @@ async def upload_complete(request: Request, data: UploadCompleteRequest, db: Ses
                 if idx_str.isdigit():
                     chunks.append((int(idx_str), os.path.join(project_dir, filename)))
         
-        if not chunks:
-            raise HTTPException(status_code=400, detail="No chunks found to merge.")
+        # CRITICAL FIX: Ensure chunks are in EXACT order
+        chunks.sort(key=lambda x: x[0])
+        
+        # Ironclad safety check: Ensure no gaps and exact count
+        if len(chunks) < data.totalChunks:
+             raise HTTPException(status_code=400, detail=f"Incomplete upload: Received {len(chunks)} of {data.totalChunks} chunks.")
+             
+        observed_indices = {c[0] for c in chunks}
+        for i in range(data.totalChunks):
+            if i not in observed_indices:
+                raise HTTPException(status_code=400, detail=f"Incomplete upload: Chunk {i} is missing.")
             
         # Merge exactly in order - Optimized for 5GB+ files
         # We use a 1MB buffer for the copy operation to ensure smooth I/O
