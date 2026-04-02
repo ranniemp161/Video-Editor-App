@@ -35,11 +35,19 @@ dist-ssr
 *.aac
 *.m4a
 *.webm
+*.edl
+*.xml
 
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
+backend/__pycache__/
+backend/*/__pycache__/
+.pytest_cache/
+backend/.pytest_cache/
+.coverage
+htmlcov/
 
 # Python virtual environments
 .venv/
@@ -51,9 +59,48 @@ ENV/
 *.log
 test_output.txt
 results.txt
+bandit_results.json
+*_log.txt
+docker_build_log*.txt
 
-# Temp files
+# Temp and Archive
 temp/
 tmp/
 .temp/
 .tmp/
+_archive/
+
+# Database
+*.db
+*.sqlite3
+videos.db
+backend/videos.db
+backend/data/*.db
+
+# Project-Specific Data
+training_data/
+data/
+backend/training_data/
+backend/data/
+backend/temp_audio/
+backend/public/uploads/
+public/uploads/
+public/exports/
+
+# Scripts and Tests (Excluding to keep repo small)
+backend/scripts/
+backend/tests/
+scripts/
+tests/
+analyze_training_data.py
+check_imports.py
+debug_db.py
+debug_import.py
+test_config_only.py
+test_imports.py
+test_projects_import.py
+ml_logs.txt
+dev_output.log
+python_output.txt
+backend_logs.txt
+logs.txt

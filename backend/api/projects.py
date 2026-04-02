@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from db import Project, Segment as DBSegment, RoughCutResult, get_db
 from schemas import Segment
+from core.limiter import limiter
 from core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -102,7 +103,7 @@ async def upload_chunk(
 
 @router.post("/upload-complete")
 @limiter.limit("20/minute")
-async def upload_complete(data: UploadCompleteRequest, db: Session = Depends(get_db)):
+async def upload_complete(request: Request, data: UploadCompleteRequest, db: Session = Depends(get_db)):
     """Merge all stored chunks and finalize the project."""
     try:
         fileId = data.fileId
