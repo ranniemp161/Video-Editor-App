@@ -65,8 +65,36 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                             console.log(`[Upload] Success! ProjectID: ${data.projectId}`);
                             setProjectId(data.projectId);
                             setAssets(prev => prev.map(a =>
-                                a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
+                                a.id === asset.id ? {
+                                    ...a,
+                                    remoteSrc: data.filePath,
+                                    isUploading: false,
+                                    uploadProgress: 100,
+                                    isGeneratingProxy: true  // proxy starts generating now
+                                } : a
                             ));
+
+                            // Poll until the 480p proxy is ready, then switch preview to it
+                            const pollProxy = setInterval(async () => {
+                                try {
+                                    const res = await fetch(`${API_BASE}/project/${data.projectId}/proxy-status`);
+                                    const status = await res.json();
+                                    if (status.ready && status.proxySrc) {
+                                        clearInterval(pollProxy);
+                                        setAssets(prev => prev.map(a =>
+                                            a.id === asset.id ? {
+                                                ...a,
+                                                proxySrc: status.proxySrc,
+                                                isGeneratingProxy: false
+                                            } : a
+                                        ));
+                                        showToast('success', 'Preview proxy ready — scrubbing is now smooth.');
+                                        console.log(`[Proxy] Ready: ${status.proxySrc}`);
+                                    }
+                                } catch (e) {
+                                    console.error('[Proxy] Poll error:', e);
+                                }
+                            }, 3000); // check every 3 seconds
                         } else {
                             throw new Error(data.error || 'Server logic failed');
                         }
@@ -167,12 +195,18 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                     const cleanPath = data.mediaPath.replace(/\\/g, '/');
                     const remoteSrc = cleanPath.startsWith('public/') ? '/' + cleanPath.substring(7) : '/' + cleanPath;
 
+                    // Restore proxy URL if it was already generated
+                    const proxySrc = data.proxyReady && data.proxyPath
+                        ? `/uploads/${data.projectId}/proxy.mp4`
+                        : undefined;
+
                     const restoredAsset: Asset = {
                         id: data.projectId,
                         name: data.originalFileName,
                         type: data.originalFileName.endsWith('.mp3') || data.originalFileName.endsWith('.wav') ? 'audio' : 'video',
                         src: null,
                         remoteSrc: remoteSrc,
+                        proxySrc,
                         duration: data.duration || 0,
                     };
 

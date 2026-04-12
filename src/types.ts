@@ -47,12 +47,14 @@ export interface Asset {
   type: 'video' | 'audio' | 'image';
   name: string;
   src: string | null; // Can be null for offline media
-  remoteSrc?: string; // Persistent server-side path
+  remoteSrc?: string; // Persistent server-side path (original, deleted after proxy ready)
+  proxySrc?: string;  // 480p proxy — preferred for preview once ready
   duration: number; // in seconds
   transcription?: Transcription;
   waveformPeaks?: number[]; // Cached waveform data for performance
   isUploading?: boolean;
   uploadProgress?: number;
+  isGeneratingProxy?: boolean; // True while 480p proxy is being generated
 }
 
 export interface TimelineClip {

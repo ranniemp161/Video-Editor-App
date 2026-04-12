@@ -13,6 +13,8 @@ class Project(Base):
     duration = Column(Float, default=0.0)
     originalFileName = Column(String)
     createdAt = Column(Float)  # Timestamp
+    proxyPath = Column(String, nullable=True)   # Path to 480p proxy file
+    proxyReady = Column(Boolean, default=False)  # True when proxy is generated
 
     segments = relationship("Segment", back_populates="project", cascade="all, delete-orphan")
     rough_cut_result = relationship("RoughCutResult", back_populates="project", cascade="all, delete-orphan", uselist=False)

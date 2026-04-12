@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { Asset, TimelineClip } from '../types';
 
 interface PreviewProps {
@@ -11,57 +11,75 @@ interface PreviewProps {
 export const PreviewComponent: React.FC<PreviewProps> = ({ clip, playheadPosition, isPlaying }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastSeekTimeRef = useRef<number>(0);
-  const lastClipIdRef = useRef<string | null>(null);
 
+  // Stable references — prevents useEffect from re-running when parent re-renders
+  // but clip values haven't actually changed
+  const clipId = clip?.clip.id ?? null;
+  const clipStart = clip?.clip.start ?? 0;
+  const clipTrimStart = clip?.clip.trimStart ?? 0;
+  const clipVolume = clip?.clip.volume ?? 100;
+  const clipOpacity = clip?.clip.opacity ?? 100;
+
+  // Priority: proxy (smooth 480p) > local blob (original, laggy on large files) > remoteSrc (fallback after reload)
+  const videoSrc = useMemo(() => {
+    if (!clip?.asset) return null;
+    return clip.asset.proxySrc || clip.asset.src || clip.asset.remoteSrc || null;
+  }, [clip?.asset?.proxySrc, clip?.asset?.src, clip?.asset?.remoteSrc]);
+
+  const isGeneratingProxy = clip?.asset?.isGeneratingProxy ?? false;
+
+  // Source change: only swap src when the clip itself changes
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    if (clip && clip.asset && clip.asset.src) {
-      // Change video source only if clip changed
-      if (video.src !== clip.asset.src) {
-        video.src = clip.asset.src;
-        lastClipIdRef.current = clip.clip.id;
-      }
-
-      const clipTime = playheadPosition - clip.clip.start + clip.clip.trimStart;
-
-      // Use different thresholds for playing vs scrubbing
-      // When playing: only seek if drift is > 0.5s (let video play naturally)
-      // When scrubbing/paused: seek more precisely (0.1s threshold)
-      const threshold = isPlaying ? 0.5 : 0.1;
-      const timeDrift = Math.abs(video.currentTime - clipTime);
-
-      // Prevent seek spam - minimum 50ms between seeks when scrubbing
-      const now = performance.now();
-      const canSeek = isPlaying || (now - lastSeekTimeRef.current > 50);
-
-      if (timeDrift > threshold && canSeek) {
-        video.currentTime = clipTime;
-        lastSeekTimeRef.current = now;
-      }
-
-      video.volume = (clip.clip.volume ?? 100) / 100;
-      video.style.opacity = ((clip.clip.opacity ?? 100) / 100).toString();
-
-      if (isPlaying && video.paused) {
-        video.play().catch(() => { }); // Silently ignore play errors
-      } else if (!isPlaying && !video.paused) {
-        video.pause();
-      }
-    } else {
+    if (!videoSrc) {
       video.pause();
-      if (video.src) video.src = '';
-      lastClipIdRef.current = null;
+      video.src = '';
+      return;
     }
-  }, [clip, playheadPosition, isPlaying]);
+    if (video.src !== videoSrc) {
+      video.src = videoSrc;
+      video.load();
+    }
+  }, [videoSrc]);
+
+  // Playback control: separated from source so seeks don't cause src reloads
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoSrc) return;
+
+    const clipTime = playheadPosition - clipStart + clipTrimStart;
+
+    // When playing: allow 0.5s drift before correcting (let video run naturally)
+    // When scrubbing/paused: seek precisely but throttle to 80ms to avoid seek spam
+    const threshold = isPlaying ? 0.5 : 0.08;
+    const timeDrift = Math.abs(video.currentTime - clipTime);
+    const now = performance.now();
+    const canSeek = isPlaying || (now - lastSeekTimeRef.current > 80);
+
+    if (timeDrift > threshold && canSeek) {
+      video.currentTime = clipTime;
+      lastSeekTimeRef.current = now;
+    }
+
+    video.volume = clipVolume / 100;
+    video.style.opacity = (clipOpacity / 100).toString();
+
+    if (isPlaying && video.paused) {
+      video.play().catch(() => {});
+    } else if (!isPlaying && !video.paused) {
+      video.pause();
+    }
+  }, [playheadPosition, isPlaying, clipStart, clipTrimStart, clipVolume, clipOpacity, videoSrc]);
 
   return (
     <div className="w-full h-full bg-[#0a0a0a] flex items-center justify-center flex-grow relative overflow-hidden">
-      {clip && clip.asset && clip.asset.src ? (
+      {videoSrc ? (
         <video
           ref={videoRef}
-          className="max-w-full max-h-full transition-opacity duration-150 shadow-2xl shadow-black"
+          className="max-w-full max-h-full shadow-2xl shadow-black"
+          preload="auto"
+          playsInline
         />
       ) : (
         <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
@@ -85,6 +103,23 @@ export const PreviewComponent: React.FC<PreviewProps> = ({ clip, playheadPositio
 
       {/* Playback Mask Overlay */}
       <div className="absolute inset-0 pointer-events-none border border-white/5"></div>
+
+      {/* Proxy generation indicator */}
+      {isGeneratingProxy && (
+        <div style={{
+          position: 'absolute', bottom: '8px', left: '50%', transform: 'translateX(-50%)',
+          background: 'rgba(0,0,0,0.7)', color: '#a78bfa', fontSize: '10px',
+          fontWeight: 'bold', letterSpacing: '0.1em', padding: '4px 10px',
+          borderRadius: '999px', border: '1px solid rgba(167,139,250,0.3)',
+          display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap'
+        }}>
+          <svg style={{ width: 10, height: 10, animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+          GENERATING SMOOTH PREVIEW...
+        </div>
+      )}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };

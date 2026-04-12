@@ -5,7 +5,7 @@ import shutil
 import time
 import logging
 from typing import List
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request, Form
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Request, Form, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from db import Project, Segment as DBSegment, RoughCutResult, get_db
@@ -72,6 +72,7 @@ def secure_filename(filename: str) -> str:
 @router.post("/upload")
 async def upload_video(
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     """
@@ -121,9 +122,15 @@ async def upload_video(
         db.commit()
         
         logger.info(f"✅ Stream complete: {project_id} ({bytes_received} bytes)")
+
+        # Kick off 480p proxy generation in background — deletes original when done
+        proxy_path = os.path.join(project_dir, "proxy.mp4")
+        background_tasks.add_task(_generate_proxy, project_id, final_path, proxy_path)
+        logger.info(f"[Proxy] Background transcode queued for {project_id}")
+
         return {
-            "success": True, 
-            "projectId": project_id, 
+            "success": True,
+            "projectId": project_id,
             "filePath": f"/uploads/{project_id}/{safe_name}"
         }
         
@@ -134,6 +141,65 @@ async def upload_video(
         if 'project_dir' in locals() and os.path.exists(project_dir):
             shutil.rmtree(project_dir, ignore_errors=True)
         raise HTTPException(status_code=500, detail=str(e) or type(e).__name__)
+
+def _generate_proxy(project_id: str, original_path: str, proxy_path: str):
+    """
+    Background task: transcode original video to 480p proxy, then delete original.
+    Uses ultrafast preset + low CRF — quality doesn't matter, only speed does.
+    Audio kept at 64k so transcription and editing still work on the proxy.
+    """
+    import subprocess
+    from db.database import SessionLocal
+
+    logger.info(f"[Proxy] Starting 480p transcode for project {project_id}")
+    try:
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", original_path,
+            "-vf", "scale=-2:480",
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "35",
+            "-c:a", "aac", "-b:a", "64k",
+            proxy_path
+        ]
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logger.info(f"[Proxy] Transcode complete: {proxy_path}")
+
+        # Delete the original to free disk space
+        if os.path.exists(original_path):
+            os.remove(original_path)
+            logger.info(f"[Proxy] Original deleted: {original_path}")
+
+        # Mark proxy as ready in DB
+        db = SessionLocal()
+        try:
+            project = db.query(Project).filter(Project.id == project_id).first()
+            if project:
+                project.proxyPath = proxy_path
+                project.proxyReady = True
+                db.commit()
+                logger.info(f"[Proxy] DB updated — proxy ready for {project_id}")
+        finally:
+            db.close()
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"[Proxy] FFmpeg failed for {project_id}: {e.stderr.decode()}")
+    except Exception as e:
+        logger.error(f"[Proxy] Unexpected error for {project_id}: {e}")
+
+
+@router.get("/project/{project_id}/proxy-status")
+def get_proxy_status(project_id: str, db: Session = Depends(get_db)):
+    """Poll this endpoint to check if the 480p proxy is ready."""
+    db_project = db.query(Project).filter(Project.id == project_id).first()
+    if not db_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if db_project.proxyReady and db_project.proxyPath:
+        proxy_filename = os.path.basename(db_project.proxyPath)
+        return {"ready": True, "proxySrc": f"/uploads/{project_id}/{proxy_filename}"}
+
+    return {"ready": False, "proxySrc": None}
+
 
 @router.get("/project/{project_id}")
 def get_project(project_id: str, db: Session = Depends(get_db)):
@@ -147,6 +213,8 @@ def get_project(project_id: str, db: Session = Depends(get_db)):
         "mediaPath": db_project.mediaPath,
         "duration": db_project.duration,
         "originalFileName": db_project.originalFileName,
+        "proxyReady": db_project.proxyReady,
+        "proxyPath": db_project.proxyPath,
         "segments": [
             {
                 "start": s.start,
