@@ -1,4 +1,5 @@
 import path from 'path';
+import http from 'http';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -91,7 +92,6 @@ export default defineConfig(({ mode }) => {
           // body when proxying large application/octet-stream requests in Vite 6.
           server.middlewares.use('/api/upload', (req, res, next) => {
             if (req.method !== 'POST') return next();
-            const http = require('http') as typeof import('http');
             const target = new URL(backendTarget);
             const proxyReq = http.request(
               {
