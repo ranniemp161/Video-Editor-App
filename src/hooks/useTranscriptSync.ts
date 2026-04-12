@@ -2,8 +2,8 @@
 import { useCallback, useState } from 'react';
 import { TimelineClip } from '../types';
 import { TimelineStateHook } from './useTimelineState';
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+import { API_BASE, getAuthHeaders } from '@/config/api';
+import { showToast } from '@/utils/toast';
 
 export const useTranscriptSync = (state: TimelineStateHook) => {
     const {
@@ -31,9 +31,9 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         // Without it, the backend cannot locate the file.
         if (!projectId) {
             const isStillUploading = asset.isUploading;
-            alert(isStillUploading
-                ? 'The video is still uploading to the server. Please wait for the upload to complete (see progress in Media tab) before transcribing.'
-                : 'Upload has not completed yet. Please try re-uploading the video first.');
+            showToast('warning', isStillUploading
+                ? 'Video is still uploading. Wait for it to finish (check progress in the Media tab) before transcribing.'
+                : 'Upload has not completed. Please try re-uploading the video first.');
             setIsTranscribing(null);
             return;
         }
@@ -55,13 +55,9 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         }, 1000);
 
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/transcribe`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify({
                     videoPath,
                     duration: asset.duration,
@@ -85,7 +81,7 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
                 };
                 setAssets(prev => prev.map(a => a.id === assetId ? { ...a, transcription: transcriptionWithSource } : a));
             } else {
-                alert(`Transcription failed: ${result.error || 'Unknown error'}`);
+                showToast('error', `Transcription failed: ${result.error || 'Unknown error'}`);
             }
         } catch (err) {
             console.error('Transcription failed:', err);
@@ -100,10 +96,9 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         if (!projectId) return;
 
         try {
-            const token = localStorage.getItem('auth_token');
             const res = await fetch(`${API_BASE}/project/${projectId}/refine-transcript`, {
                 method: 'POST',
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                headers: getAuthHeaders()
             });
             const data = await res.json();
 
@@ -120,7 +115,7 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
                     return a;
                 }));
             } else {
-                alert(`Refinement failed: ${data.error}`);
+                showToast('error', `Transcript refinement failed: ${data.error}`);
             }
         } catch (e) {
             console.error("Refinement error:", e);
@@ -140,13 +135,9 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
         setSegments(newSegments);
 
         try {
-            const token = localStorage.getItem('auth_token');
             await fetch(`${API_BASE}/project/${projectId}/segments`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify(newSegments)
             });
         } catch (e) {
@@ -156,14 +147,10 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
 
     const uploadTranscript = useCallback(async (assetId: string, file: File) => {
         try {
-            const token = localStorage.getItem('auth_token');
             const content = await file.text();
             const response = await fetch(`${API_BASE}/upload-transcript`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify({ content, fileName: file.name, projectId })
             });
 
@@ -187,13 +174,9 @@ export const useTranscriptSync = (state: TimelineStateHook) => {
                     }));
                     setSegments(newSegments);
 
-                    const token = localStorage.getItem('auth_token');
                     fetch(`${API_BASE}/project/${projectId}/segments`, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                        },
+                        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                         body: JSON.stringify(newSegments)
                     }).catch(e => console.error("Sync failed", e));
                 }

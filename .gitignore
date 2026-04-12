@@ -1,7 +1,9 @@
-# Environment variables
+# Environment variables — never commit real secrets
+# Copy .env.example → .env and fill in your values
 .env
 .env.local
 .env.*.local
+backend/.env
 
 # Logs
 logs

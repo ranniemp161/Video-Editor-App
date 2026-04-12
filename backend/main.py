@@ -100,4 +100,12 @@ app.mount("/uploads", StaticFiles(directory=str(settings.upload_dir)), name="upl
 
 if __name__ == "__main__":
     # use_reloader=False to prevent scheduler from running twice in dev
-    uvicorn.run("main:app", host=settings.host, port=settings.port, reload=True)
+    # We only watch .py files to prevent the server from restarting during large video uploads
+    uvicorn.run(
+        "main:app", 
+        host=settings.host, 
+        port=settings.port, 
+        reload=True, 
+        reload_includes=["*.py"],
+        reload_dirs=["."]
+    )

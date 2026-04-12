@@ -1,10 +1,12 @@
 import React, { useState, ChangeEvent, useMemo, useEffect } from 'react';
 import { Login } from '@/components/Login';
 import { EditorLayout } from '@/components/EditorLayout';
+import { ToastContainer } from '@/components/Toast';
 import { useTimeline } from '@/hooks/useTimeline';
 import { useMarkers } from '@/hooks/useMarkers';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Asset } from '@/types';
+import { TRANSCRIPT_EPSILON } from '@/constants';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -102,7 +104,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   // Event Handlers
   const onSeekFromTranscript = (sourceTime: number) => {
     const adjustedSourceTime = sourceTime + transcriptOffset;
-    const EPSILON = 0.1;
+    const EPSILON = TRANSCRIPT_EPSILON;
     const targetAsset = assets[0] || activeTranscriptAsset;
     if (!targetAsset) return;
 
@@ -148,6 +150,8 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   };
 
   return (
+    <>
+    <ToastContainer />
     <EditorLayout
       {...timelineProps}
       {...markerProps}
@@ -171,6 +175,7 @@ const VideoEditor: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
       markers={markerProps.markers}
       resetAll={resetAll}
     />
+    </>
   );
 };
 

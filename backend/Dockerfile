@@ -27,5 +27,6 @@ RUN mkdir -p public/uploads data
 # Expose port 8000
 EXPOSE 8000
 
-# Run the application with hot-reloading enabled for development
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Start the application with a high timeout and reload filtering to support 5GB uploads
+# We only watch .py files to prevent the server from restarting during large video uploads
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-include", "*.py", "--timeout-keep-alive", "900"]

@@ -1,8 +1,7 @@
 import React from 'react';
 import { MenuIcon } from './icons';
-
-// Deployment Support: Use VITE_API_URL for cloud, fallback to /api for local proxy
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+import { API_BASE, getAuthHeaders } from '@/config/api';
+import { showToast } from '@/utils/toast';
 
 interface HeaderProps {
   onImportClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -64,13 +63,9 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
 
     setIsTraining(true);
     try {
-      const token = localStorage.getItem('auth_token');
       const res = await fetch(`${API_BASE}/train-feedback`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           projectId: 'default_project',
           finalTimeline: timelineState  // Fixed: was 'timeline', backend expects 'finalTimeline'
@@ -78,13 +73,13 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
       });
       const data = await res.json();
       if (data.success) {
-        alert(`AI Trained! Updated ${data.updated_count} decisions based on your edits.`);
+        showToast('success', `AI trained — updated ${data.updated_count} decisions based on your edits.`);
       } else {
-        alert('Training failed: ' + data.message);
+        showToast('error', 'Training failed: ' + data.message);
       }
     } catch (e) {
       console.error(e);
-      alert('Failed to send training feedback.');
+      showToast('error', 'Failed to send training feedback. Check server connection.');
     } finally {
       setIsTraining(false);
     }

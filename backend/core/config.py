@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     upload_dir: Path = base_dir / "public" / "uploads"
     
     # Security: Maximum file upload size to prevent DoS attacks
-    max_upload_size_mb: int = 500
+    max_upload_size_mb: int = 10240
     
     # Global Authentication Password (REQUIRED)
     app_password: str = "MISSING_IN_ENV"

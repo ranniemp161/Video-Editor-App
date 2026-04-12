@@ -22,7 +22,7 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - APP_PASSWORD=${APP_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
-      - MAX_UPLOAD_SIZE_MB=${MAX_UPLOAD_SIZE_MB:-500}
+      - MAX_UPLOAD_SIZE_MB=10240
     restart: unless-stopped
     networks:
       - video-editor-network

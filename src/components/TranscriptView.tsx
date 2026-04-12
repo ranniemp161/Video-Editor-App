@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Asset, Transcription, TimelineState } from '../types';
 import { formatTime } from '../utils/time';
 import { ThoughtListView, ThoughtStats } from './ThoughtView';
+import { TRANSCRIPT_EPSILON } from '../constants';
 
 interface TranscriptViewProps {
     asset: Asset | null;
@@ -233,7 +234,7 @@ export const TranscriptView: React.FC<TranscriptViewProps> = ({
     const activeWordIndexRef = useRef<number>(-1);
 
     useEffect(() => {
-        const EPSILON = 0.05;
+        const EPSILON = TRANSCRIPT_EPSILON;
         // Binary Search for performance O(log N)
         let low = 0;
         let high = words.length - 1;

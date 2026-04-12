@@ -2,8 +2,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Asset } from '../types';
 import { TimelineStateHook } from './useTimelineState';
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+import { API_BASE, getAuthToken, getAuthHeaders } from '@/config/api';
+import { showToast } from '@/utils/toast';
 
 export const useProjectManagement = (state: TimelineStateHook) => {
     const {
@@ -36,103 +36,72 @@ export const useProjectManagement = (state: TimelineStateHook) => {
 
         const dummyVideo = document.createElement('video');
         dummyVideo.src = asset.src!;
-        dummyVideo.onloadedmetadata = async () => {
+        dummyVideo.onloadedmetadata = () => {
             asset.duration = dummyVideo.duration;
             asset.isUploading = true;
             asset.uploadProgress = 0;
             setAssets([asset]);
 
-            const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
-            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-            const fileId = `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const token = localStorage.getItem('auth_token');
-            const headers: Record<string, string> = {};
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            // Ironclad: Direct binary upload (no FormData overhead)
+            const xhr = new XMLHttpRequest();
+            const uploadUrl = `${API_BASE}/upload`;
+            
+            console.log(`[Upload] Starting direct binary stream for: ${file.name} to ${uploadUrl}`);
 
-            const uploadUrl = `${API_BASE}/upload-chunk`;
-            console.log(`[Upload] Starting massive chunked upload to: ${uploadUrl} (ID: ${fileId})`);
-
-            try {
-                for (let i = 0; i < totalChunks; i++) {
-                    const start = i * CHUNK_SIZE;
-                    const end = Math.min(start + CHUNK_SIZE, file.size);
-                    const chunk = file.slice(start, end);
-
-                    const formData = new FormData();
-                    formData.append('fileId', fileId);
-                    formData.append('chunkIndex', i.toString());
-                    formData.append('file', chunk, file.name);
-
-                    // Robust retry logic for each chunk
-                    let success = false;
-                    let attempts = 0;
-                    const maxAttempts = 3;
-
-                    while (!success && attempts < maxAttempts) {
-                        try {
-                            const res = await fetch(uploadUrl, {
-                                method: 'POST',
-                                headers,
-                                body: formData
-                            });
-
-                            if (!res.ok) {
-                                if (res.status === 401) {
-                                    localStorage.removeItem('auth_token');
-                                    window.location.reload();
-                                    return;
-                                }
-                                let errText = await res.text();
-                                try { errText = JSON.parse(errText).detail || errText; } catch(e){}
-                                throw new Error(`${res.status} ${errText}`);
-                            }
-                            success = true;
-                        } catch (err) {
-                            attempts++;
-                            console.warn(`[Upload] Chunk ${i} failed (attempt ${attempts}/${maxAttempts}):`, err);
-                            if (attempts >= maxAttempts) throw err;
-                            // Wait 500ms before retrying
-                            await new Promise(r => setTimeout(r, 500));
-                        }
-                    }
-
-                    const percentComplete = Math.round(((i + 1) / totalChunks) * 100);
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
                     setAssets(prev => prev.map(a =>
                         a.id === asset.id ? { ...a, uploadProgress: percentComplete } : a
                     ));
-
-                    // Small 50ms pause to let the proxy breathe
-                    await new Promise(r => setTimeout(r, 50));
                 }
+            };
 
-                // Finalize with total chunk count for verification
-                const completeRes = await fetch(`${API_BASE}/upload-complete`, {
-                    method: 'POST',
-                    headers: { ...headers, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId, fileName: file.name, totalChunks })
-                });
-
-                if (!completeRes.ok) {
-                    let errText = await completeRes.text();
-                    try { errText = JSON.parse(errText).detail || errText; } catch(e){}
-                    throw new Error(`Finalization failed: ${completeRes.status} ${errText}`);
-                }
-
-                const data = await completeRes.json();
-                if (data.success) {
-                    setProjectId(data.projectId);
-                    setAssets(prev => prev.map(a =>
-                        a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
-                    ));
+            xhr.onload = async () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.success) {
+                            console.log(`[Upload] Success! ProjectID: ${data.projectId}`);
+                            setProjectId(data.projectId);
+                            setAssets(prev => prev.map(a =>
+                                a.id === asset.id ? { ...a, remoteSrc: data.filePath, isUploading: false, uploadProgress: 100 } : a
+                            ));
+                        } else {
+                            throw new Error(data.error || 'Server logic failed');
+                        }
+                    } catch (e: any) {
+                        console.error("[Upload] Parse error:", e);
+                        showToast('error', 'Upload failed: invalid response from server.');
+                        setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
+                    }
                 } else {
-                    throw new Error(data.error || 'Server logic failed on finalize');
+                    let errText = xhr.responseText;
+                    try { errText = JSON.parse(errText).detail || errText; } catch(e){}
+                    console.error("[Upload] Server error:", xhr.status, errText);
+                    showToast('error', `Upload failed (${xhr.status}): ${errText}`);
+                    setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
                 }
+            };
 
-            } catch (err: any) {
-                console.error("Chunked upload failed:", err);
+            xhr.onerror = () => {
+                const detail = xhr.status ? `HTTP ${xhr.status}` : 'backend unreachable — check Docker logs';
+                console.error("[Upload] Network Error", { status: xhr.status, response: xhr.responseText });
+                showToast('error', `Upload failed: network error (${detail})`);
                 setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
-                alert(`Upload failed: ${err.message || 'Network/Server Error'}`);
-            }
+            };
+
+            xhr.timeout = 3600000; // 1 hour
+            xhr.open('POST', uploadUrl);
+            
+            const token = getAuthToken();
+            if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            
+            // Critical metadata in headers
+            xhr.setRequestHeader('x-file-name', encodeURIComponent(file.name));
+            xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+            
+            xhr.send(file); // Send raw file binary
         };
     }, [setAssets, setProjectId]);
 
@@ -265,10 +234,9 @@ export const useProjectManagement = (state: TimelineStateHook) => {
         if (!confirm("FINAL CONFIRMATION: Are you absolutely sure?")) return;
 
         try {
-            const token = localStorage.getItem('auth_token');
             const res = await fetch(`${API_BASE}/system/reset`, {
                 method: 'POST',
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                headers: getAuthHeaders()
             });
             
             if (res.ok) {
@@ -278,15 +246,15 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                 setSegments([]);
                 setTimeline({ tracks: [{ id: 'track-1', clips: [] }] });
                 
-                alert("System Reset Complete. All storage cleared.");
-                window.location.reload(); 
+                showToast('success', 'System reset complete. All storage cleared.');
+                window.location.reload();
             } else {
                 const err = await res.text();
-                alert(`Reset failed: ${err}`);
+                showToast('error', `Reset failed: ${err}`);
             }
         } catch (e) {
             console.error("Failed to reset system:", e);
-            alert("Network error during reset.");
+            showToast('error', 'Network error during reset. Check server connection.');
         }
     }, [setProjectId, setAssets, setSegments, setTimeline]);
 

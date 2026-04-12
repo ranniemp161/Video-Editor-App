@@ -69,167 +69,71 @@ def secure_filename(filename: str) -> str:
         safe_name = "upload_" + str(uuid.uuid4())[:8] + ".tmp"
     return safe_name
 
-class UploadCompleteRequest(BaseModel):
-    fileId: str
-    fileName: str
-    totalChunks: int
-
-@router.post("/upload-chunk")
-@limiter.limit("5000/minute")
-async def upload_chunk(
+@router.post("/upload")
+async def upload_video(
     request: Request,
-    fileId: str = Form(...),
-    chunkIndex: int = Form(...),
-    file: UploadFile = File(...)
+    db: Session = Depends(get_db)
 ):
-    """Receive and store a single chunk of a large file."""
+    """
+    IRONCLAD STREAMING UPLOAD: Pipes raw binary bytes directly from the network socket to disk.
+    Bypassing the standard multipart parser is essential for 5GB+ files to prevent timeouts.
+    """
     try:
-        if not re.match(r'^[a-zA-Z0-9-]+$', fileId):
-            raise HTTPException(status_code=400, detail="Invalid fileId formatted.")
-
-        project_dir = os.path.join(UPLOAD_DIR, fileId)
+        # 1. Capture metadata from headers (URI decoded for special characters)
+        from urllib.parse import unquote
+        raw_filename = request.headers.get("x-file-name", "unknown_video.mp4")
+        filename = unquote(raw_filename)
+        
+        # 2. Generate unique project ID
+        project_id = str(uuid.uuid4())
+        project_dir = os.path.join(UPLOAD_DIR, project_id)
         os.makedirs(project_dir, exist_ok=True)
         
-        chunk_path = os.path.join(project_dir, f"chunk_{chunkIndex}.part")
-        
-        # Write the 5MB chunk to disk asynchronously
-        chunk_data = await file.read()
-        with open(chunk_path, "wb") as f:
-            f.write(chunk_data)
-            
-        return {"success": True, "chunkIndex": chunkIndex}
-    except Exception as e:
-        logger.error(f"Chunk upload failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/upload-complete")
-@limiter.limit("20/minute")
-async def upload_complete(request: Request, data: UploadCompleteRequest, db: Session = Depends(get_db)):
-    """Merge all stored chunks and finalize the project."""
-    try:
-        fileId = data.fileId
-        if not re.match(r'^[a-zA-Z0-9-]+$', fileId):
-            raise HTTPException(status_code=400, detail="Invalid fileId formed.")
-
-        project_dir = os.path.join(UPLOAD_DIR, fileId)
-        if not os.path.exists(project_dir):
-            raise HTTPException(status_code=404, detail="Upload directory missing or no chunks sent.")
-
-        safe_name = secure_filename(data.fileName)
+        # 3. Secure and prepare file path
+        safe_name = secure_filename(filename)
         final_path = os.path.join(project_dir, safe_name)
         
-        # Discover and sort chunks
-        chunks = []
-        for filename in os.listdir(project_dir):
-            if filename.startswith("chunk_") and filename.endswith(".part"):
-                idx_str = filename.replace("chunk_", "").replace(".part", "")
-                if idx_str.isdigit():
-                    chunks.append((int(idx_str), os.path.join(project_dir, filename)))
+        # 4. Stream directly to disk using 1MB chunks (Efficient I/O)
+        logger.info(f"🚀 Direct Binary Stream Started: {filename} (ID: {project_id})")
         
-        # CRITICAL FIX: Ensure chunks are in EXACT order
-        chunks.sort(key=lambda x: x[0])
-        
-        # Ironclad safety check: Ensure no gaps and exact count
-        if len(chunks) < data.totalChunks:
-             raise HTTPException(status_code=400, detail=f"Incomplete upload: Received {len(chunks)} of {data.totalChunks} chunks.")
-             
-        observed_indices = {c[0] for c in chunks}
-        for i in range(data.totalChunks):
-            if i not in observed_indices:
-                raise HTTPException(status_code=400, detail=f"Incomplete upload: Chunk {i} is missing.")
-            
-        # Merge exactly in order - Optimized for 5GB+ files
-        # We use a 1MB buffer for the copy operation to ensure smooth I/O
-        with open(final_path, "wb") as outfile:
-            for idx, chunk_file in chunks:
-                try:
-                    with open(chunk_file, "rb") as infile:
-                        shutil.copyfileobj(infile, outfile, length=1024*1024)
-                    os.remove(chunk_file)
-                except Exception as chunk_err:
-                    logger.error(f"Failed to process chunk {idx}: {chunk_err}")
-                    raise HTTPException(status_code=500, detail=f"Failed during merge at chunk {idx}")
-                
-        # Validate final composed size
+        bytes_received = 0
         max_bytes = settings.max_upload_size_mb * 1024 * 1024
-        if os.path.getsize(final_path) > max_bytes:
-            os.remove(final_path)
-            shutil.rmtree(project_dir, ignore_errors=True)
-            raise HTTPException(status_code=413, detail=f"Merged file too large. Maximum size is {settings.max_upload_size_mb}MB.")
-            
-        db_project = Project(
-            id=fileId,
-            mediaPath=final_path,
-            duration=0.0,
-            originalFileName=data.fileName,
-            createdAt=time.time()
-        )
-        db.add(db_project)
-        db.commit()
         
-        return {"success": True, "projectId": fileId, "filePath": f"/uploads/{fileId}/{safe_name}"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Upload complete failed: {e}")
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/upload")
-@limiter.limit("20/minute")
-async def upload_video(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    """Legacy endpoint for single-request uploads. Replaced by chunked uploads for large files."""
-    try:
-        # Pre-emptive check using Content-Length header (if provided by client)
-        content_length = request.headers.get("content-length")
-        max_bytes = settings.max_upload_size_mb * 1024 * 1024
-        if content_length and int(content_length) > max_bytes:
-            raise HTTPException(status_code=413, detail=f"File too large. Maximum size is {settings.max_upload_size_mb}MB.")
-
-        file_id = str(uuid.uuid4())
-        project_dir = os.path.join(UPLOAD_DIR, file_id)
-        os.makedirs(project_dir, exist_ok=True)
-        
-        # Prevent Path Traversal by securing the uploaded filename
-        safe_name = secure_filename(file.filename)
-        file_path = os.path.join(project_dir, safe_name)
-        
-        # Stream file in chunks to prevent memory RAM exhaustion and enforce true size limits
-        bytes_written = 0
-        chunk_size = 1024 * 1024  # 1MB chunks
-        
-        with open(file_path, "wb") as buffer:
-            while True:
-                chunk = file.file.read(chunk_size)
-                if not chunk:
-                    break
-                bytes_written += len(chunk)
-                if bytes_written > max_bytes:
+        with open(final_path, "wb") as buffer:
+            async for chunk in request.stream():
+                bytes_received += len(chunk)
+                if bytes_received > max_bytes:
                     buffer.close()
-                    os.remove(file_path)
+                    os.remove(final_path)
                     shutil.rmtree(project_dir, ignore_errors=True)
-                    raise HTTPException(status_code=413, detail=f"File too large. Maximum size is {settings.max_upload_size_mb}MB.")
+                    raise HTTPException(status_code=413, detail=f"File exceeds {settings.max_upload_size_mb}MB limit.")
                 buffer.write(chunk)
             
+        # 5. Save to database
         db_project = Project(
-            id=file_id,
-            mediaPath=file_path,
+            id=project_id,
+            mediaPath=final_path,
             duration=0.0,
-            originalFileName=file.filename,
+            originalFileName=filename,
             createdAt=time.time()
         )
         db.add(db_project)
         db.commit()
         
-        return {"success": True, "projectId": file_id, "filePath": f"/uploads/{file_id}/{safe_name}"}
+        logger.info(f"✅ Stream complete: {project_id} ({bytes_received} bytes)")
+        return {
+            "success": True, 
+            "projectId": project_id, 
+            "filePath": f"/uploads/{project_id}/{safe_name}"
+        }
+        
     except HTTPException:
-        # Re-raise HTTP exceptions (like our 413) so they aren't caught by the generic handler
         raise
     except Exception as e:
-        logger.error(f"Upload failed: {e}")
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
+        logger.error(f"Streaming upload failed: {type(e).__name__}: {e}")
+        if 'project_dir' in locals() and os.path.exists(project_dir):
+            shutil.rmtree(project_dir, ignore_errors=True)
+        raise HTTPException(status_code=500, detail=str(e) or type(e).__name__)
 
 @router.get("/project/{project_id}")
 def get_project(project_id: str, db: Session = Depends(get_db)):
@@ -274,7 +178,6 @@ def delete_project(project_id: str, db: Session = Depends(get_db)):
             shutil.rmtree(project_dir)
             logger.info(f"Deleted project directory: {project_dir}")
     except Exception as e:
-        logger.error(f"Error deleting files for project {project_id}: {e}")
         logger.error(f"Error deleting files for project {project_id}: {e}")
 
     # Delete from DB

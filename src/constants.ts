@@ -37,3 +37,9 @@ export const TIMELINE_CONSTANTS = {
   TRACK_HEIGHT: 60,
   TRACK_GAP: 5,
 };
+
+/**
+ * Tolerance (in seconds) used when matching transcript words to playhead position.
+ * Was previously duplicated as 0.1 in App.tsx and 0.05 in TranscriptView.tsx — unified here.
+ */
+export const TRANSCRIPT_EPSILON = 0.05;

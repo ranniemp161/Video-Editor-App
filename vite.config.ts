@@ -58,10 +58,18 @@ export default defineConfig(({ mode }) => {
           target: backendTarget,
           changeOrigin: true,
           secure: false,
-          // Stream large chunked uploads without buffering in memory
+          timeout: 3600000,
+          proxyTimeout: 3600000,
+          // Stream large uploads without buffering
           configure: (proxy) => {
-            proxy.on('error', (err) => {
-              console.error('[Vite Proxy Error]', err.message);
+            proxy.on('error', (err, req, res) => {
+              console.error('[Vite Proxy Error]', err.message, '→', req.method, req.url);
+              if ('headersSent' in res && !res.headersSent) {
+                (res as import('http').ServerResponse).writeHead(502, { 'Content-Type': 'application/json' });
+                (res as import('http').ServerResponse).end(JSON.stringify({
+                  detail: `Proxy error: backend unreachable. ${err.message}`
+                }));
+              }
             });
           }
         },
@@ -78,6 +86,35 @@ export default defineConfig(({ mode }) => {
       {
         name: 'vite-plugin-render-api',
         configureServer(server) {
+
+          // Direct streaming proxy for binary uploads — bypasses http-proxy which drops the
+          // body when proxying large application/octet-stream requests in Vite 6.
+          server.middlewares.use('/api/upload', (req, res, next) => {
+            if (req.method !== 'POST') return next();
+            const http = require('http') as typeof import('http');
+            const target = new URL(backendTarget);
+            const proxyReq = http.request(
+              {
+                hostname: target.hostname,
+                port: Number(target.port) || 8000,
+                path: '/api/upload',
+                method: 'POST',
+                headers: { ...req.headers, host: target.host },
+              },
+              (proxyRes) => {
+                res.writeHead(proxyRes.statusCode ?? 502, proxyRes.headers);
+                proxyRes.pipe(res, { end: true });
+              }
+            );
+            proxyReq.on('error', (err) => {
+              console.error('[Upload Direct Proxy] Error:', err.message);
+              if (!res.headersSent) {
+                res.writeHead(502, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ detail: `Upload proxy error: ${err.message}` }));
+              }
+            });
+            req.pipe(proxyReq, { end: true });
+          });
 
           // Serve rendered video files
           server.middlewares.use('/renders', (req, res, next) => {

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { TimelineStateHook } from './useTimelineState';
-
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+import { API_BASE, getAuthHeaders } from '@/config/api';
+import { showToast } from '@/utils/toast';
 
 export const useAutoCut = (state: TimelineStateHook) => {
     const {
@@ -19,13 +19,9 @@ export const useAutoCut = (state: TimelineStateHook) => {
         const backendAssetId = projectId || assetId;
         setIsAutoCutting(true);
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/auto-cut`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify({
                     words: asset.transcription.words,
                     asset: {
@@ -49,7 +45,7 @@ export const useAutoCut = (state: TimelineStateHook) => {
                     return { ...prev, tracks: newTracks };
                 });
             } else {
-                alert('Auto-cut returned no clips.');
+                showToast('warning', 'Auto-cut returned no clips. Try transcribing first or adjusting silence thresholds.');
             }
         } catch (err) {
             console.error('Auto-cut failed:', err);

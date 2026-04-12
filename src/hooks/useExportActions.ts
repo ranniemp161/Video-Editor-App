@@ -1,9 +1,10 @@
 
 import { useCallback, useState } from 'react';
 import { TimelineStateHook } from './useTimelineState';
+import { API_BASE, getAuthHeaders } from '@/config/api';
+import { showToast } from '@/utils/toast';
 
 const basename = (path: string) => path.split(/[\\/]/).pop() || '';
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const useExportActions = (state: TimelineStateHook) => {
     const { timeline, assets } = state;
@@ -19,13 +20,9 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/render`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify(data)
             });
             const result = await response.json();
@@ -70,13 +67,9 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-xml`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify(data)
             });
 
@@ -88,7 +81,7 @@ export const useExportActions = (state: TimelineStateHook) => {
             if (contentType && contentType.includes('application/json')) {
                 const result = await response.json();
                 if (result.success === false) {
-                    alert(result.error || 'Export failed');
+                    showToast('error', result.error || 'XML export failed');
                     return;
                 }
                 if (result.path) {
@@ -113,7 +106,7 @@ export const useExportActions = (state: TimelineStateHook) => {
             window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error('XML Export failed:', err);
-            alert('XML Export failed. Please try again.');
+            showToast('error', 'XML export failed. Please try again.');
         }
     }, [timeline, assets]);
 
@@ -129,13 +122,9 @@ export const useExportActions = (state: TimelineStateHook) => {
         };
 
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-edl`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify(data)
             });
 
@@ -147,7 +136,7 @@ export const useExportActions = (state: TimelineStateHook) => {
             if (contentType && contentType.includes('application/json')) {
                 const result = await response.json();
                 if (result.success === false) {
-                    alert(result.error || 'Export failed');
+                    showToast('error', result.error || 'EDL export failed');
                     return;
                 }
                 if (result.path) {
@@ -172,19 +161,15 @@ export const useExportActions = (state: TimelineStateHook) => {
             window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error('EDL Export failed:', err);
-            alert('EDL Export failed. Please try again.');
+            showToast('error', 'EDL export failed. Please try again.');
         }
     }, [timeline, assets]);
 
     const exportTranscript = useCallback(async (transcription: any) => {
         try {
-            const token = localStorage.getItem('auth_token');
             const response = await fetch(`${API_BASE}/export-transcript`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                 body: JSON.stringify({ transcription, format: 'txt' }),
             });
 
