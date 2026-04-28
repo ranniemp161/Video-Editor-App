@@ -10,6 +10,7 @@ from slowapi.errors import RateLimitExceeded
 import uvicorn
 
 from db import SessionLocal, engine, Base, RoughCutResult
+from db.database import run_migrations
 from api.projects import router as projects_router
 from api.transcripts import router as transcripts_router
 from api.editing import router as editing_router
@@ -21,6 +22,7 @@ from core.config import settings
 
 # Create tables and directories
 Base.metadata.create_all(bind=engine)
+run_migrations()
 os.makedirs(settings.data_dir, exist_ok=True)
 os.makedirs(settings.upload_dir, exist_ok=True)
 

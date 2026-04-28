@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
   // Determine backend target:
   // - In Docker: container name 'backend' is resolvable via Docker internal network
   // - Locally without Docker: falls back to localhost:8000
-  const backendTarget = process.env.BACKEND_URL || env.BACKEND_URL || 'http://backend:8000';
+  const backendTarget = process.env.BACKEND_URL || env.BACKEND_URL || 'http://localhost:8000';
   console.log(`[Vite Proxy] Configured to target backend at: ${backendTarget}`);
 
   return {
@@ -55,13 +55,15 @@ export default defineConfig(({ mode }) => {
       // This eliminates CORS issues in local dev and ensures consistent routing
       // regardless of whether VITE_API_URL is set or not.
       proxy: {
-        '/api': {
+        // Exclude /api/upload — it's handled by the custom direct-stream middleware
+        // below so that http-proxy never buffers the binary body (which causes the
+        // "stuck at 1%" symptom for large files in Vite 6).
+        '^/api/(?!upload($|/))': {
           target: backendTarget,
           changeOrigin: true,
           secure: false,
           timeout: 3600000,
           proxyTimeout: 3600000,
-          // Stream large uploads without buffering
           configure: (proxy) => {
             proxy.on('error', (err, req, res) => {
               console.error('[Vite Proxy Error]', err.message, '→', req.method, req.url);
@@ -88,31 +90,68 @@ export default defineConfig(({ mode }) => {
         name: 'vite-plugin-render-api',
         configureServer(server) {
 
-          // Direct streaming proxy for binary uploads — bypasses http-proxy which drops the
-          // body when proxying large application/octet-stream requests in Vite 6.
+          // Direct streaming proxy for binary uploads.
+          // The standard Vite proxy (http-proxy) buffers the entire request body before
+          // forwarding, which causes uploads to stall at 1% for large files. This
+          // middleware pipes the raw socket stream directly to the backend, bypassing
+          // http-proxy entirely. The /api regex above also excludes /api/upload from
+          // the standard proxy so this middleware always wins.
           server.middlewares.use('/api/upload', (req, res, next) => {
             if (req.method !== 'POST') return next();
-            const target = new URL(backendTarget);
+
+            let target;
+            try {
+              target = new URL(backendTarget);
+            } catch (e) {
+              console.error('[Upload Proxy] Invalid backendTarget:', backendTarget);
+              res.writeHead(500);
+              return res.end('Invalid backend configuration');
+            }
+
+            const fileName = decodeURIComponent(req.headers['x-file-name'] as string || 'unknown');
+            const contentLength = req.headers['content-length'];
+            console.log(`[Upload Proxy] → ${target.origin}/api/upload  file="${fileName}"  size=${contentLength ? Math.round(Number(contentLength)/1024/1024) + 'MB' : 'unknown'}`);
+
+            // Build forwarded headers: preserve Authorization, x-file-name, content-length.
+            // Drop transfer-encoding so the backend sees a plain content-length body.
+            const forwardHeaders: Record<string, string | string[]> = {};
+            for (const [k, v] of Object.entries(req.headers)) {
+              if (k === 'transfer-encoding') continue; // let Node handle framing
+              if (v !== undefined) forwardHeaders[k] = v as string | string[];
+            }
+            forwardHeaders['host'] = target.host;
+            forwardHeaders['connection'] = 'keep-alive';
+
             const proxyReq = http.request(
               {
                 hostname: target.hostname,
-                port: Number(target.port) || 8000,
+                port: Number(target.port) || (target.protocol === 'https:' ? 443 : 80),
                 path: '/api/upload',
                 method: 'POST',
-                headers: { ...req.headers, host: target.host },
+                headers: forwardHeaders,
+                timeout: 3600000,
               },
               (proxyRes) => {
+                console.log(`[Upload Proxy] Backend responded: ${proxyRes.statusCode}`);
                 res.writeHead(proxyRes.statusCode ?? 502, proxyRes.headers);
                 proxyRes.pipe(res, { end: true });
               }
             );
+
             proxyReq.on('error', (err) => {
-              console.error('[Upload Direct Proxy] Error:', err.message);
+              console.error('[Upload Proxy] Backend connection error:', err.message);
               if (!res.headersSent) {
                 res.writeHead(502, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ detail: `Upload proxy error: ${err.message}` }));
+                res.end(JSON.stringify({ detail: `Upload failed: cannot reach backend at ${backendTarget}. Is the server running? (${err.message})` }));
               }
             });
+
+            proxyReq.on('timeout', () => {
+              console.error('[Upload Proxy] Request timed out after 1 hour');
+              proxyReq.destroy();
+            });
+
+            // Pipe raw request stream straight to backend — zero buffering
             req.pipe(proxyReq, { end: true });
           });
 

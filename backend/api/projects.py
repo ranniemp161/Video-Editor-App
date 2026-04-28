@@ -98,28 +98,49 @@ async def upload_video(
         logger.info(f"🚀 Direct Binary Stream Started: {filename} (ID: {project_id})")
         
         bytes_received = 0
+        chunks_count = 0
         max_bytes = settings.max_upload_size_mb * 1024 * 1024
         
         with open(final_path, "wb") as buffer:
             async for chunk in request.stream():
-                bytes_received += len(chunk)
+                chunk_len = len(chunk)
+                bytes_received += chunk_len
+                chunks_count += 1
+                
                 if bytes_received > max_bytes:
+                    logger.error(f"❌ Upload failed: File too large ({bytes_received} > {max_bytes})")
                     buffer.close()
                     os.remove(final_path)
                     shutil.rmtree(project_dir, ignore_errors=True)
                     raise HTTPException(status_code=413, detail=f"File exceeds {settings.max_upload_size_mb}MB limit.")
+                
                 buffer.write(chunk)
+                
+                # Log progress every 50MB
+                if chunks_count % 50 == 0:
+                    logger.info(f"📥 Uploading {project_id}: {bytes_received / (1024*1024):.1f}MB received...")
             
+        logger.info(f"✅ Stream binary write complete: {project_id} ({bytes_received} bytes in {chunks_count} chunks)")
+
         # 5. Save to database
-        db_project = Project(
-            id=project_id,
-            mediaPath=final_path,
-            duration=0.0,
-            originalFileName=filename,
-            createdAt=time.time()
-        )
-        db.add(db_project)
-        db.commit()
+        try:
+            db_project = Project(
+                id=project_id,
+                mediaPath=final_path,
+                duration=0.0,
+                originalFileName=filename,
+                createdAt=time.time()
+            )
+            db.add(db_project)
+            db.commit()
+            logger.info(f"💾 Database record created for project {project_id}")
+        except Exception as db_err:
+            logger.error(f"❌ Database error during project creation: {db_err}")
+            db.rollback()
+            if os.path.exists(final_path):
+                os.remove(final_path)
+            shutil.rmtree(project_dir, ignore_errors=True)
+            raise HTTPException(status_code=500, detail=f"Database error: {str(db_err)}")
         
         logger.info(f"✅ Stream complete: {project_id} ({bytes_received} bytes)")
 
@@ -182,9 +203,27 @@ def _generate_proxy(project_id: str, original_path: str, proxy_path: str):
             db.close()
 
     except subprocess.CalledProcessError as e:
-        logger.error(f"[Proxy] FFmpeg failed for {project_id}: {e.stderr.decode()}")
+        error_msg = e.stderr.decode(errors="replace")[:500]
+        logger.error(f"[Proxy] FFmpeg failed for {project_id}: {error_msg}")
+        db = SessionLocal()
+        try:
+            project = db.query(Project).filter(Project.id == project_id).first()
+            if project:
+                project.proxyError = f"FFmpeg error: {error_msg}"
+                db.commit()
+        finally:
+            db.close()
     except Exception as e:
-        logger.error(f"[Proxy] Unexpected error for {project_id}: {e}")
+        error_msg = str(e)[:500]
+        logger.error(f"[Proxy] Unexpected error for {project_id}: {error_msg}")
+        db = SessionLocal()
+        try:
+            project = db.query(Project).filter(Project.id == project_id).first()
+            if project:
+                project.proxyError = error_msg
+                db.commit()
+        finally:
+            db.close()
 
 
 @router.get("/project/{project_id}/proxy-status")
@@ -193,6 +232,9 @@ def get_proxy_status(project_id: str, db: Session = Depends(get_db)):
     db_project = db.query(Project).filter(Project.id == project_id).first()
     if not db_project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    if db_project.proxyError:
+        return {"ready": False, "proxySrc": None, "error": db_project.proxyError}
 
     if db_project.proxyReady and db_project.proxyPath:
         proxy_filename = os.path.basename(db_project.proxyPath)

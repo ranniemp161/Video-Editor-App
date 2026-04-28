@@ -34,10 +34,8 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             duration: 0,
         };
 
-        const dummyVideo = document.createElement('video');
-        dummyVideo.src = asset.src!;
-        dummyVideo.onloadedmetadata = () => {
-            asset.duration = dummyVideo.duration;
+        const startXhrUpload = (duration: number) => {
+            asset.duration = duration;
             asset.isUploading = true;
             asset.uploadProgress = 0;
             setAssets([asset]);
@@ -45,7 +43,7 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             // Ironclad: Direct binary upload (no FormData overhead)
             const xhr = new XMLHttpRequest();
             const uploadUrl = `${API_BASE}/upload`;
-            
+
             console.log(`[Upload] Starting direct binary stream for: ${file.name} to ${uploadUrl}`);
 
             xhr.upload.onprogress = (event) => {
@@ -70,15 +68,41 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                                     remoteSrc: data.filePath,
                                     isUploading: false,
                                     uploadProgress: 100,
-                                    isGeneratingProxy: true  // proxy starts generating now
+                                    isGeneratingProxy: true
                                 } : a
                             ));
 
-                            // Poll until the 480p proxy is ready, then switch preview to it
+                            // Poll until the 480p proxy is ready, then switch preview to it.
+                            // Stop after 6 minutes (120 × 3s) to avoid infinite polling on FFmpeg failure.
+                            let pollCount = 0;
+                            const maxPolls = 120;
                             const pollProxy = setInterval(async () => {
+                                pollCount++;
+                                if (pollCount > maxPolls) {
+                                    clearInterval(pollProxy);
+                                    setAssets(prev => prev.map(a =>
+                                        a.id === asset.id ? { ...a, isGeneratingProxy: false } : a
+                                    ));
+                                    showToast('error', 'Proxy generation timed out. The file was uploaded but preview encoding failed — check server logs.');
+                                    return;
+                                }
                                 try {
-                                    const res = await fetch(`${API_BASE}/project/${data.projectId}/proxy-status`);
+                                    const res = await fetch(`${API_BASE}/project/${data.projectId}/proxy-status`, {
+                                        headers: getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}
+                                    });
+                                    if (!res.ok) {
+                                        console.error(`[Proxy] Status check returned ${res.status}`);
+                                        return;
+                                    }
                                     const status = await res.json();
+                                    if (status.error) {
+                                        clearInterval(pollProxy);
+                                        setAssets(prev => prev.map(a =>
+                                            a.id === asset.id ? { ...a, isGeneratingProxy: false } : a
+                                        ));
+                                        showToast('error', `Proxy generation failed: ${status.error}`);
+                                        return;
+                                    }
                                     if (status.ready && status.proxySrc) {
                                         clearInterval(pollProxy);
                                         setAssets(prev => prev.map(a =>
@@ -94,7 +118,7 @@ export const useProjectManagement = (state: TimelineStateHook) => {
                                 } catch (e) {
                                     console.error('[Proxy] Poll error:', e);
                                 }
-                            }, 3000); // check every 3 seconds
+                            }, 3000);
                         } else {
                             throw new Error(data.error || 'Server logic failed');
                         }
@@ -113,7 +137,7 @@ export const useProjectManagement = (state: TimelineStateHook) => {
             };
 
             xhr.onerror = () => {
-                const detail = xhr.status ? `HTTP ${xhr.status}` : 'backend unreachable — check Docker logs';
+                const detail = xhr.status ? `HTTP ${xhr.status}` : 'backend unreachable — check Docker/server logs';
                 console.error("[Upload] Network Error", { status: xhr.status, response: xhr.responseText });
                 showToast('error', `Upload failed: network error (${detail})`);
                 setAssets(prev => prev.map(a => a.id === asset.id ? { ...a, isUploading: false } : a));
@@ -121,15 +145,56 @@ export const useProjectManagement = (state: TimelineStateHook) => {
 
             xhr.timeout = 3600000; // 1 hour
             xhr.open('POST', uploadUrl);
-            
+
             const token = getAuthToken();
             if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-            
+
             // Critical metadata in headers
             xhr.setRequestHeader('x-file-name', encodeURIComponent(file.name));
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-            
+
             xhr.send(file); // Send raw file binary
+        };
+
+        // Read video duration before uploading. If the browser can't parse metadata
+        // (unsupported codec, audio-only file, or large file with slow seek), we fall
+        // back and start the upload anyway after a 5-second timeout so the upload is
+        // never silently swallowed.
+        const dummyVideo = document.createElement('video');
+        dummyVideo.preload = 'metadata';
+        dummyVideo.src = asset.src!;
+
+        let metadataHandled = false;
+
+        const metadataTimeout = setTimeout(() => {
+            if (metadataHandled) return;
+            metadataHandled = true;
+            dummyVideo.onloadedmetadata = null;
+            dummyVideo.onerror = null;
+            dummyVideo.src = '';
+            console.warn('[Upload] onloadedmetadata timed out — starting upload without duration');
+            showToast('error', 'Could not read video duration — uploading anyway.');
+            startXhrUpload(0);
+        }, 5000);
+
+        dummyVideo.onloadedmetadata = () => {
+            if (metadataHandled) return;
+            metadataHandled = true;
+            clearTimeout(metadataTimeout);
+            dummyVideo.onerror = null;
+            const duration = isFinite(dummyVideo.duration) ? dummyVideo.duration : 0;
+            startXhrUpload(duration);
+        };
+
+        dummyVideo.onerror = () => {
+            if (metadataHandled) return;
+            metadataHandled = true;
+            clearTimeout(metadataTimeout);
+            dummyVideo.onloadedmetadata = null;
+            dummyVideo.src = '';
+            console.warn('[Upload] dummyVideo error — starting upload without duration', dummyVideo.error?.message);
+            showToast('error', `Browser could not decode video metadata — uploading anyway.`);
+            startXhrUpload(0);
         };
     }, [setAssets, setProjectId]);
 

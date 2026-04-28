@@ -15,6 +15,7 @@ class Project(Base):
     createdAt = Column(Float)  # Timestamp
     proxyPath = Column(String, nullable=True)   # Path to 480p proxy file
     proxyReady = Column(Boolean, default=False)  # True when proxy is generated
+    proxyError = Column(String, nullable=True)   # FFmpeg error message if proxy failed
 
     segments = relationship("Segment", back_populates="project", cascade="all, delete-orphan")
     rough_cut_result = relationship("RoughCutResult", back_populates="project", cascade="all, delete-orphan", uselist=False)

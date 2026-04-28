@@ -41,6 +41,20 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+def run_migrations():
+    """Apply lightweight schema migrations for new columns on existing tables."""
+    with engine.connect() as conn:
+        # Add proxyError column if it doesn't exist (introduced after initial release)
+        try:
+            conn.execute(__import__('sqlalchemy').text(
+                "ALTER TABLE projects ADD COLUMN proxyError TEXT"
+            ))
+            conn.commit()
+            logger.info("Migration: added proxyError column to projects table")
+        except Exception:
+            pass  # Column already exists — safe to ignore
+
+
 def get_db():
     """Dependency to get database session."""
     db = SessionLocal()
