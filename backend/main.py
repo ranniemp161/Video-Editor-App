@@ -45,24 +45,41 @@ if settings.app_password == "MISSING_IN_ENV" or settings.jwt_secret == "MISSING_
 # ML Scheduler instance
 scheduler = MLScheduler()
 
+def _periodic_cleanup():
+    """Run upload-directory cleanup every hour in a background thread."""
+    import time, threading
+    def loop():
+        while True:
+            time.sleep(3600)
+            db = SessionLocal()
+            try:
+                cleanup_orphaned_files(db)
+            except Exception as e:
+                logger.error(f"Periodic cleanup error: {e}")
+            finally:
+                db.close()
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application startup and shutdown events."""
-    # Startup
+    # Startup: clean up any orphaned upload dirs left by crashes or failed deletes
     db = SessionLocal()
     try:
         cleanup_orphaned_files(db)
     finally:
         db.close()
-        
+
+    _periodic_cleanup()  # also runs every hour while server is up
+
     try:
-        # Start ML Scheduler (checks every hour)
         scheduler.start(interval_seconds=3600)
     except Exception as e:
         logger.error(f"Failed to start ML scheduler: {e}")
-        
+
     yield
-    
+
     # Shutdown
     if scheduler:
         scheduler.stop()

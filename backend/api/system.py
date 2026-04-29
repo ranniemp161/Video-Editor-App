@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 import logging
 import os
 import shutil
+import time
 from sqlalchemy.orm import Session
 from db import get_db, Project, Segment, RoughCutResult
 from core.config import settings
@@ -53,6 +54,70 @@ async def reset_system(request: Request, db: Session = Depends(get_db)):
         logger.error(f"System reset failed: {e}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Reset failed: {str(e)}")
+
+@router.post("/purge-all-uploads")
+def purge_all_uploads(db: Session = Depends(get_db)):
+    """
+    Delete every project directory AND every DB record. Equivalent to WIPE STORAGE
+    but keeps the database structure intact. Use this to clear all residue left by
+    the old delete bug (missing auth headers meant backend never ran deletions).
+    """
+    upload_dir = str(settings.upload_dir)
+    removed_dirs = []
+    if os.path.exists(upload_dir):
+        for name in os.listdir(upload_dir):
+            item_path = os.path.join(upload_dir, name)
+            try:
+                if os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
+                else:
+                    os.remove(item_path)
+                removed_dirs.append(name)
+            except Exception as e:
+                logger.error(f"[Purge] Failed to remove {name}: {e}")
+
+    db.query(RoughCutResult).delete()
+    db.query(Segment).delete()
+    db.query(Project).delete()
+    db.commit()
+    logger.info(f"[Purge] Cleared {len(removed_dirs)} upload directories and all DB records")
+    return {"success": True, "removed_dirs": len(removed_dirs)}
+
+
+@router.post("/cleanup-orphans")
+def cleanup_orphans(db: Session = Depends(get_db)):
+    """
+    Scan public/uploads/ and delete any project directories that have no
+    matching record in the database (orphaned files left by failed/cancelled
+    deletes or crashes). Safe to call at any time — only removes dirs that
+    are both DB-orphaned AND older than 10 minutes.
+    """
+    upload_dir = str(settings.upload_dir)
+    if not os.path.exists(upload_dir):
+        return {"removed": [], "kept": []}
+
+    valid_ids = {p.id for p in db.query(Project.id).all()}
+    now = time.time()
+    removed = []
+    kept = []
+
+    for name in os.listdir(upload_dir):
+        item_path = os.path.join(upload_dir, name)
+        if not os.path.isdir(item_path):
+            continue
+        age_minutes = (now - os.path.getmtime(item_path)) / 60
+        if name not in valid_ids and age_minutes > 10:
+            try:
+                shutil.rmtree(item_path)
+                removed.append(name)
+                logger.info(f"[Cleanup] Removed orphaned directory: {name}")
+            except Exception as e:
+                logger.error(f"[Cleanup] Failed to remove {name}: {e}")
+        else:
+            kept.append(name)
+
+    return {"removed": removed, "kept": kept, "removed_count": len(removed)}
+
 
 @router.get("/ml-status")
 def get_ml_status(request: Request):

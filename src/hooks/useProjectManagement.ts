@@ -26,10 +26,15 @@ export const useProjectManagement = (state: TimelineStateHook) => {
         const file = files[0];
         if (!file) return;
 
+        // Determine type by extension when the browser reports an empty or generic MIME type
+        // (common for .mkv, .ts, .hevc, and other containers the OS doesn't register).
+        const audioExts = /\.(mp3|wav|aac|flac|ogg|m4a|opus|wma)$/i;
+        const assetType = audioExts.test(file.name) ? 'audio' : 'video';
+
         const asset: Asset = {
             id: `asset-${Date.now()}`,
             name: file.name,
-            type: file.type.startsWith('video') ? 'video' : 'audio',
+            type: assetType,
             src: URL.createObjectURL(file),
             duration: 0,
         };
@@ -203,37 +208,36 @@ export const useProjectManagement = (state: TimelineStateHook) => {
 
         console.log("Resetting project...", { projectId });
 
-        try {
-            if (projectId) {
-                const res = await fetch(`${API_BASE}/project/${projectId}`, { method: 'DELETE' });
-                if (!res.ok) {
-                    console.warn("Backend project deletion failed or returned error, but proceeding with local reset.");
-                }
-            }
-        } catch (e) {
-            console.error("Failed to delete project on backend", e);
-        } finally {
-            // ALWAYS clear local state
-            setProjectId(null);
-            setSegments([]);
-            setAssets([]);
-            setTimeline({
-                tracks: [
-                    { id: 'v1', type: 'video', clips: [], muted: false, locked: false },
-                    { id: 'v2', type: 'video', clips: [], muted: false, locked: false },
-                    { id: 'a1', type: 'audio', clips: [], muted: false, locked: false },
-                ]
-            });
-            setPlayheadPosition(0);
-            setSelectedClipIds([]);
-            setPast([]);
-            setFuture([]);
-            localStorage.removeItem('currentProjectId');
+        // Remove from localStorage FIRST so the restore useEffect can't race and
+        // read the old ID back after setProjectId(null) triggers it.
+        localStorage.removeItem('currentProjectId');
 
-            // Give React a moment to update state before reloading
-            setTimeout(() => {
-                window.location.reload();
-            }, 100);
+        // Reset the init guards so a future upload can re-run fetchProject normally.
+        hasInitializedRef.current = false;
+        hasRestoredRef.current = false;
+
+        // Clear all React state immediately — the UI empties right away, no reload needed.
+        setProjectId(null);
+        setSegments([]);
+        setAssets([]);
+        setTimeline({
+            tracks: [
+                { id: 'v1', type: 'video', clips: [], muted: false, locked: false },
+                { id: 'v2', type: 'video', clips: [], muted: false, locked: false },
+                { id: 'a1', type: 'audio', clips: [], muted: false, locked: false },
+            ]
+        });
+        setPlayheadPosition(0);
+        setSelectedClipIds([]);
+        setPast([]);
+        setFuture([]);
+
+        // Best-effort backend delete — fire and forget, don't block the UI.
+        if (projectId) {
+            fetch(`${API_BASE}/project/${projectId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders(),
+            }).catch(e => console.warn("Backend project deletion failed (non-blocking):", e));
         }
     }, [projectId, setProjectId, setSegments, setAssets, setTimeline, setPlayheadPosition, setSelectedClipIds, setPast, setFuture]);
 

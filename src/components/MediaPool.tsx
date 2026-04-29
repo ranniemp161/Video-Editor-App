@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Asset } from '../types';
 import { AddIcon, MediaIcon, EffectsIcon, FilmIcon } from './icons';
 
@@ -7,6 +7,74 @@ interface MediaPoolProps {
   onAddToTimeline: (asset: Asset) => void;
   onMediaUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+const AssetThumbnail: React.FC<{ asset: Asset; onAddToTimeline: (a: Asset) => void }> = ({ asset, onAddToTimeline }) => {
+  const [thumbError, setThumbError] = useState(false);
+
+  // Prefer the H.264 proxy for thumbnail; fall back to blob src
+  const thumbSrc = asset.proxySrc || (!thumbError ? asset.src : null);
+  const isTranscoding = asset.isGeneratingProxy || (thumbError && !asset.proxySrc);
+
+  return (
+    <div
+      onClick={() => onAddToTimeline(asset)}
+      className="group relative aspect-video bg-white/[0.03] rounded-xl overflow-hidden cursor-pointer border border-white/[0.05] hover:border-[#26c6da]/50 transition-all duration-300 shadow-lg active:scale-[0.98]"
+    >
+      {asset.isUploading ? (
+        /* Upload in progress */
+        <div className="w-full h-full relative">
+          {asset.src && <video src={asset.src} className="w-full h-full object-cover opacity-30" />}
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-3 bg-black/60 backdrop-blur-[2px]">
+            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-[#26c6da] h-full transition-all duration-300 shadow-[0_0_10px_rgba(38,198,218,0.5)]"
+                style={{ width: `${asset.uploadProgress || 0}%` }}
+              />
+            </div>
+            <span className="text-[10px] font-bold text-[#fafafa] uppercase tracking-wider animate-pulse">
+              Uploading {asset.uploadProgress || 0}%
+            </span>
+          </div>
+        </div>
+      ) : isTranscoding ? (
+        /* Codec unsupported or proxy still generating — show spinner */
+        <div className="w-full h-full flex flex-col items-center justify-center bg-violet-950/20 gap-2">
+          <svg style={{ width: 20, height: 20, color: '#a78bfa', animation: 'spin 1.2s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+          <span className="text-[8px] font-bold text-violet-400 uppercase tracking-widest text-center px-2">Transcoding…</span>
+          <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+        </div>
+      ) : thumbSrc ? (
+        /* Normal thumbnail */
+        <div className="w-full h-full relative">
+          <video
+            src={thumbSrc}
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+            onError={() => { if (!asset.proxySrc) setThumbError(true); }}
+            onLoadedData={(e) => {
+              const v = e.currentTarget;
+              requestAnimationFrame(() => {
+                if (v.videoWidth === 0 && !asset.proxySrc) setThumbError(true);
+              });
+            }}
+          />
+          <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-md px-1 rounded text-[9px] text-gray-300 font-mono">
+            {Math.floor(asset.duration)}s
+          </div>
+        </div>
+      ) : (
+        /* Truly offline */
+        <div className="w-full h-full flex items-center justify-center bg-red-900/10">
+          <span className="text-[9px] text-red-500 font-bold tracking-tighter uppercase">OFFLINE</span>
+        </div>
+      )}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <p className="text-[10px] text-gray-200 font-medium truncate">{asset.name}</p>
+      </div>
+    </div>
+  );
+};
 
 export const MediaPoolComponent: React.FC<MediaPoolProps> = ({ assets, onAddToTimeline, onMediaUpload }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +101,7 @@ export const MediaPoolComponent: React.FC<MediaPoolProps> = ({ assets, onAddToTi
             ref={fileInputRef}
             onChange={onMediaUpload}
             className="hidden"
-            accept="video/*"
+            accept="video/*,.mkv,.avi,.mov,.wmv,.flv,.webm,.mp4,.m4v,.mpeg,.mpg,.3gp,.ts,.mts,.m2ts,.vob,.ogv,.hevc,.h265,.h264"
             multiple
           />
           <div
@@ -54,44 +122,7 @@ export const MediaPoolComponent: React.FC<MediaPoolProps> = ({ assets, onAddToTi
             </div>
             <div className="grid grid-cols-2 gap-2">
               {assets.map((asset) => (
-                <div
-                  key={asset.id}
-                  onClick={() => onAddToTimeline(asset)}
-                  className="group relative aspect-video bg-white/[0.03] rounded-xl overflow-hidden cursor-pointer border border-white/[0.05] hover:border-[#26c6da]/50 transition-all duration-300 shadow-lg active:scale-[0.98]"
-                >
-                  {asset.src ? (
-                    <div className="w-full h-full relative">
-                      <video
-                        src={asset.src}
-                        className={`w-full h-full object-cover transition-opacity ${asset.isUploading ? 'opacity-40' : 'opacity-80 group-hover:opacity-100'}`}
-                      />
-                      {asset.isUploading ? (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-3 bg-black/40 backdrop-blur-[2px]">
-                          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-2">
-                            <div
-                              className="bg-[#26c6da] h-full transition-all duration-300 shadow-[0_0_10px_rgba(38,198,218,0.5)]"
-                              style={{ width: `${asset.uploadProgress || 0}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-[10px] font-bold text-[#fafafa] uppercase tracking-wider animate-pulse">
-                            Uploading {asset.uploadProgress || 0}%
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="absolute top-1 right-1 bg-black/60 backdrop-blur-md px-1 rounded text-[9px] text-gray-300 font-mono">
-                          {Math.floor(asset.duration)}s
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-red-900/10">
-                      <span className="text-[9px] text-red-500 font-bold tracking-tighter uppercase">OFFLINE</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-[10px] text-gray-200 font-medium truncate">{asset.name}</p>
-                  </div>
-                </div>
+                <AssetThumbnail key={asset.id} asset={asset} onAddToTimeline={onAddToTimeline} />
               ))}
             </div>
           </div>

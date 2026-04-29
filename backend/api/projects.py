@@ -23,39 +23,56 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 def cleanup_orphaned_files(db: Session):
-    """Delete files in UPLOAD_DIR that are not referenced in the database."""
+    """
+    Two-pass cleanup:
+    1. Remove upload directories that have no matching DB record (crashed uploads).
+    2. Remove DB records whose upload directory no longer exists — "zombie" projects
+       left by the old delete bug where the frontend cleared localStorage but the
+       backend DELETE returned 401 (missing auth header) and never ran.
+    """
     try:
-        # Get all valid project IDs
-        valid_project_ids = {p.id for p in db.query(Project).all()}
-        
+        projects = db.query(Project).all()
+        valid_project_ids = {p.id for p in projects}
         now = time.time()
-        
-        if not os.path.exists(UPLOAD_DIR):
-            return
 
-        for item in os.listdir(UPLOAD_DIR):
-            item_path = os.path.join(UPLOAD_DIR, item)
-            
-            # Handle project directories (named by UUID)
-            if os.path.isdir(item_path):
-                # Check if directory name (UUID) is a valid project ID
-                if item not in valid_project_ids and (now - os.path.getmtime(item_path)) > 600:
-                    logger.info(f"Cleaning up orphaned project directory: {item}")
+        # --- Pass 1: directories with no DB record ---
+        if os.path.exists(UPLOAD_DIR):
+            for item in os.listdir(UPLOAD_DIR):
+                item_path = os.path.join(UPLOAD_DIR, item)
+                if os.path.isdir(item_path):
+                    if item not in valid_project_ids and (now - os.path.getmtime(item_path)) > 600:
+                        logger.info(f"[Cleanup] Removing orphaned directory: {item}")
+                        try:
+                            shutil.rmtree(item_path)
+                        except Exception as e:
+                            logger.error(f"[Cleanup] Failed to remove directory {item}: {e}")
+                    continue
+                # Stale root-level files
+                if (now - os.path.getmtime(item_path)) > 3600:
+                    logger.info(f"[Cleanup] Removing stale root file: {item}")
                     try:
-                        shutil.rmtree(item_path)
-                    except Exception as e:
-                        logger.error(f"Failed to delete directory {item}: {e}")
-                continue
-            
-            # Handle legacy flat files or other junk
-            if (now - os.path.getmtime(item_path)) > 3600: # 1 hour grace for root files
-                 logger.info(f"Cleaning up old root file: {item}")
-                 try:
-                    os.remove(item_path)
-                 except Exception:
-                    pass
+                        os.remove(item_path)
+                    except Exception:
+                        pass
+
+        # --- Pass 2: DB records whose upload directory is gone (zombie projects) ---
+        for project in projects:
+            project_dir = os.path.join(UPLOAD_DIR, project.id)
+            if not os.path.exists(project_dir):
+                logger.info(f"[Cleanup] Removing zombie DB record: {project.id} (upload dir missing)")
+                try:
+                    db.query(DBSegment).filter(DBSegment.projectId == project.id).delete()
+                    db.delete(project)
+                except Exception as e:
+                    logger.error(f"[Cleanup] Failed to delete zombie record {project.id}: {e}")
+        db.commit()
+
     except Exception as e:
         logger.error(f"Orphan cleanup failed: {e}")
+        try:
+            db.rollback()
+        except Exception:
+            pass
 
 
 import re
@@ -174,15 +191,26 @@ def _generate_proxy(project_id: str, original_path: str, proxy_path: str):
 
     logger.info(f"[Proxy] Starting 480p transcode for project {project_id}")
     try:
+        # -vf scale=-2:480  → 480p, width divisible by 2 (required by libx264)
+        # -profile:v baseline -level 3.0 → widest browser support (Safari iOS, old Android)
+        # -pix_fmt yuv420p → some inputs (ProRes, 10-bit HEVC) use non-standard pixel formats
+        #                    that libx264 baseline can't encode; yuv420p forces compatible output
+        # -movflags +faststart → moov atom at front, browser can play before full download
         cmd = [
             "ffmpeg", "-y",
             "-i", original_path,
             "-vf", "scale=-2:480",
-            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "35",
+            "-c:v", "libx264",
+            "-profile:v", "baseline",
+            "-level", "3.0",
+            "-pix_fmt", "yuv420p",
+            "-preset", "ultrafast", "-crf", "35",
             "-c:a", "aac", "-b:a", "64k",
+            "-movflags", "+faststart",
             proxy_path
         ]
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        logger.info(f"[Proxy] FFmpeg stderr: {result.stderr.decode(errors='replace')[-500:]}")
         logger.info(f"[Proxy] Transcode complete: {proxy_path}")
 
         # Delete the original to free disk space
